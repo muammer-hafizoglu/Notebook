@@ -105,7 +105,7 @@ namespace Notebook.Web.Controllers
         #region CRUD
 
         [Route("~/{id?}/folder/{title}")]
-        public IActionResult Detail(string id = "", string list = "")
+        public IActionResult Detail(string id = "")
         {
             FolderDetailModel detail = null;
 
@@ -113,7 +113,6 @@ namespace Notebook.Web.Controllers
             if (_folder != null)
             {
                 detail = new FolderDetailModel();
-
                 detail.ID = _folder.ID;
                 detail.Name = _folder.Name;
                 detail.Explanation = _folder.Explanation;
@@ -122,9 +121,13 @@ namespace Notebook.Web.Controllers
                 detail.OwnerID = _folder.OwnerID;
                 detail.OwnerName = _folder.Owner.Name;
                 detail.NoteCount = _folderNoteManager.getMany(a => a.FolderID == _folder.ID).Count();
-                detail.UserCount = _userFolderManager.getMany(a => a.FolderID == _folder.ID).Count();
 
-                detail.List = list;
+                var _group = _groupManager.getOne(a => a.ID == TempData["GroupID"].ToString());
+                if (_group != null)
+                {
+                    detail.GroupID = _group.ID;
+                    detail.GroupName = _group.Name;
+                }
             }
 
             return View(detail);

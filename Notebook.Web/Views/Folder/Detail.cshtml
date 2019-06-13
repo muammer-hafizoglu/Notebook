@@ -8,6 +8,15 @@
 
 @if (Model != null)
 {
+    TempData["GroupID"] = @Model.GroupID;
+
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>
+        <li><a href="/@Model.GroupID/group">@Model.GroupName</a></li>
+        <li class="active">@Model.Name</li>
+    </ol>
+
     <div class="row">
         <div class="col-md-3">
 
@@ -35,9 +44,6 @@
                         <li class="list-group-item">
                             <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <span class="pull-right">@Model.NoteCount</span>
                         </li>
-                        <li class="list-group-item">
-                            <i class="fa fa-users"></i>&nbsp;@Localizer["Members"] <span class="pull-right">@Model.UserCount</span>
-                        </li>
                     </ul>
 
                     @if (Model.OwnerID == _activeUser.ID)
@@ -60,17 +66,12 @@
         <!-- /.col -->
         <div class="col-md-9">
             <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs">
+                @*<ul class="nav nav-tabs">
                     <li @((Model.List == "" || Model.List == "notes") ? "class=active" : "")><a href="/folder/@Model.ID/notes"><i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"]</a></li>
                     <li @((Model.List == "users") ? "class=active" : "")><a href="/folder/@Model.ID/users"><i class="fa fa-users"></i>&nbsp;@Localizer["Users"]</a></li>
-                </ul>
+                </ul>*@
                 <div class="tab-content">
-                    @if (Model.List == "users")
-                    {
-                        await Html.RenderPartialAsync("users", Model.ID);
-                    }
-                    else
-                    {
+                    @{ 
                         await Html.RenderPartialAsync("Notes", Model.ID);
                     }
                 </div>

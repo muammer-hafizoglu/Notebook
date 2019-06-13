@@ -284,10 +284,16 @@ table.dataTable thead .sorting_desc {
     margin-bottom:0;
 }
 
+
+
 @media (min-width: 768px) {
     .n-modal-content {
         width: 500px;
         margin-top:60px;
+    }
+
+    .n-modal-lg {
+        width:1170px;
     }
 }
 /*----------------End Notebook Modal-----------------------*/

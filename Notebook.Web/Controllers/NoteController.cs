@@ -196,7 +196,7 @@ namespace Notebook.Web.Controllers
             if (!string.IsNullOrEmpty(groupId)) TempData["GroupID"] = groupId;
             if (!string.IsNullOrEmpty(folderId)) TempData["FolderID"] = folderId;
 
-            return View(_note);
+            return PartialView(_note);
         }
 
         [HttpPost]
@@ -214,8 +214,6 @@ namespace Notebook.Web.Controllers
             _userNoteManager.Add(new UserNote { User = _user, Note = _note, CreateDate = DateTime.Now, Member = Member.Owner });
             _userNoteManager.Save();
 
-            string _url = "/profile/notes";
-
             // Group-Note
             if (TempData["GroupID"] != null)
             {
@@ -224,9 +222,6 @@ namespace Notebook.Web.Controllers
                 {
                     _groupNoteManager.Add(new GroupNote { Group = _group, Note = _note, CreateDate = DateTime.Now });
                     _groupNoteManager.Save();
-
-                    _url = string.Format("/{0}/group/notes", _group.ID);
-                    TempData["GroupID"] = null;
                 }
             }
 
@@ -238,15 +233,12 @@ namespace Notebook.Web.Controllers
                 {
                     _folderNoteManager.Add(new FolderNote { Folder = _folder, Note = _note, CreateDate = DateTime.Now });
                     _folderNoteManager.Save();
-
-                    _url = string.Format("/{0}/folder/notes", _folder.ID);
-                    TempData["FolderID"] = null;
                 }
             }
 
             TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
-            return Redirect(_url);
+            return Redirect(TempData["BeforeUrl"].ToString());
         }
 
         [HttpPost]

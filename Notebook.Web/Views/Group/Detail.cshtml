@@ -10,6 +10,8 @@
 
 @if (Model != null)
 {
+    TempData["GroupID"] = Model.ID;
+
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
         <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>

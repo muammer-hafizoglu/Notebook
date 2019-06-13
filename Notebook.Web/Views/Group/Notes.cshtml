@@ -8,7 +8,10 @@
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">@Localizer["Note List"]</h3>
-                <a class="btn btn-xs btn-success pull-right" href="/add-note?groupId=@Model">
+                @*<a class="btn btn-xs btn-success pull-right" href="/add-note?groupId=@Model">
+                    <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Add Note"]
+                </a>*@
+                <a class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-note">
                     <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Add Note"]
                 </a>
             </div>

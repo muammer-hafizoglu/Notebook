@@ -21,58 +21,17 @@
     }
 </style>
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="box box-primary">
-            <div class="box-body box-profile">
-                <p class="text-center">
-                    <i class="fa fa-file-text-o" style="font-size:70px;"></i>
-                </p>
+<div id="modal" class="n-modal" role="dialog">
+    <div class="n-modal-dialog">
+        <form action="@(Model != null ? "/editNote" : "/addNote")" method="post">
+            @Html.AntiForgeryToken()
 
-                <h3 class="text-center box-title">@(Model != null ? Localizer["Edit Note"] : Localizer["Add Note"])</h3>
-
-                @*<p class="text-muted text-center">@Model.Explanation</p><br />
-                <ul class="list-group list-group-unbordered" style="color:#3D8CBC;">
-                    <li class="list-group-item">
-                        <i class="fa fa-user"></i>&nbsp;@Localizer["Autor"]
-                        <a href="/@Model.OwnerID/profile/groups" class="pull-right" style="font-weight:bold; color:darkblue">@Model.OwnerName</a>
-                    </li>
-                    <li class="list-group-item">
-                        <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <a class="pull-right">@Model.CreateDate.ToString("dddd, dd MMMM yyyy")</a>
-                    </li>
-                    <li class="list-group-item">
-                        <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Read Count"] <a class="pull-right">@Model.ReadCount</a>
-                    </li>
-                    <li class="list-group-item">
-                        <i class="fa fa-comment-o"></i>&nbsp;@Localizer["Comments"] <a class="pull-right">28</a>
-                    </li>
-                </ul>
-                <div class="text-center">
-                    @if (_user != null && Model.OwnerID == _user.ID)
-                    {
-                        <a href="/@Model.ID/edit-note" class="btn btn-primary"><b>@Localizer["Edit"]</b></a>
-                        <a class="btn btn-danger" data-type="redirect" data-url="@TempData["BeforeUrl"]" data-method="post" data-action="@Model.ID/delete-note" data-confirm="@Localizer["Are you sure you want to delete"]?"><b>@Localizer["Remove"]</b></a>
-                    }
-                    else
-                    {
-                        <a href="#" class="btn btn-primary"><b>Follow</b></a>
-                        <a href="#" class="btn btn-success"><b>Message</b></a>
-                    }
-                </div>*@
-            </div>
-        </div>
-    </div>
-    <div class="col-md-9">
-        <div class="box">
-            @*<div class="box-header">
-                <div class="box-title">
-                    <i class="fa fa-file-text-o"></i>&nbsp;&nbsp;@(Model != null ? Localizer["Edit Note"] : Localizer["Add Note"])
+            <div class="n-modal-content n-modal-lg">
+                <div class="n-modal-header">
+                    <button type="button" class="close" onclick="closeModal()">&times;</button>
+                    <label class="n-modal-title">@(Model != null ? Localizer["Edit Note"] : Localizer["Add Note"])</label>
                 </div>
-            </div>*@
-            <form action="@(Model != null ? "/editNote" : "/addNote")" method="post">
-                @Html.AntiForgeryToken()
-
-                <div class="box-body">
+                <div class="n-modal-body">
                     <div class="form-group">
                         @Html.HiddenFor(a => a.ID)
                         <input type="text" class="form-control" name="Title" required value="@(Model != null ? Model.Title : "")" placeholder="@Localizer["Title"]" />
@@ -98,22 +57,20 @@
                         }
                     </div>
                 </div>
-                <div class="box-footer">
+                <div class="n-modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>
                     <input type="submit" class="btn btn-success  btn-sm" value="@(Model != null ? Localizer["Update"] : Localizer["Add"])" />
-                    <a href="@TempData["Return"]" class="btn btn-default  btn-sm">@Localizer["Cancel"]</a>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 
-@section scripts{
-    <script src="/adminlte/components/summernote/summernote.min.js"></script>
-    <script>
-        $(".summernote").summernote({
-            height: 400,
-            placeholder: '@Localizer["Content"] ...'
-        });
-    </script>
-}
+<script src="/adminlte/components/summernote/summernote.min.js"></script>
+<script>
+    $(".summernote").summernote({
+        height: 400,
+        placeholder: '@Localizer["Content"] ...'
+    });
+</script>
