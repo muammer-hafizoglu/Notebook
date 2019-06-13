@@ -71,6 +71,19 @@
 <script>
     $(".summernote").summernote({
         height: 400,
-        placeholder: '@Localizer["Content"] ...'
+        placeholder: '@Localizer["Content"] ...',
+        toolbar: [
+            ['style', ['style']],
+            ['fontsize', ['fontsize']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'hr']],
+            ['view', ['fullscreen', 'codeview']],
+            ['help', ['help']]
+        ]
     });
 </script>

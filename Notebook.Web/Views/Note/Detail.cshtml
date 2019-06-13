@@ -8,6 +8,12 @@
 
 @if (Model != null)
 {
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>
+        <li class="active">@Model.Title</li>
+    </ol>
+
     <div class="row">
         <div class="col-md-3">
             <div class="box box-primary">
@@ -37,7 +43,7 @@
                     <div class="text-center">
                         @if (_user != null && Model.OwnerID == _user.ID)
                         {
-                            <a href="/@Model.ID/edit-note" class="btn btn-primary"><b>@Localizer["Edit"]</b></a>
+                            <a data-type="modal" data-action="@Model.ID/edit-note" class="btn btn-primary"><b>@Localizer["Edit"]</b></a>
                             <a class="btn btn-danger" data-type="redirect" data-url="@TempData["BeforeUrl"]" data-method="post" data-action="@Model.ID/delete-note" data-confirm="@Localizer["Are you sure you want to delete"]?"><b>@Localizer["Remove"]</b></a>
                         }
                         else

@@ -54,8 +54,13 @@ hr{
     border-radius: 3px;
 }
 
-.btn-default, .btn-default:hover{
-    background:none;
+/*--summernote---*/
+.note-group-select-from-files{
+    display:none !important;
+}
+
+.btn-default, .btn-default:hover {
+    background: none;
 }
 
 .btn-smx{
@@ -97,7 +102,7 @@ input[type=text]{
     padding:15px;
 }
 .box-header > .fa, .box-header > .glyphicon, .box-header > .ion, .box-header .box-title, .box-title {
-    font-size: 16px;
+    font-size: 14px;
     color: #3D8CBC;
     font-weight: bold;
 }
@@ -120,7 +125,7 @@ input[type=text]{
 table.dataTable a {
     font-weight: bold;
     color: #3D8CBC;
-    font-size:14px;
+    font-size:13px;
 }
 table.dataTable tbody th, table.dataTable tbody td {
     padding: 10px 10px;

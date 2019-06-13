@@ -73,7 +73,7 @@
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
                     <li @((Model.List == "" || Model.List == "folders") ? "class=active" : "")><a href="/@Model.ID/group/folders"><i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"]</a></li>
-                    <li @((Model.List == "notes") ? "class=active" : "")><a href="/@Model.ID/group/notes"><i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"]</a></li>
+                    <li @((Model.List == "notes") ? "class=active" : "")><a href="/@Model.ID/group/notes"><i class="fa fa-file-text-o"></i>&nbsp;@Localizer["All Notes"]</a></li>
                 </ul>
                 <div class="tab-content">
                     @if (Model.List == "notes")
