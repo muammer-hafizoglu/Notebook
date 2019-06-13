@@ -1,0 +1,50 @@
+﻿@model ObjectListModel
+
+@inject IViewLocalizer Localizer
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">@Localizer["Users List"]</h3>
+            </div>
+            <div class="box-body table-responsive">
+                <table class="table table-striped dataTable ">
+                    <thead  class="table-header">
+                        <tr>
+                            <th sr="true">@Localizer["Name"]</th>
+                            <th sr="true">@Localizer["Username"]</th>
+                            <th sr="true" class="not-mobile">@Localizer["Email"]</th>
+                            <th sr="true">@Localizer["State"]</th>
+                            <th sr="false"></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{ 
+
+    <script>
+        var table = $(".dataTable").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/Admin/UserList",
+                "type": "POST"
+            },
+            "columns": [
+                { "data": "name", },
+                { "data": "username" },
+                { "data": "email", "orderable": false, "className":"not-mobile" },
+                { "data": "state" },
+                { "data": "operations", "orderable": false }
+            ],
+            "language": {
+                "searchPlaceholder":"@Localizer["Search name or username"]"
+            }
+        });
+    </script>
+}

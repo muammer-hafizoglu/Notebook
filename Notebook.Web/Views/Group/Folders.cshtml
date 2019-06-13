@@ -1,0 +1,50 @@
+﻿@model string
+
+@inject IViewLocalizer Localizer
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">@Localizer["Folder List"]</h3>
+                <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?groupId=@Model">
+                    <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Add Folder"]
+                </button>
+            </div>
+            <div class="box-body table-responsive">
+                <table class="table table-striped dataTable">
+                    <thead class="table-header">
+                        <tr>
+                            <th>@Localizer["Name"]</th>
+                            <th>@Localizer["Content"]</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Script(
+    @<script>
+        var table = $(".dataTable").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ordering": false,
+            "ajax": {
+                "url": "/group-folders?groupId=@Model",
+                "type": "POST"
+            },
+            "columns": [
+                { "data": "name", },
+                { "data": "info", "className": "not-mobile" }
+               
+            ],
+            "language": {
+                "searchPlaceholder":"@Localizer["Search folder name"]"
+            }
+        });
+    </script>
+)
+

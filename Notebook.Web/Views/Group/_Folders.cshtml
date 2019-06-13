@@ -1,0 +1,49 @@
+﻿@model string
+
+@inject IViewLocalizer Localizer
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">@Localizer["Folder List"]</h3>
+                <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?groupId=@Model">
+                    <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Add Folder"]
+                </button>
+            </div>
+            <div class="box-body" id="content">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Script(
+    @<script>
+        var _skip = 0;
+        var _take = 30;
+
+        function loadData() {
+            var _ajax = new AjaxOperations();
+            _ajax.parameters = {
+                url: "/group-folders",
+                methodType: "POST",
+                returnType: "content",
+                data: { "groupId": "@Model", "take": _take, "skip": _skip }
+            };
+            var _result = _ajax.run();
+
+            console.log(_result);
+        }
+
+        loadData();
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+                loadData();
+            }
+        });
+    </script>
+)
+

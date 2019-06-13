@@ -1,0 +1,18 @@
+﻿@model string
+
+@if (Model != null)
+{
+    var _model = HelperMethods.JsonConvertObject<TempDataModel>(Model);
+
+    <div class="modal modal-default" id="messageModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="alert alert-@_model.type" style="margin-bottom:0; font-size:14px; font-weight:bold">
+                    @Html.Raw(_model.message)
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+

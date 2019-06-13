@@ -1,0 +1,65 @@
+﻿
+@inject IViewLocalizer Localizer
+
+<div class="login-box" style="width:100%;">
+    <div class="row">
+        <div class="col-md-6">
+
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+    <div class="login-box-body">
+        <div class="login-logo">
+            <img src="/notebook/images/blue-logo.png" height="30" />
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p>
+                    Lorem Ipsum, dizgi ve baskı endüstrisinde kullanılan mıgır metinlerdir. 
+                    Lorem Ipsum, adı bilinmeyen bir matbaacının bir hurufat numune kitabı oluşturmak üzere bir yazı 
+                    galerisini alarak karıştırdığı 1500'lerden beri endüstri standardı sahte metinler olarak kullanılmıştır. 
+                    Beşyüz yıl boyunca varlığını sürdürmekle kalmamış, aynı zamanda pek değişmeden elektronik dizgiye de sıçramıştır. 
+                    1960'larda Lorem Ipsum pasajları da içeren Letraset yapraklarının yayınlanması ile ve yakın zamanda Aldus PageMaker gibi Lorem Ipsum 
+                    sürümleri içeren masaüstü yayıncılık yazılımları ile popüler olmuştur.
+                </p>
+            </div>
+            <div class="col-md-6">
+                <div style="width:100%; max-width:350px; margin:auto">
+                    <form action="/Account/Login" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control" placeholder="@Localizer["Email or username"]" name="Username">
+                            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <input type="password" class="form-control" placeholder="@Localizer["Password"]" name="Password">
+                            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div class="checkbox icheck">
+                                    <label style="padding-left:20px">
+                                        <input type="checkbox" name="Remember"> @Localizer["Remember Me"]
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-xs-6" style="line-height:40px; text-align:right">
+                                <a href="#" style="color:Red">@Localizer["I forgot my password"]</a>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:15px 0">
+                            <button type="submit" class="btn btn-primary btn-block btn-flat">@Localizer["Login"]</button>
+                        </div>
+                    </form>
+                    <div class="row" style="text-align:center">
+                        <a href="/Account/Register" class="text-center">--> @Localizer["Register a new membership"]</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

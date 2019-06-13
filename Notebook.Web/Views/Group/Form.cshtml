@@ -1,0 +1,70 @@
+﻿@model Group
+
+@inject IViewLocalizer Localizer
+
+<div id="modal" class="n-modal" role="dialog">
+    <div class="n-modal-dialog">
+        <form action="@(Model != null ? "/editGroup" : "/addGroup")" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="n-modal-content">
+                <div class="n-modal-header">
+                    <button type="button" class="close" onclick="closeModal()">&times;</button>
+                    <label class="n-modal-title">@(Model != null ? Localizer["Edit Group"] : Localizer["Add Group"])</label>
+                </div>
+                <div class="n-modal-body">
+                    <div class="form-group">
+                        @Html.HiddenFor(a => a.ID)
+                        <input type="text" class="form-control" name="Name" required value="@(Model != null ? Model.Name : "")" placeholder="@Localizer["Name"]" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="Explanation" value="@(Model != null ? Model.Explanation : "")" placeholder="@Localizer["Explanation"]" />
+                    </div>
+                    <div class="form-group">
+                        <label>@Localizer["Visibility"]</label>
+                        @foreach (var item in Enum.GetValues(typeof(Visible)))
+                        {
+                            <div class="checkbox">
+                                <label style="padding:0">
+                                    @Html.RadioButtonFor(a=>a.Visible,item.ToString()) @Localizer[item.ToString()]
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group membershipControl">
+                        <label>@Localizer["Membership"]</label>
+                        <div class="checkbox">
+                            <label>
+                                @Html.CheckBoxFor(a=>a.IsRequiredApproval) @Localizer["Is required approval"] ?
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="n-modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>
+                    <input type="submit" class="btn btn-success  btn-sm" value="@(Model != null ? Localizer["Update"] : Localizer["Add"])" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        membership();
+    })
+
+    $("input[name=Visible]").on("change", function () {
+        membership();
+    })
+
+    function membership() {
+        var _result = $("input[name=Visible]:checked").val();
+        if (_result === "Public") {
+            $(".membershipControl").show();
+        }
+        else {
+            $(".membershipControl").hide();
+        }
+    }
+</script>

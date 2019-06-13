@@ -1,0 +1,293 @@
+﻿@media (max-width: 768px) {
+    .not-mobile{
+        display:none !important;
+    }
+    .mobile {
+        display: block !important;
+    }
+
+    .dataTables_wrapper .dataTables_length{
+        float:left;
+    }
+    .dataTables_wrapper .dataTables_filter{
+        float:left;
+        margin-top:auto;
+        width:150px;
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile {
+        display: none !important;
+    }
+}
+.skin-blue{
+    padding-right:0 !important;
+}
+
+
+* {
+    padding: 0;
+    margin: 0;
+    position: relative;
+    box-sizing: border-box;
+    -webkit-font-smoothing: subpixel-antialiased !important;
+    -webkit-backface-visibility: hidden;
+}
+
+body, a, ul, li, div, p, span, label, input, button, select, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    /*font-family: 'Trebuchet MS';*/
+    font-family: Cantarell, 'Trebuchet MS';
+    font-size: 13px;
+    outline: none;
+}
+a{
+    color:black;
+}
+hr{
+    margin: 15px 0;
+}
+.title{
+    letter-spacing:0.8px;
+}
+.btn {
+    border-radius: 3px;
+}
+
+.btn-default, .btn-default:hover{
+    background:none;
+}
+
+.btn-smx{
+    padding:4px 10px;
+    line-height:1.3;
+    font-size:12px;
+}
+.btn-xxs {
+    padding: 1px 4px;
+    line-height: 1.3;
+    font-size: 10px;
+}
+
+table .btn{
+    margin-left:4px;
+}
+input[type=text]{
+    border-radius:3px;
+    font-weight:bold;
+    height:32px;
+}
+
+.breadcrumb{
+    margin-bottom:10px;
+    padding:7px 10px;
+    background:white;
+}
+    .breadcrumb a {
+        color: darkblue;
+    }
+
+.dropdown-menu > li > a {
+    padding: 7px 15px;
+}
+.box{
+    border:0;
+}
+.box-body{
+    padding:15px;
+}
+.box-header > .fa, .box-header > .glyphicon, .box-header > .ion, .box-header .box-title, .box-title {
+    font-size: 16px;
+    color: #3D8CBC;
+    font-weight: bold;
+}
+.table-header > tr:first-child {
+    background: #3D8CBC;
+    color: white;
+    font-weight: bold;
+}
+.table-header-info {
+    width: auto;
+    display: inline-flex;
+    padding: 3px 5px;
+    font-size: 13px;
+    background: #3D8CBC;
+    color: white;
+    border-radius:3px;
+    margin-top:-2px
+}
+/*----- Jquery Datatable----------*/
+table.dataTable a {
+    font-weight: bold;
+    color: #3D8CBC;
+    font-size:14px;
+}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 10px 10px;
+}
+table.dataTable thead th, table.dataTable thead td {
+    padding: 5px 10px;
+    margin-top:5px;
+}
+.dataTables_length select {
+    padding: 2px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-weight: bold;
+}
+.dataTables_filter{
+    margin-bottom:5px
+}
+.dataTables_filter input {
+    border-radius: 3px;
+    padding: 3px 5px;
+}
+.dataTables_wrapper .dataTables_paginate{
+    padding-top:7px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 2px 5px;
+}
+table.dataTable thead .sorting_asc{
+    background-image:url("../../../adminlte/components/DataTables-1.10.18/images/sort_asc.png");
+}
+table.dataTable thead .sorting {
+    background-image: url("../../../adminlte/components/DataTables-1.10.18/images/sort_both.png");
+}
+table.dataTable thead .sorting_desc {
+    background-image: url("../../../adminlte/components/DataTables-1.10.18/images/sort_desc.png");
+}
+/*----- Jquery Datatable----------*/
+.table-filter {
+    margin-top: 10px;
+    width: 100%;
+    padding: 6px 6px 1px;
+    background: #ddd;
+    border-radius: 3px;
+}
+.table-filter > *{
+    margin-bottom:5px;
+}
+.table-filter > select{
+    padding:3px !important;
+    width:auto;
+    outline:none;
+    border-radius:3px;
+    cursor:pointer;
+}
+
+.table-filter > input[type=text]{
+    padding:3px 5px;
+    border:1px solid #ccc;
+    outline:none;
+    font-weight:bold;
+}
+.table-filter > button{
+    margin-top:3px;
+}
+
+.pagination > li > a.active {
+    background: #3D8CBC;
+    color: white;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #bbb;
+    font-weight:normal;
+    opacity: 1;
+}
+
+.modal-content{
+    border-radius:5px;
+    overflow:hidden;
+}
+.modal-header, .modal-body, .modal-footer {
+    padding: 10px 15px;
+    font-family: 'Trebuchet MS';
+}
+.modal-header{
+    background: #3D8CBC;
+    color:white;
+}
+.modal-title {
+    font-size:15px;
+    font-family:'Trebuchet MS';
+    font-weight:bold;
+}
+
+/*----------------Notebook Modal-----------------------*/
+
+.n-modal {
+    background: rgba(0,0,0,0.7);
+    opacity: 1;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+    width:100%;
+    height:100%;
+}
+
+.n-modal-dialog {
+    position: relative;
+    width: 100%;
+    height:100%;
+    overflow:auto;
+}
+
+.n-modal-content {
+    position: relative;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #999;
+    border: 1px solid rgba(0,0,0,.2);
+    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    outline: 0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+.n-modal-header {
+    background: #26a8ff;
+    color: white;
+    border-bottom-color: #f4f4f4;
+    padding: 13px 15px;
+}
+
+.n-modal-body {
+    height: 100%;
+    overflow: auto;
+}
+
+.n-modal-body, .n-modal-footer {
+    padding: 10px 15px;
+    position: relative;
+}
+
+.n-modal-footer {
+    border-top-color: #f4f4f4;
+    text-align:right;
+}
+
+.n-modal-title {
+    font-size: 15px;
+    font-family: 'Trebuchet MS';
+    font-weight: bold;
+    margin-bottom:0;
+}
+
+@media (min-width: 768px) {
+    .n-modal-content {
+        width: 500px;
+        margin-top:60px;
+    }
+}
+/*----------------End Notebook Modal-----------------------*/

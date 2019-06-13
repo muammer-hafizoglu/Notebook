@@ -1,0 +1,98 @@
+﻿@model ObjectListModel
+
+@inject IViewLocalizer Localizer
+
+<link href="/adminlte/components/datatable/datatables.min.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">@Localizer[Model.Title]</h3>
+                <div class="table-header-info pull-right">
+                    @Localizer["Total"] : @Model.TotalData
+                </div>
+                <form action="/Admin/Users" method="get">
+                    <div class="table-filter  table-responsive">
+                        <select name="Filter">
+                            <option value="" style="color:#bbb;">@Localizer["Filter column"]</option>
+                            <option value="ID">ID</option>
+                            <option value="Name">@Localizer["Name"]</option>
+                            <option value="Username">@Localizer["Username"]</option>
+                            <option value="Email">@Localizer["Email"]</option>
+                        </select>
+                        <input type="text" name="Value" placeholder="@Localizer["Filter text"]" />
+                        <button type="submit" class="btn btn-primary btn-smx" title="@Localizer["Search"]"><i class="fa fa-search"></i></button>
+                        <button type="button" onclick="location.href='/Admin/Users'" class="btn btn-success btn-smx" title="@Localizer["All List"]"><i class="fa fa-th-large"></i></button>
+                    </div>
+                </form>
+            </div>
+            <div class="box-body table-responsive">
+                <table class="table table-striped dataTable ">
+                    <thead  class="table-header">
+                        <tr>
+                            <th style="width: 30px">#</th>
+                            <th>@Localizer["Name"]</th>
+                            <th>@Localizer["Username"]</th>
+                            <th>@Localizer["Email"]</th>
+                            <th>@Localizer["State"]</th>
+                            <th>@Localizer["Last Active Date"]</th>
+                            <th style="text-align:right"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ 
+                            int i = (Model.ActivePage - 1) * Model.ShowInPage + 1;
+                        }
+                        @foreach (var item in (List<User>)Model.Datalist)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.Name</td>
+                                <td>@item.Username</td>
+                                <td>@item.Email</td>
+                                <td><label class="label label-@(item.Approve ? "success" : "warning")">@(item.Approve ? "Active" : "Passive")</label></td>
+                                <td>@item.LastActiveDate.ToShortDateString()</td>
+                                <td style="text-align:right">
+                                    <button class="btn btn-primary btn-xs" nb-type="modal" nb-method="get" nb-cont="Admin" nb-act="EditUserPartial" nb-id="@item.ID">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-xs" nb-type="reload" nb-method="get" nb-cont="Admin" nb-act="RemoveUser" nb-id="@item.ID" nb-confirm="Silmek isteğinize emin misiniz ?">
+                                        <i class="fa fa-remove"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="box-footer clearfix">
+                @Html.Raw(Model.Pagination)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{ 
+<script src="/adminlte/components/datatable/datatables.min.js"></script>
+    <script>
+        $(".dataTable").DataTable({
+            "responsive": true,
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/Admin/UserList",
+                "type": "POST"
+            },
+            "columns": [
+                { "data": "name" },
+                { "data": "username" },
+                { "data": "email" },
+                { "data": "state" },
+                { "data": "operations" }
+            ]
+        });
+    </script>
+}

@@ -1,0 +1,94 @@
+﻿@model GroupDetailModel
+
+@inject IViewLocalizer Localizer
+
+@{
+    var _activeUser = Context.Session.GetSession<User>("User");
+}
+
+
+
+@if (Model != null)
+{
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>
+        <li class="active">@Model.Name</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="box box-primary">
+                <div class="box-body box-profile" style="padding:10px 15px;">
+                    <p class="text-center">
+                        <i class="fa fa-clone" style="font-size:70px;"></i>
+                    </p>
+
+                    <h3 class="text-center box-title">@Model.Name</h3>
+
+                    <p class="text-muted text-center">@Model.Explanation</p>
+                    <p class="text-center">
+                        <label class="label label-success">@Localizer[Model.Visible.ToString()]</label>
+                    </p>
+                    <ul class="list-group list-group-unbordered" style="color:#9b9b9b;">
+                        <li class="list-group-item">
+                            <i class="fa fa-user"></i>&nbsp;@Localizer["Owner"]
+                            <a href="/@Model.OwnerID/profile/groups" class="pull-right" style="font-weight:bold; color:darkblue">@Model.OwnerName</a>
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <span class="pull-right">@Model.CreateDate.ToString("dddd, dd MMMM yyyy")</span>
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"] <span class="pull-right">@Model.FolderCount</span>
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <span class="pull-right">@Model.NoteCount</span>
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fa fa-users"></i>&nbsp;@Localizer["Members"] <span class="pull-right">@Model.UserCount</span>
+                        </li>
+                    </ul>
+
+                    @if (Model.OwnerID == _activeUser?.ID)
+                    {
+                        <div class="text-center">
+                            <a class="btn btn-primary" data-type="modal" data-action="@Model.ID/edit-group"><b>@Localizer["Edit"]</b></a>
+                            <a class="btn btn-danger" data-type="redirect" data-url="@TempData["BeforeUrl"]" data-action="@Model.ID/delete-group" data-confirm="@Localizer["Are you sure you want to delete"]?"><b>@Localizer["Delete"]</b></a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center">
+                            <a href="#" class="btn btn-primary"><b>@Localizer["Join"]</b></a>
+                        </div>
+                    }
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <!-- /.col -->
+        <div class="col-md-9">
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li @((Model.List == "" || Model.List == "folders") ? "class=active" : "")><a href="/@Model.ID/group/folders"><i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"]</a></li>
+                    <li @((Model.List == "notes") ? "class=active" : "")><a href="/@Model.ID/group/notes"><i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"]</a></li>
+                </ul>
+                <div class="tab-content">
+                    @if (Model.List == "notes")
+                    {
+                        await Html.RenderPartialAsync("Notes", Model.ID);
+                    }
+                    else
+                    {
+                        await Html.RenderPartialAsync("Folders", Model.ID);
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">@Localizer["Group not found"]</div>
+}
+

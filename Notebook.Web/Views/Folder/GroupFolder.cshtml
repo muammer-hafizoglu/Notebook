@@ -1,0 +1,13 @@
+﻿@model List<GroupFolder>
+
+@inject IViewLocalizer Localizer
+
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        <div class="form-control" style="height:100px; margin-bottom:20px">
+            @item.Folder.Name
+        </div>
+    }
+}
