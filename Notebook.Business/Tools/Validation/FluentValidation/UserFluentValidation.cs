@@ -10,12 +10,10 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
     {
         public UserFluentValidation()
         {
-            RuleFor(p => p.ID).NotEmpty().MaximumLength(8);
             RuleFor(p => p.Name).NotEmpty();
-            RuleFor(p => p.Email).NotEmpty();
-            RuleFor(p => p.Email).EmailAddress();
-            RuleFor(p => p.Username).NotEmpty();
-            RuleFor(p => p.Username).Must(UsernameTagControl).WithMessage("Custom character unavailable");
+            RuleFor(p => p.Email).NotEmpty().EmailAddress();
+            RuleFor(p => p.Password).NotEmpty();
+            //RuleFor(p => p.Username).Must(UsernameTagControl).WithMessage("Custom character unavailable");
         }
 
         public void Validator(object entity)
@@ -28,7 +26,7 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
 
                 foreach (var error in result.Errors)
                 {
-                    exceptionMessage += string.Format("Property Name: {0} | Message: {1} <br/>", error.PropertyName,error.ErrorMessage);
+                    exceptionMessage += string.Format("{0} <br/>",error.ErrorMessage);
                 }
                 //var exception = new ValidateException();
 

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Localization;
 using Notebook.Business.Managers.Abstract;
 using Notebook.Entities.Entities;
 using Notebook.Web.Filters;
+using Notebook.Web.Models;
 using System;
 using System.Linq;
 
@@ -13,9 +14,11 @@ namespace Notebook.Web.Controllers
     [TypeFilter(typeof(ExceptionFilterAttribute))]
     public class AccountController : Controller
     {
+        private IStringLocalizer<AccountController> _localizer;
         private IUserManager _userManager;
-        public AccountController(IUserManager userManager)
+        public AccountController(IStringLocalizer<AccountController> localizer,IUserManager userManager)
         {
+            _localizer = localizer;
             _userManager = userManager;
         }
 
@@ -30,6 +33,7 @@ namespace Notebook.Web.Controllers
                     _user.LastActiveDate = DateTime.Now;
                     _userManager.Update(_user);
 
+                    _user.Avatar = _user.Avatar ?? "/notebook/images/avatar.png";
                     HttpContext.Session.SetSession("User", _user);
 
                     return RedirectToAction("Index", "Home");
@@ -41,14 +45,14 @@ namespace Notebook.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(User user, string Remember = "off")
+        public IActionResult Login(User user, string remember = "off")
         {
             var _user = _userManager.getOne(a => (a.Username == user.Username || a.Email == user.Username) && a.Password == user.Password.SHA256Encrypt());
             if (_user != null)
             {
                 if (_user.Approve)
                 {
-                    if (Remember == "on")
+                    if (remember == "on")
                     {
                         HttpContext.Response.Cookies.SetCookies("Notebook", _user.Email);
                     }
@@ -56,6 +60,7 @@ namespace Notebook.Web.Controllers
                     _user.LastActiveDate = DateTime.Now;
                     _userManager.Update(_user);
 
+                    _user.Avatar = _user.Avatar ?? "/notebook/images/avatar.png";
                     HttpContext.Session.SetSession("User", _user);
 
                     return RedirectToAction("Index", "Home");
@@ -84,13 +89,17 @@ namespace Notebook.Web.Controllers
         {
             if (!string.IsNullOrEmpty(model.Password) && model.Password == PasswordConfirm) 
             {
+                // Email onayı ve avatar ayarı yapılacak
+                model.Approve = true;
+
                 _userManager.Add(model);
-            }
-            else
-            {
-                TempData["Error"] = "Passwords do not match";
+                _userManager.Save();
+
+                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Registration successful"] });
+                return View("Login");
             }
 
+            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Passwords do not match"] });
             return View();
         }
 

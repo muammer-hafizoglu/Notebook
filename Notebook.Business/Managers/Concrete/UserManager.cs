@@ -29,6 +29,7 @@ namespace Notebook.Business.Managers.Concrete
             EmailControl(model.Email);
             UsernameControl(model.Username);
 
+            model.Password = model.Password.SHA256Encrypt();
             base.Add(model);
         }
 
