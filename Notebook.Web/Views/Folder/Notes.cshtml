@@ -1,4 +1,4 @@
-﻿@model string
+﻿@model DataListPartialModel
 
 @inject IViewLocalizer Localizer
 
@@ -8,9 +8,13 @@
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">@Localizer["Note List"]</h3>
-                <a class="btn btn-xs btn-success pull-right" href="/add-note?folderId=@Model">
-                    <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Add Note"]
-                </a>
+                @if (Model.Member == Member.Owner || Model.Member == Member.Manager)
+                {
+                    <a class="btn btn-xs btn-success pull-right" href="/add-note?folderId=@Model">
+                        <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Add Note"]
+                    </a>
+                }
+                
             </div>
             <div class="box-body table-responsive">
                 <table class="table table-striped dataTable">
@@ -33,7 +37,7 @@
             "serverSide": true,
             "ordering": false,
             "ajax": {
-                "url": "/notes?folderId=@Model",
+                "url": "/folder-notes?folderId=@Model.ID",
                 "type": "POST"
             },
             "columns": [

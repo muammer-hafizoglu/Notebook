@@ -1,4 +1,4 @@
-﻿@model string
+﻿@model DataListPartialModel
 
 @inject IViewLocalizer Localizer
 
@@ -8,9 +8,12 @@
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">@Localizer["Folder List"]</h3>
-                <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?groupId=@Model">
-                    <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Add Folder"]
-                </button>
+                @if (Model.Member == Member.Owner || Model.Member == Member.Manager)
+                {
+                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?groupId=@Model">
+                        <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Add Folder"]
+                    </button>
+                }
             </div>
             <div class="box-body table-responsive">
                 <table class="table table-striped dataTable">
@@ -33,7 +36,7 @@
             "serverSide": true,
             "ordering": false,
             "ajax": {
-                "url": "/group-folders?groupId=@Model",
+                "url": "/group-folders?groupId=@Model.ID",
                 "type": "POST"
             },
             "columns": [

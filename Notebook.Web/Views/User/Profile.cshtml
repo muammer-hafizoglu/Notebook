@@ -8,6 +8,11 @@
 
 @if (Model != null)
 {
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+        <li class="active">@Model.Name</li>
+    </ol>
+
     <div class="row">
         <div class="col-md-3">
 
@@ -22,9 +27,6 @@
                     <ul class="list-group list-group-unbordered" style="color:#3D8CBC; padding:10px 15px;">
                         <li class="list-group-item">
                             <i class="fa fa-clone"></i>&nbsp;@Localizer["Groups"] <a class="pull-right">@Model.GroupCount</a>
-                        </li>
-                        <li class="list-group-item">
-                            <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"] <a class="pull-right">@Model.FolderCount</a>
                         </li>
                         <li class="list-group-item">
                             <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <a class="pull-right">@Model.NoteCount</a>
@@ -43,12 +45,19 @@
                             <a href="#" class="btn btn-primary"><b><i class="fa fa-cogs"></i> Settings</b></a>
                         </div>
                     }
-                    else
+                    else if (activeUser != null)
                     {
                         <div class="text-center">
                             <a href="#" class="btn btn-primary"><b>Follow</b></a>
                             <a href="#" class="btn btn-success"><b>Message</b></a>
                         </div>
+                    }
+                    else
+                    {
+                    <div class="text-center">
+                        <a href="/register" style="color:blue"><b>@Localizer["Sign up"]</b></a> or 
+                        <a href="/register" style="color:blue"><b>@Localizer["Sign in"]</b></a> @Localizer["for follow"]
+                    </div>
                     }
                 </div>
                 <!-- /.box-body -->
@@ -59,21 +68,16 @@
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
                     <li @((Model.List == "" || Model.List == "groups") ? "class=active" : "")><a href="/@Model.ID/profile"><i class="fa fa-clone"></i>&nbsp;@Localizer["Groups"]</a></li>
-                    @*<li @((Model.List == "folders") ? "class=active" : "")><a href="/@Model.ID/profile/folders"><i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"]</a></li>*@
                     <li @((Model.List == "notes") ? "class=active" : "")><a href="/@Model.ID/profile/notes"><i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["All Notes"]</a></li>
                 </ul>
                 <div class="tab-content">
-                    @if (Model.List == "folders")
+                    @if (Model.List == "notes")
                     {
-                        await Html.RenderPartialAsync("Folders", Model.ID);
-                    }
-                    else if (Model.List == "notes")
-                    {
-                        await Html.RenderPartialAsync("Notes", Model.ID);
+                        await Html.RenderPartialAsync("Notes", new DataListPartialModel { ID = Model.ID, Member = (Model.ID == activeUser?.ID) ? Member.Owner : Member.Member });
                     }
                     else
                     {
-                        await Html.RenderPartialAsync("Groups", Model.ID);
+                        await Html.RenderPartialAsync("Groups", new DataListPartialModel { ID = Model.ID, Member = (Model.ID == activeUser?.ID) ? Member.Owner : Member.Member });
                     }
                 </div>
             </div>

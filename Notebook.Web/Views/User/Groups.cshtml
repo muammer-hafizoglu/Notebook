@@ -1,4 +1,4 @@
-﻿@model string
+﻿@model DataListPartialModel
 
 @inject IViewLocalizer Localizer
 
@@ -7,9 +7,12 @@
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">@Localizer["Group List"]</h3>
-                <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-group">
-                    <i class="fa fa-clone"></i>&nbsp;@Localizer["Add Group"]
-                </button>
+                @if (Model.Member == Member.Owner)
+                {
+                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-group">
+                        <i class="fa fa-clone"></i>&nbsp;@Localizer["Add Group"]
+                    </button>
+                }
             </div>
             <div class="box-body table-responsive">
                 <table class="table table-striped grouplist">
@@ -33,7 +36,7 @@
             "serverSide": true,
             "ordering": false,
             "ajax": {
-                "url": "/groups?userId=@Model",
+                "url": "/groups?userId=@Model.ID",
                 "type": "POST"
             },
             "columns": [

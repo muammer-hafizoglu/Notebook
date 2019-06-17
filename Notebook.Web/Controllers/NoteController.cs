@@ -42,27 +42,8 @@ namespace Notebook.Web.Controllers
         #region List
 
         [HttpPost]
-        [Route("~/notes")]
-        public JsonResult List(DatatableParameters parameters, string userId = "", string categoryId = "", string folderId = "")
-        {
-            DatatableResult _result = null;
-
-            if (!string.IsNullOrEmpty(userId))
-            {
-                _result = UserNotes(parameters, userId);
-            }
-            else if (!string.IsNullOrEmpty(categoryId))
-            {
-                _result = GroupNotes(parameters, categoryId);
-            }
-            else if (!string.IsNullOrEmpty(folderId))
-            {
-                _result = FolderNotes(parameters, folderId);
-            }
-
-            return Json(_result);
-        }
-        private DatatableResult UserNotes(DatatableParameters parameters, string userId = "")
+        [Route("~/user-notes")]
+        public JsonResult UserNotes(DatatableParameters parameters, string userId = "")
         {
             var sqlQuery = _userNoteManager.Table()
                 .Include(a => a.Note)
@@ -87,15 +68,18 @@ namespace Notebook.Web.Controllers
                          state = _un.Member == Member.Owner ? _localizer["Owner"] : _localizer["Favorite"]
                      }).ToList();
 
-            return result;
+            return Json(result);
         }
-        private DatatableResult GroupNotes(DatatableParameters parameters, string categoryId = "")
+
+        [HttpPost]
+        [Route("~/group-notes")]
+        public JsonResult GroupNotes(DatatableParameters parameters, string groupId = "")
         {
             var sqlQuery = _groupNoteManager.Table()
                 .Include(a => a.Group)
                 .Include(a => a.Note)
                 .OrderByDescending(a => a.Note.CreateDate)
-                .Where(a => a.Group.ID == categoryId)
+                .Where(a => a.Group.ID == groupId)
                 as IQueryable<GroupNote>;
 
             var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
@@ -116,15 +100,18 @@ namespace Notebook.Web.Controllers
                           name = string.Format("<a href='/{0}/note/{1}'>{2} {3}</a>", _gn.Note.ID, _gn.Note.Title.ClearHtmlTagAndCharacter(), _gn.Note.Title,_gn.Note.Visible == Visible.Private ? _lockIcon : "")
                       }).ToList();
 
-            return result;
+            return Json(result);
         }
-        private DatatableResult FolderNotes(DatatableParameters parameters, string categoryId = "")
+
+        [HttpPost]
+        [Route("~/folder-notes")]
+        public JsonResult FolderNotes(DatatableParameters parameters, string folderId = "")
         {
             var sqlQuery = _folderNoteManager.Table()
                 .Include(a => a.Folder)
                 .Include(a => a.Note)
                 .OrderByDescending(a => a.Note.CreateDate)
-                .Where(a => a.Folder.ID == categoryId)
+                .Where(a => a.Folder.ID == folderId)
                 as IQueryable<FolderNote>;
 
             var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
@@ -145,7 +132,7 @@ namespace Notebook.Web.Controllers
                           name = string.Format("<a href='/{0}/note/{1}'>{2} {3}</a>", _gn.Note.ID, _gn.Note.Title.ClearHtmlTagAndCharacter(), _gn.Note.Title, _gn.Note.Visible == Visible.Private ? _lockIcon : "")
                       }).ToList();
 
-            return result;
+            return Json(result);
         }
 
         #endregion

@@ -42,35 +42,7 @@ namespace Notebook.Web.Controllers
 
         [HttpPost]
         [Route("~/group-folders")]
-        public JsonResult GroupFolderList(DatatableParameters parameters, string groupId = "")
-        {
-            //JsonDataModel model = new JsonDataModel();
-
-            //model.data = _groupFolderManager.Table()
-            //    .Include(a => a.Group)
-            //    .Include(a => a.Folder)
-            //    .OrderByDescending(a => a.CreateDate)
-            //    .Where(a => a.GroupID == groupId).Skip(skip).Take(take).ToList();
-
-            //model.isFinished = take >= (model.data as List<GroupFolder>).Count() ? true : false;
-
-            //return Json(model);
-
-            DatatableResult _result = null;
-
-            //if (!string.IsNullOrEmpty(userId))
-            //{
-            //    _result = UserFolders(parameters, userId);
-            //}
-            if (!string.IsNullOrEmpty(groupId))
-            {
-                _result = GroupFolders(parameters, groupId);
-            }
-
-            return Json(_result);
-        }
-
-        private DatatableResult GroupFolders(DatatableParameters parameters, string groupId = "")
+        public JsonResult GroupFolders(DatatableParameters parameters, string groupId = "")
         {
             var sqlQuery = _groupFolderManager.Table()
                 .Include(a => a.Group)
@@ -97,7 +69,7 @@ namespace Notebook.Web.Controllers
                           info = string.Format("{0}: {1}", _noteIcon, _uf.Folder.Notes.Count())
                       }).ToList();
 
-            return result;
+            return Json(result);
         }
 
         #endregion

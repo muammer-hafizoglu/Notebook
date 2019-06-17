@@ -101,6 +101,18 @@ input[type=text]{
 .box-body{
     padding:15px;
 }
+
+.media-icon {
+    background: #3C8DBC;
+    color: white;
+    border-radius: 50%;
+    padding: 15px;
+    font-size: 25px;
+    font-weight: bold;
+    width: 70px;
+    margin: auto;
+}
+
 .box-header > .fa, .box-header > .glyphicon, .box-header > .ion, .box-header .box-title, .box-title {
     font-size: 14px;
     color: #3D8CBC;

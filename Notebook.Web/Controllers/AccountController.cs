@@ -22,6 +22,8 @@ namespace Notebook.Web.Controllers
             _userManager = userManager;
         }
 
+
+        [Route("~/login")]
         public IActionResult Login()
         {
             var _email = HttpContext.Request.Cookies.GetCookies("Notebook");
@@ -78,6 +80,8 @@ namespace Notebook.Web.Controllers
             return View();
         }
 
+
+        [Route("~/register")]
         public IActionResult Register()
         {
             return View(new User());
@@ -108,6 +112,7 @@ namespace Notebook.Web.Controllers
             return View();
         }
 
+        [Route("~/logout")]
         public IActionResult Logout()
         {
             HttpContext.Response.Cookies.SetCookies("Notebook", "", -5000);
