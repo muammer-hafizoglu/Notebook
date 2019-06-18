@@ -10,7 +10,7 @@
                 <h3 class="box-title">@Localizer["Note List"]</h3>
                 @if (Model.Member == Member.Owner || Model.Member == Member.Manager)
                 {
-                    <a class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-note">
+                    <a class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-note?groupId=@Model.ID">
                         <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Add Note"]
                     </a>
                 }
