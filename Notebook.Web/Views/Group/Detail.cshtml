@@ -76,11 +76,11 @@
                 <div class="tab-content">
                     @if (Model.List == "notes")
                     {
-                        await Html.RenderPartialAsync("Notes", new DataListPartialModel { ID = Model.ID, Member = (Model.ID == _activeUser?.ID) ? Member.Owner : Member.Member });
+                        await Html.RenderPartialAsync("Notes", new DataListPartialModel { ID = Model.ID, Member = (Model.OwnerID == _activeUser?.ID) ? Member.Owner : Member.Member });
                     }
                     else
                     {
-                        await Html.RenderPartialAsync("Folders", new DataListPartialModel { ID = Model.ID, Member = (Model.ID == _activeUser?.ID) ? Member.Owner : Member.Member });
+                        await Html.RenderPartialAsync("Folders", new DataListPartialModel { ID = Model.ID, Member = (Model.OwnerID == _activeUser?.ID) ? Member.Owner : Member.Member });
                     }
                 </div>
             </div>
