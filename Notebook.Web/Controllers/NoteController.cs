@@ -18,7 +18,7 @@ namespace Notebook.Web.Controllers
     public class NoteController : Controller
     {
         public string _lockIcon = "<i class='fa fa-lock'></i> ";
-        public string _noteIcon = "<i class='fa fa-file-text-o'></i> ";
+        public string _noteIcon = "<i class='fa fa-newspaper-o'></i> ";
 
         private IStringLocalizer<NoteController> _localizer;
         private INoteManager _noteManager;
@@ -45,27 +45,22 @@ namespace Notebook.Web.Controllers
         [Route("~/user-notes")]
         public JsonResult UserNotes(DatatableParameters parameters, string userId = "")
         {
-            var sqlQuery = _userNoteManager.Table()
-                .Include(a => a.Note)
-                .OrderByDescending(a => a.CreateDate)
-                .Where(a => a.UserID == userId) as IQueryable<UserNote>;
+            var _activeUser = HttpContext.Session.GetSession<User>("User");
+
+            var sqlQuery = _userNoteManager.getUserNotes(userId,(_activeUser != null && _activeUser.ID == userId) ? true:false);
 
             var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
 
-            #region Searching
-            string search = Request.Form["search[value]"].ToString();
-            if (!string.IsNullOrEmpty(search))
-            {
-                sqlQuery = sqlQuery.Where(a => a.Note.Title.Contains(search)) as IQueryable<UserNote>;
-            }
+            //Searching
+            string searchText = Request.Form["search[value]"].ToString();
+            sqlQuery = sqlQuery.Where(a => a.Note.Title.Contains(searchText)) as IQueryable<UserNote>;
             result.recordsFiltered = sqlQuery.Count();
-            #endregion
 
             result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_un =>
                      new NoteModel
                      {
-                         name = string.Format("<a href='/{0}/note/{1}'>{2} {3}</a>", _un.Note.ID, _un.Note.Title.ClearHtmlTagAndCharacter(), _un.Note.Title, (_un.Note.Visible == Visible.Private ? _lockIcon : "")),
-                         state = _un.Member == Member.Owner ? _localizer["Owner"] : _localizer["Favorite"]
+                         name = string.Format("<a href='/{0}/note/{1}'>{4} {2} {3}</a>",
+                                    _un.Note.ID, _un.Note.Title.ClearHtmlTagAndCharacter(), _un.Note.Title, (_un.Note.Visible == Visible.Private ? _lockIcon : ""), _noteIcon)
                      }).ToList();
 
             return Json(result);
@@ -84,20 +79,16 @@ namespace Notebook.Web.Controllers
 
             var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
 
-            #region Searching
-            string search = Request.Form["search[value]"].ToString();
-            if (!string.IsNullOrEmpty(search))
-            {
-                sqlQuery = sqlQuery.Where(a => a.Note.Title.Contains(search)) as IQueryable<GroupNote>;
-            }
-
+            //Searching
+            string searchText = Request.Form["search[value]"].ToString();
+            sqlQuery = sqlQuery.Where(a => a.Note.Title.Contains(searchText)) as IQueryable<GroupNote>;
             result.recordsFiltered = sqlQuery.Count();
-            #endregion
 
             result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_gn =>
                       new NoteModel
                       {
-                          name = string.Format("<a href='/{0}/note/{1}'>{2} {3}</a>", _gn.Note.ID, _gn.Note.Title.ClearHtmlTagAndCharacter(), _gn.Note.Title,_gn.Note.Visible == Visible.Private ? _lockIcon : "")
+                          name = string.Format("<a href='/{0}/note/{1}'>{4} {2} {3}</a>",
+                                    _gn.Note.ID, _gn.Note.Title.ClearHtmlTagAndCharacter(), _gn.Note.Title, (_gn.Note.Visible == Visible.Private ? _lockIcon : ""), _noteIcon)
                       }).ToList();
 
             return Json(result);
@@ -116,20 +107,16 @@ namespace Notebook.Web.Controllers
 
             var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
 
-            #region Searching
-            string search = Request.Form["search[value]"].ToString();
-            if (!string.IsNullOrEmpty(search))
-            {
-                sqlQuery = sqlQuery.Where(a => a.Note.Title.Contains(search)) as IQueryable<FolderNote>;
-            }
-
+            //Searching
+            string searchText = Request.Form["search[value]"].ToString();
+            sqlQuery = sqlQuery.Where(a => a.Note.Title.Contains(searchText)) as IQueryable<FolderNote>;
             result.recordsFiltered = sqlQuery.Count();
-            #endregion
 
-            result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_gn =>
+            result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_fn =>
                       new NoteModel
                       {
-                          name = string.Format("<a href='/{0}/note/{1}'>{2} {3}</a>", _gn.Note.ID, _gn.Note.Title.ClearHtmlTagAndCharacter(), _gn.Note.Title, _gn.Note.Visible == Visible.Private ? _lockIcon : "")
+                          name = string.Format("<a href='/{0}/note/{1}'>{4} {2} {3}</a>",
+                                    _fn.Note.ID, _fn.Note.Title.ClearHtmlTagAndCharacter(), _fn.Note.Title, (_fn.Note.Visible == Visible.Private ? _lockIcon : ""), _noteIcon)
                       }).ToList();
 
             return Json(result);

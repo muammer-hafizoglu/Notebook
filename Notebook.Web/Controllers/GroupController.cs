@@ -20,7 +20,7 @@ namespace Notebook.Web.Controllers
     {
         public string _lock = "<i class='fa fa-lock'></i> ";
         public string _folderIcon = "<i class='fa fa-folder-open-o'></i> ";
-        public string _noteIcon = "<i class='fa fa-file-text-o'></i> ";
+        public string _noteIcon = "<i class='fa fa-newspaper-o'></i> ";
         public string _userIcon = "<i class='fa fa-user'></i> ";
 
         private IStringLocalizer<GroupController> _localizer;

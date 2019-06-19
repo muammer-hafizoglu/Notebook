@@ -18,7 +18,7 @@ namespace Notebook.Web.Controllers
     public class FolderController : Controller
     {
         public string _lockIcon = "<i class='fa fa-lock'></i> ";
-        public string _noteIcon = "<i class='fa fa-file-text-o'></i> ";
+        public string _noteIcon = "<i class='fa fa-newspaper-o'></i> ";
         public string _userIcon = "<i class='fa fa-user'></i> ";
 
         private IStringLocalizer<FolderController> _localizer;
