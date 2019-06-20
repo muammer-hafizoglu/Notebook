@@ -10,7 +10,7 @@
                 <h3 class="box-title">@Localizer["Folder List"]</h3>
                 @if (Model.Member == Member.Owner || Model.Member == Member.Manager)
                 {
-                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?groupId=@Model">
+                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?groupId=@Model.ID">
                         <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Add Folder"]
                     </button>
                 }

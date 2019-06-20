@@ -4,21 +4,21 @@
 
 <div class="n-modal" id="modal">
     <div class="n-modal-dialog">
-        <form action="@(Model != null ? "/editFolder" : "/addFolder")" method="post">
+        <form action="@(Model.ID != null ? "/editFolder" : "/addFolder")" method="post">
             @Html.AntiForgeryToken()
 
             <div class="n-modal-content">
                 <div class="n-modal-header">
                     <button type="button" class="close" onclick="closeModal()">&times;</button>
-                    <label class="n-modal-title">@(Model != null ? Localizer["Edit Folder"] : Localizer["Add Folder"])</label>
+                    <label class="n-modal-title">@(Model.ID != null ? Localizer["Edit Folder"] : Localizer["Add Folder"])</label>
                 </div>
                 <div class="n-modal-body">
                     <div class="form-group">
                         @Html.HiddenFor(a => a.ID)
-                        <input type="text" class="form-control" name="Name" required value="@(Model != null ? Model.Name : "")" placeholder="@Localizer["Name"]" />
+                        <input type="text" class="form-control" name="Name" required value="@Model.Name" placeholder="@Localizer["Name"]" />
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" name="Explanation" value="@(Model != null ? Model.Explanation : "")" placeholder="@Localizer["Explanation"]" />
+                        <input type="text" class="form-control" name="Explanation" value="@Model.Explanation" placeholder="@Localizer["Explanation"]" />
                     </div>
                     <div class="form-group">
                         <label>@Localizer["Visibility"]</label>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="n-modal-footer">
                     <button type="button" class="btn btn-default btn-sm" onclick="closeModal('modal')">@Localizer["Close"]</button>
-                    <input type="submit" class="btn btn-success  btn-sm" value="@(Model != null ? Localizer["Update"] : Localizer["Add"])" />
+                    <input type="submit" class="btn btn-success  btn-sm" value="@(Model.ID != null ? Localizer["Update"] : Localizer["Add"])" />
                 </div>
             </div>
         </form>

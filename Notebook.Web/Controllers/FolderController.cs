@@ -114,7 +114,7 @@ namespace Notebook.Web.Controllers
 
             if (!string.IsNullOrEmpty(groupId)) TempData["GroupID"] = groupId;
 
-            return PartialView(_folder);
+            return PartialView(_folder ?? new Folder { Visible = Visible.Public });
         }
 
         [HttpPost]

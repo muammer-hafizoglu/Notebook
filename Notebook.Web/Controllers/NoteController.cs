@@ -170,7 +170,7 @@ namespace Notebook.Web.Controllers
             if (!string.IsNullOrEmpty(groupId)) TempData["GroupID"] = groupId;
             if (!string.IsNullOrEmpty(folderId)) TempData["FolderID"] = folderId;
 
-            return PartialView(_note);
+            return PartialView(_note ?? new Note { Visible = Visible.Public });
         }
 
         [HttpPost]

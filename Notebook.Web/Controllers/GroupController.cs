@@ -79,6 +79,8 @@ namespace Notebook.Web.Controllers
         [Route("~/{id?}/group/{list?}")]
         public IActionResult Detail(string id = "", string list = "")
         {
+            var _activeUser = HttpContext.Session.GetSession<User>("User");
+
             GroupDetailModel detail = null;
 
             var _group = _groupManager.getMany(a => a.ID == id).Include(a => a.Owner).FirstOrDefault();
@@ -101,6 +103,7 @@ namespace Notebook.Web.Controllers
             return View(detail);
         }
 
+        [TypeFilter(typeof(AccountFilterAttribute))]
         [HttpGet]
         [Route("~/add-group")]
         [Route("~/{id?}/edit-group")]
@@ -108,9 +111,10 @@ namespace Notebook.Web.Controllers
         {
             var _group = _groupManager.getOne(a => a.ID == id && a.OwnerID == HttpContext.Session.GetSession<User>("User").ID);
 
-            return PartialView(_group);
+            return PartialView(_group ?? new Group { Visible = Visible.Public });
         }
 
+        [TypeFilter(typeof(AccountFilterAttribute))]
         [HttpPost]
         [Route("~/addGroup")]
         [ValidateAntiForgeryToken]

@@ -23,27 +23,27 @@
 
 <div id="modal" class="n-modal" role="dialog">
     <div class="n-modal-dialog">
-        <form action="@(Model != null ? "/editNote" : "/addNote")" method="post">
+        <form action="@(Model.ID != null ? "/editNote" : "/addNote")" method="post">
             @Html.AntiForgeryToken()
 
             <div class="n-modal-content n-modal-lg">
                 <div class="n-modal-header">
                     <button type="button" class="close" onclick="closeModal()">&times;</button>
-                    <label class="n-modal-title">@(Model != null ? Localizer["Edit Note"] : Localizer["Add Note"])</label>
+                    <label class="n-modal-title">@(Model.ID != null ? Localizer["Edit Note"] : Localizer["Add Note"])</label>
                 </div>
                 <div class="n-modal-body">
                     <div class="form-group">
                         @Html.HiddenFor(a => a.ID)
-                        <input type="text" class="form-control" name="Title" required value="@(Model != null ? Model.Title : "")" placeholder="@Localizer["Title"]" />
+                        <input type="text" class="form-control" name="Title" required value="@Model.Title" placeholder="@Localizer["Title"]" />
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" name="Explanation" value="@(Model != null ? Model.Explanation : "")" placeholder="@Localizer["Explanation"]" />
+                        <input type="text" class="form-control" name="Explanation" value="@Model.Explanation" placeholder="@Localizer["Explanation"]" />
                     </div>
                     <div class="form-group">
-                        <textarea name="Content" class="form-control summernote">@(Model != null ? Model.Content : "")</textarea>
+                        <textarea name="Content" class="form-control summernote">@Model.Content)</textarea>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" name="Tags" value="@(Model != null ? Model.Tags : "")" placeholder="@Localizer["Tags"]" />
+                        <input type="text" class="form-control" name="Tags" value="@Model.Tags" placeholder="@Localizer["Tags"]" />
                     </div>
                     <div class="form-group">
                         <label>@Localizer["Visible"]</label>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="n-modal-footer">
                     <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>
-                    <input type="submit" class="btn btn-success  btn-sm" value="@(Model != null ? Localizer["Update"] : Localizer["Add"])" />
+                    <input type="submit" class="btn btn-success  btn-sm" value="@(Model.ID != null ? Localizer["Update"] : Localizer["Add"])" />
                 </div>
             </div>
         </form>
