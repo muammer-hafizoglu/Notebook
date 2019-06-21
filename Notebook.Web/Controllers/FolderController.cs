@@ -79,6 +79,8 @@ namespace Notebook.Web.Controllers
         [Route("~/{id?}/folder/{title}")]
         public IActionResult Detail(string id = "")
         {
+            var _activeUser = HttpContext.Session.GetSession<User>("User");
+
             FolderDetailModel detail = null;
 
             var _folder = _folderManager.getMany(a => a.ID == id).Include(a => a.Owner).FirstOrDefault();
@@ -94,12 +96,7 @@ namespace Notebook.Web.Controllers
                 detail.OwnerName = _folder.Owner.Name;
                 detail.NoteCount = _folderNoteManager.getMany(a => a.FolderID == _folder.ID).Count();
 
-                var _group = _groupManager.getOne(a => a.ID == TempData["GroupID"].ToString());
-                if (_group != null)
-                {
-                    detail.GroupID = _group.ID;
-                    detail.GroupName = _group.Name;
-                }
+                detail.Group = _groupManager.getMany(a => a.ID == TempData["GroupID"].ToString()).Include(a => a.Users).FirstOrDefault();
             }
 
             return View(detail);

@@ -8,12 +8,12 @@
 
 @if (Model != null)
 {
-    TempData["GroupID"] = @Model.GroupID;
+    TempData["GroupID"] = @Model.Group.ID;
 
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
         <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>
-        <li><a href="/@Model.GroupID/group">@Model.GroupName</a></li>
+        <li><a href="/@Model.Group.ID/group">@Model.Group.Name</a></li>
         <li class="active">@Model.Name</li>
     </ol>
 

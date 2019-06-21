@@ -1,4 +1,5 @@
-﻿using Notebook.Entities.Enums;
+﻿using Notebook.Entities.Entities;
+using Notebook.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,7 @@ namespace Notebook.Web.Models
         public int NoteCount { get; set; }
         public int UserCount { get; set; }
         public string List { get; set; }
+
+        public Group Group { get; set; }
     }
 }
