@@ -65,7 +65,7 @@ namespace Notebook.Web.Controllers
             result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_uf =>
                       new FolderModel
                       {
-                          name = string.Format("<a href='/{0}/folder/{1}'>{2}  {3}</a>", _uf.Folder.ID, _uf.Folder.Name.ClearHtmlTagAndCharacter(), _uf.Folder.Name, (_uf.Folder.Visible == Visible.Private ? _lockIcon : "")),
+                          name = string.Format("<a href='/folder/{0}/{1}'>{2}  {3}</a>", _uf.Folder.ID, _uf.Folder.Name.ClearHtmlTagAndCharacter(), _uf.Folder.Name, (_uf.Folder.Visible == Visible.Private ? _lockIcon : "")),
                           info = string.Format("{0}: {1}", _noteIcon, _uf.Folder.Notes.Count())
                       }).ToList();
 
@@ -76,13 +76,13 @@ namespace Notebook.Web.Controllers
 
         #region CRUD
 
-        [Route("~/{id?}/folder/{title}")]
+        [Route("~/folder/{id}/{title}")]
         public IActionResult Detail(string id = "")
         {
             var _activeUser = HttpContext.Session.GetSession<User>("User");
 
             FolderDetailModel detail = null;
-
+            
             var _folder = _folderManager.getMany(a => a.ID == id).Include(a => a.Owner).FirstOrDefault();
             if (_folder != null)
             {
@@ -95,8 +95,7 @@ namespace Notebook.Web.Controllers
                 detail.OwnerID = _folder.OwnerID;
                 detail.OwnerName = _folder.Owner.Name;
                 detail.NoteCount = _folderNoteManager.getMany(a => a.FolderID == _folder.ID).Count();
-
-                detail.Group = _groupManager.getMany(a => a.ID == TempData["GroupID"].ToString()).Include(a => a.Users).FirstOrDefault();
+                detail.Group = _groupFolderManager.getMany(a => a.FolderID == _folder.ID).Select(a => a.Group).FirstOrDefault();
             }
 
             return View(detail);
@@ -109,7 +108,8 @@ namespace Notebook.Web.Controllers
         {
             var _folder = _folderManager.getOne(a => a.ID == id && a.OwnerID == HttpContext.Session.GetSession<User>("User").ID);
 
-            if (!string.IsNullOrEmpty(groupId)) TempData["GroupID"] = groupId;
+            if (!string.IsNullOrEmpty(groupId))
+                TempData["GroupID"] = groupId;
 
             return PartialView(_folder ?? new Folder { Visible = Visible.Public });
         }
@@ -121,26 +121,27 @@ namespace Notebook.Web.Controllers
             var _user = HttpContext.Session.GetSession<User>("User");
             _folder.Owner = _user;
 
-            _folderManager.Add(_folder);
-            _folderManager.Save();
-
-            // User - Folder
-            _userFolderManager.Add(new UserFolder { Folder = _folder, User = _user, CreateDate = DateTime.Now });
-            _userFolderManager.Save();
-
             // Group-Folder
             if (TempData["GroupID"] != null)
             {
                 var _group = _groupManager.getOne(a => a.ID == TempData["GroupID"].ToString());
                 if (_group != null)
                 {
+                    _folderManager.Add(_folder);
+                    _folderManager.Save();
+
                     _groupFolderManager.Add(new GroupFolder{ Group = _group, Folder = _folder, CreateDate = DateTime.Now });
                     _groupFolderManager.Save();
+
+                    TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
                 }
+                else
+                {
+                    TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Group not found"] });
+                }
+
                 TempData["GroupID"] = null;
             }
-
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Redirect(TempData["BeforeUrl"].ToString());
         }

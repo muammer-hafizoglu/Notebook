@@ -362,7 +362,7 @@ namespace Notebook.DataAccess.Migrations
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "ID", "Approve", "Avatar", "CreateDate", "Email", "Info", "LastActiveDate", "Name", "Password", "RoleID", "Username" },
-                values: new object[] { "23m454h5", true, "/notebook/images/avatar.png", new DateTime(2019, 6, 2, 2, 44, 17, 95, DateTimeKind.Local).AddTicks(3719), "muammer.hafizogluu@gmail.com", null, new DateTime(2019, 6, 2, 2, 44, 17, 96, DateTimeKind.Local).AddTicks(1112), "Muammer Hafızoğlu", "D3CE20FCCBE7D116ECD0", null, "muammer.hafizoglu" });
+                values: new object[] { "23m454h5", true, "/notebook/images/avatar.png", new DateTime(2019, 6, 23, 1, 7, 51, 464, DateTimeKind.Local).AddTicks(1211), "muammer.hafizogluu@gmail.com", null, new DateTime(2019, 6, 23, 1, 7, 51, 465, DateTimeKind.Local).AddTicks(1281), "Muammer Hafızoğlu", "D3CE20FCCBE7D116ECD0", null, "muammer.hafizoglu" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Folder_OwnerID",

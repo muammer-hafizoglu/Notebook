@@ -13,7 +13,7 @@
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
         <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>
-        <li><a href="/@Model.Group.ID/group">@Model.Group.Name</a></li>
+        <li><a href="/group/@Model.Group.ID/@Model.Group.Name.ClearHtmlTagAndCharacter()">@Model.Group.Name</a></li>
         <li class="active">@Model.Name</li>
     </ol>
 

@@ -9,7 +9,7 @@ using Notebook.DataAccess.DataContext;
 namespace Notebook.DataAccess.Migrations
 {
     [DbContext(typeof(NotebookContext))]
-    [Migration("20190601234417_1")]
+    [Migration("20190622220751_1")]
     partial class _1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -262,9 +262,9 @@ namespace Notebook.DataAccess.Migrations
                             ID = "23m454h5",
                             Approve = true,
                             Avatar = "/notebook/images/avatar.png",
-                            CreateDate = new DateTime(2019, 6, 2, 2, 44, 17, 95, DateTimeKind.Local).AddTicks(3719),
+                            CreateDate = new DateTime(2019, 6, 23, 1, 7, 51, 464, DateTimeKind.Local).AddTicks(1211),
                             Email = "muammer.hafizogluu@gmail.com",
-                            LastActiveDate = new DateTime(2019, 6, 2, 2, 44, 17, 96, DateTimeKind.Local).AddTicks(1112),
+                            LastActiveDate = new DateTime(2019, 6, 23, 1, 7, 51, 465, DateTimeKind.Local).AddTicks(1281),
                             Name = "Muammer Hafızoğlu",
                             Password = "D3CE20FCCBE7D116ECD0",
                             Username = "muammer.hafizoglu"

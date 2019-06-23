@@ -64,7 +64,7 @@ namespace Notebook.Web.Controllers
             result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_ug =>
                       new GroupModel
                       {
-                          name = string.Format("<a href='/{0}/group/folders'>{1}  {2}</a>", _ug.Group.ID, _ug.Group.Name, (_ug.Group.Visible == Visible.Private ? _lock : "")),
+                          name = string.Format("<a href='/group/{0}/{3}'>{1}  {2}</a>", _ug.Group.ID, _ug.Group.Name, (_ug.Group.Visible == Visible.Private ? _lock : ""), _ug.Group.Name.ClearHtmlTagAndCharacter()),
                           info = string.Format("{0}: {2} & {3}: {5}", _folderIcon, _localizer["Folder"], _ug.Group.Folders.Count(), _noteIcon, _localizer["Note"],_ug.Group.Notes.Count()),
                           state = string.Format("{0}", (_ug.MemberType == Member.Owner ? _localizer["Owner"] : _localizer["Member"]))
                       }).ToList();
@@ -76,7 +76,7 @@ namespace Notebook.Web.Controllers
 
         #region CRUD
 
-        [Route("~/{id?}/group/{list?}")]
+        [Route("~/group/{id}/{title}/{list?}")]
         public IActionResult Detail(string id = "", string list = "")
         {
             var _activeUser = HttpContext.Session.GetSession<User>("User");
