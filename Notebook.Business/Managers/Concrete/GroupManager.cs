@@ -1,10 +1,13 @@
-﻿using Notebook.Business.Managers.Abstract;
+﻿using Microsoft.EntityFrameworkCore;
+using Notebook.Business.Managers.Abstract;
 using Notebook.Business.Tools.Validation.FluentValidation;
 using Notebook.Core.Aspects.SimpleProxy.Validation;
 using Notebook.DataAccess.DataAccess.Abstract;
 using Notebook.Entities.Entities;
+using Notebook.Entities.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Notebook.Business.Managers.Concrete
@@ -43,6 +46,21 @@ namespace Notebook.Business.Managers.Concrete
             {
                 throw new NullReferenceException();
             }
+        }
+
+        public Member MembershipControl(string GroupID, string UserID)
+        {
+            var _memberType = Member.Visitor;
+
+            var _group = servisDal.getMany(a => a.ID == GroupID).Include(a => a.Users).FirstOrDefault();
+            if (_group != null)
+            {
+                var _member = _group.Users.Where(a => a.UserID == UserID).FirstOrDefault();
+                if (_member != null)
+                    _memberType = _member.MemberType;
+            }
+
+            return _memberType;
         }
     }
 }

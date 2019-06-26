@@ -48,6 +48,7 @@ namespace Notebook.Web.Controllers
         {
             var sqlQuery = _userGroupManager.Table()
                 .Include(a => a.Group)
+                    .ThenInclude(b => b.Folders)
                 .Where(a=>a.UserID == userId)
                 .OrderByDescending(a=>a.Group.CreateDate) as IQueryable<UserGroup>;
 
@@ -83,7 +84,7 @@ namespace Notebook.Web.Controllers
 
             GroupDetailModel detail = null;
 
-            var _group = _groupManager.getMany(a => a.ID == id).Include(a => a.Owner).FirstOrDefault();
+            var _group = _groupManager.getMany(a => a.ID == id).Include(a => a.Owner).Include(a => a.Folders).FirstOrDefault();
             if (_group != null)
             {
                 detail = new GroupDetailModel();
@@ -94,7 +95,7 @@ namespace Notebook.Web.Controllers
                 detail.Visible = _group.Visible;
                 detail.OwnerID = _group.OwnerID;
                 detail.OwnerName = _group.Owner.Name;
-                detail.FolderCount = _groupFolderManager.getMany(a => a.GroupID == _group.ID).Count();
+                detail.FolderCount = _group.Folders.Count();
                 detail.NoteCount = _groupNoteManager.getMany(a => a.GroupID == _group.ID).Count();
                 detail.UserCount = _userGroupManager.getMany(a => a.GroupID == _group.ID).Count();
                 detail.List = list;

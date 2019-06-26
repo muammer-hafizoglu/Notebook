@@ -59,7 +59,7 @@ namespace Notebook.Web.Controllers
             result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_un =>
                      new NoteModel
                      {
-                         name = string.Format("<a href='/{0}/note/{1}'>{4} {2} {3}</a>",
+                         name = string.Format("<a href='/note/{0}/{1}'>{4} {2} {3}</a>",
                                     _un.Note.ID, _un.Note.Title.ClearHtmlTagAndCharacter(), _un.Note.Title, (_un.Note.Visible == Visible.Private ? _lockIcon : ""), _noteIcon)
                      }).ToList();
 
@@ -127,8 +127,7 @@ namespace Notebook.Web.Controllers
         #region CRUD
 
         [HttpGet]
-        [Route("~/{id?}/note/{title?}")]
-        [Route("~/{id?}/note/{list?}")]
+        [Route("~/note/{id}/{title?}")]
         public IActionResult Detail(string id = "", string list = "")
         {
             NoteDetailModel detail = null;

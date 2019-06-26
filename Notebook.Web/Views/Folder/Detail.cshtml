@@ -12,7 +12,6 @@
 
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
-        <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>
         <li><a href="/group/@Model.Group.ID/@Model.Group.Name.ClearHtmlTagAndCharacter()">@Model.Group.Name</a></li>
         <li class="active">@Model.Name</li>
     </ol>
@@ -33,8 +32,8 @@
                     </p>
                     <ul class="list-group list-group-unbordered" style="color:#9b9b9b;">
                         <li class="list-group-item">
-                            <i class="fa fa-user"></i>&nbsp;@Localizer["Owner"]
-                            <a href="/@Model.OwnerID/profile/notes" class="pull-right" style="font-weight:bold; color:darkblue">@Model.OwnerName</a>
+                            <i class="fa fa-user"></i>&nbsp;@Localizer["Group"]
+                            <a href="/group/@Model.Group.ID/@Model.Group.Name.ClearHtmlTagAndCharacter()" class="pull-right" style="font-weight:bold; color:darkblue">@Model.Group.Name</a>
                         </li>
                         <li class="list-group-item">
                             <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <span class="pull-right">@Model.CreateDate.ToString("dddd, dd MMMM yyyy")</span>
@@ -44,7 +43,7 @@
                         </li>
                     </ul>
 
-                    @if (Model.OwnerID == _activeUser?.ID)
+                    @if (Model.MemberType == Member.Owner || Model.MemberType == Member.Manager)
                     {
                         <div class="text-center">
                             <a class="btn btn-primary" data-type="modal" data-action="@Model.ID/edit-folder"><b>@Localizer["Edit"]</b></a>
@@ -70,7 +69,7 @@
                 </ul>*@
                 <div class="tab-content">
                     @{ 
-                        await Html.RenderPartialAsync("Notes", new DataListPartialModel { ID = Model.ID, Member = (Model.OwnerID == _activeUser?.ID) ? Member.Owner : Member.Member });
+                        await Html.RenderPartialAsync("Notes", new DataListPartialModel { ID = Model.ID, Member = Model.MemberType });
                     }
                 </div>
             </div>

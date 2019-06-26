@@ -21,6 +21,7 @@ namespace Notebook.Business.Managers.Concrete
             model.ID = model.ID ?? CreateGuid();
 
             serviceDal.Add(model);
+            Save();
         }
 
         public string CreateGuid(int length = 8)
@@ -38,6 +39,7 @@ namespace Notebook.Business.Managers.Concrete
         public virtual void Delete(T model)
         {
             serviceDal.Delete(model);
+            Save();
         }
 
         public virtual IQueryable<T> getAll()
@@ -93,11 +95,13 @@ namespace Notebook.Business.Managers.Concrete
         public virtual void Update(T model)
         {
             serviceDal.Update(model);
+            Save();
         }
 
         public virtual void Update(T databaseModel, T objectModel)
         {
             serviceDal.Update(databaseModel);
+            Save();
         }
     }
 }

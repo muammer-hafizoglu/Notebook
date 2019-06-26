@@ -13,7 +13,7 @@ namespace Notebook.Entities.Entities
         {
             Users = new HashSet<UserGroup>();
             Notes = new HashSet<GroupNote>();
-            Folders = new HashSet<GroupFolder>();
+            Folders = new HashSet<Folder>();
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None), MaxLength(8)]
@@ -27,6 +27,6 @@ namespace Notebook.Entities.Entities
         public virtual User Owner { get; set; }
         public virtual ICollection<UserGroup> Users { get; set; }
         public virtual ICollection<GroupNote> Notes { get; set; }
-        public virtual ICollection<GroupFolder> Folders { get; set; }
+        public virtual ICollection<Folder> Folders { get; set; }
     }
 }

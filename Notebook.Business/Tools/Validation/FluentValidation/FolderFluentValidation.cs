@@ -11,6 +11,7 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
         public FolderFluentValidation()
         {
             RuleFor(p => p.Name).NotEmpty();
+            RuleFor(p => p.Group.ID).NotEmpty();
         }
 
         public void Validator(object entity)
@@ -23,7 +24,7 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
 
                 foreach (var error in result.Errors)
                 {
-                    exceptionMessage += string.Format("Property Name: {0} | Message: {1} <br/>", error.PropertyName,error.ErrorMessage);
+                    exceptionMessage += string.Format("{0} <br/>", error.ErrorMessage);
                 }
 
                 throw new System.Exception(exceptionMessage);

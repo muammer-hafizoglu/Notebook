@@ -15,11 +15,11 @@ namespace Notebook.DataAccess.DataContext
         public DbSet<Note> Note { get; set; }
         public DbSet<Group> Group { get; set; }
         public DbSet<Folder> Folder { get; set; }
-        public DbSet<UserFolder> UserFolder { get; set; }
+        //public DbSet<UserFolder> UserFolder { get; set; }
         public DbSet<UserGroup> UserGroup { get; set; }
         public DbSet<UserNote> UserNote { get; set; }
         public DbSet<FolderNote> FolderNote { get; set; }
-        public DbSet<GroupFolder> GroupFolder { get; set; }
+        //public DbSet<GroupFolder> GroupFolder { get; set; }
         public DbSet<GroupNote> GroupNote { get; set; }
         public DbSet<NotebookSettings> NotebookSettings { get; set; }
         public DbSet<UserSettings> UserSettings { get; set; }
@@ -81,16 +81,16 @@ namespace Notebook.DataAccess.DataContext
                         .WithMany(a => a.Users)
                         .HasForeignKey(a => a.GroupID);
 
-            modelBuilder.Entity<UserFolder>()
-                        .HasKey(a => new { a.UserID, a.FolderID });
-            modelBuilder.Entity<UserFolder>()
-                        .HasOne(a => a.User)
-                        .WithMany(a => a.SucscribedFolders)
-                        .HasForeignKey(a => a.UserID);
-            modelBuilder.Entity<UserFolder>()
-                        .HasOne(a => a.Folder)
-                        .WithMany(a => a.Users)
-                        .HasForeignKey(a => a.FolderID);
+            //modelBuilder.Entity<UserFolder>()
+            //            .HasKey(a => new { a.UserID, a.FolderID });
+            //modelBuilder.Entity<UserFolder>()
+            //            .HasOne(a => a.User)
+            //            .WithMany(a => a.SucscribedFolders)
+            //            .HasForeignKey(a => a.UserID);
+            //modelBuilder.Entity<UserFolder>()
+            //            .HasOne(a => a.Folder)
+            //            .WithMany(a => a.Users)
+            //            .HasForeignKey(a => a.FolderID);
 
             modelBuilder.Entity<UserNote>()
                         .HasKey(a => new { a.UserID, a.NoteID });
@@ -103,16 +103,16 @@ namespace Notebook.DataAccess.DataContext
                         .WithMany(a => a.Users)
                         .HasForeignKey(a => a.NoteID);
 
-            modelBuilder.Entity<GroupFolder>()
-                        .HasKey(a => new { a.GroupID, a.FolderID });
-            modelBuilder.Entity<GroupFolder>()
-                        .HasOne(a => a.Group)
-                        .WithMany(a => a.Folders)
-                        .HasForeignKey(a => a.GroupID);
-            modelBuilder.Entity<GroupFolder>()
-                        .HasOne(a => a.Folder)
-                        .WithMany(a => a.Groups)
-                        .HasForeignKey(a => a.FolderID);
+            //modelBuilder.Entity<GroupFolder>()
+            //            .HasKey(a => new { a.GroupID, a.FolderID });
+            //modelBuilder.Entity<GroupFolder>()
+            //            .HasOne(a => a.Group)
+            //            .WithMany(a => a.Folders)
+            //            .HasForeignKey(a => a.GroupID);
+            //modelBuilder.Entity<GroupFolder>()
+            //            .HasOne(a => a.Folder)
+            //            .WithMany(a => a.Groups)
+            //            .HasForeignKey(a => a.FolderID);
 
             modelBuilder.Entity<GroupNote>()
                         .HasKey(a => new { a.GroupID, a.NoteID });

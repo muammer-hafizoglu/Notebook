@@ -9,7 +9,7 @@ using Notebook.DataAccess.DataContext;
 namespace Notebook.DataAccess.Migrations
 {
     [DbContext(typeof(NotebookContext))]
-    [Migration("20190622220751_1")]
+    [Migration("20190626104008_1")]
     partial class _1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,15 +28,15 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<string>("Explanation");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("GroupID");
 
-                    b.Property<string>("OwnerID");
+                    b.Property<string>("Name");
 
                     b.Property<int>("Visible");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("OwnerID");
+                    b.HasIndex("GroupID");
 
                     b.ToTable("Folder");
                 });
@@ -105,27 +105,6 @@ namespace Notebook.DataAccess.Migrations
                     b.HasIndex("OwnerID");
 
                     b.ToTable("Group");
-                });
-
-            modelBuilder.Entity("Notebook.Entities.Entities.GroupFolder", b =>
-                {
-                    b.Property<string>("GroupID");
-
-                    b.Property<string>("FolderID");
-
-                    b.Property<DateTime>("CreateDate");
-
-                    b.Property<string>("ID")
-                        .IsRequired()
-                        .HasMaxLength(8);
-
-                    b.HasKey("GroupID", "FolderID");
-
-                    b.HasAlternateKey("ID");
-
-                    b.HasIndex("FolderID");
-
-                    b.ToTable("GroupFolder");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.GroupNote", b =>
@@ -262,9 +241,9 @@ namespace Notebook.DataAccess.Migrations
                             ID = "23m454h5",
                             Approve = true,
                             Avatar = "/notebook/images/avatar.png",
-                            CreateDate = new DateTime(2019, 6, 23, 1, 7, 51, 464, DateTimeKind.Local).AddTicks(1211),
+                            CreateDate = new DateTime(2019, 6, 26, 13, 40, 7, 859, DateTimeKind.Local).AddTicks(7076),
                             Email = "muammer.hafizogluu@gmail.com",
-                            LastActiveDate = new DateTime(2019, 6, 23, 1, 7, 51, 465, DateTimeKind.Local).AddTicks(1281),
+                            LastActiveDate = new DateTime(2019, 6, 26, 13, 40, 7, 861, DateTimeKind.Local).AddTicks(3772),
                             Name = "Muammer Hafızoğlu",
                             Password = "D3CE20FCCBE7D116ECD0",
                             Username = "muammer.hafizoglu"
@@ -273,25 +252,24 @@ namespace Notebook.DataAccess.Migrations
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserFolder", b =>
                 {
-                    b.Property<string>("UserID");
-
-                    b.Property<string>("FolderID");
+                    b.Property<string>("ID")
+                        .HasMaxLength(8);
 
                     b.Property<DateTime>("CreateDate");
 
-                    b.Property<string>("ID")
-                        .IsRequired()
-                        .HasMaxLength(8);
+                    b.Property<string>("FolderID");
 
                     b.Property<int>("MemberType");
 
                     b.Property<bool>("Notification");
 
-                    b.HasKey("UserID", "FolderID");
+                    b.Property<string>("UserID");
 
-                    b.HasAlternateKey("ID");
+                    b.HasKey("ID");
 
                     b.HasIndex("FolderID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("UserFolder");
                 });
@@ -361,9 +339,9 @@ namespace Notebook.DataAccess.Migrations
 
             modelBuilder.Entity("Notebook.Entities.Entities.Folder", b =>
                 {
-                    b.HasOne("Notebook.Entities.Entities.User", "Owner")
+                    b.HasOne("Notebook.Entities.Entities.Group", "Group")
                         .WithMany("Folders")
-                        .HasForeignKey("OwnerID");
+                        .HasForeignKey("GroupID");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.FolderNote", b =>
@@ -399,19 +377,6 @@ namespace Notebook.DataAccess.Migrations
                         .HasForeignKey("OwnerID");
                 });
 
-            modelBuilder.Entity("Notebook.Entities.Entities.GroupFolder", b =>
-                {
-                    b.HasOne("Notebook.Entities.Entities.Folder", "Folder")
-                        .WithMany("Groups")
-                        .HasForeignKey("FolderID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Notebook.Entities.Entities.Group", "Group")
-                        .WithMany("Folders")
-                        .HasForeignKey("GroupID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("Notebook.Entities.Entities.GroupNote", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.Group", "Group")
@@ -442,14 +407,12 @@ namespace Notebook.DataAccess.Migrations
             modelBuilder.Entity("Notebook.Entities.Entities.UserFolder", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.Folder", "Folder")
-                        .WithMany("Users")
-                        .HasForeignKey("FolderID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("FolderID");
 
                     b.HasOne("Notebook.Entities.Entities.User", "User")
                         .WithMany("SucscribedFolders")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserGroup", b =>

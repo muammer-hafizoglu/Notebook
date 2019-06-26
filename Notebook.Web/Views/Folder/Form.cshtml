@@ -14,23 +14,35 @@
                 </div>
                 <div class="n-modal-body">
                     <div class="form-group">
+                        @Html.HiddenFor(a => a.Group.ID)
                         @Html.HiddenFor(a => a.ID)
                         <input type="text" class="form-control" name="Name" required value="@Model.Name" placeholder="@Localizer["Name"]" />
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" name="Explanation" value="@Model.Explanation" placeholder="@Localizer["Explanation"]" />
                     </div>
-                    <div class="form-group">
-                        <label>@Localizer["Visibility"]</label>
-                        @foreach (var item in Enum.GetValues(typeof(Visible)))
-                        {
+                    @if (Model.Group.Visible == Visible.Public)
+                    {
+                        <div class="form-group">
+                            <label>@Localizer["Visibility"]</label>
                             <div class="checkbox">
-                                <label style="padding-left:0">
-                                    @Html.RadioButtonFor(a => a.Visible, item.ToString())&nbsp;@Localizer[item.ToString()]
+                                <label style="padding:0">
+                                    @Html.RadioButtonFor(a => a.Visible, Visible.Private) @Localizer["Me and group members"]
                                 </label>
                             </div>
-                        }
-                    </div>
+                            <div class="checkbox">
+                                <label style="padding:0">
+                                    @Html.RadioButtonFor(a => a.Visible, Visible.Public) @Localizer["Open to everyone"]
+                                </label>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning alert-small">
+                            @Localizer["Group is private"]
+                        </div>
+                    }
                 </div>
                 <div class="n-modal-footer">
                     <button type="button" class="btn btn-default btn-sm" onclick="closeModal('modal')">@Localizer["Close"]</button>

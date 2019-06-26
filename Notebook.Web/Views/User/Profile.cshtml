@@ -67,8 +67,8 @@
         <div class="col-md-9">
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
-                    <li @((Model.List == "" || Model.List == "groups") ? "class=active" : "")><a href="/@Model.ID/profile"><i class="fa fa-clone"></i>&nbsp;@Localizer["Groups"]</a></li>
-                    <li @((Model.List == "notes") ? "class=active" : "")><a href="/@Model.ID/profile/notes"><i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["All Notes"]</a></li>
+                    <li @((Model.List == "" || Model.List == "groups") ? "class=active" : "")><a href="/profile/@Model.ID/@Model.Name.ClearHtmlTagAndCharacter()"><i class="fa fa-clone"></i>&nbsp;@Localizer["Groups"]</a></li>
+                    <li @((Model.List == "notes") ? "class=active" : "")><a href="/profile/@Model.ID/@Model.Name.ClearHtmlTagAndCharacter()/notes"><i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["All Notes"]</a></li>
                 </ul>
                 <div class="tab-content">
                     @if (Model.List == "notes")

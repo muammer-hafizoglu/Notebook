@@ -11,8 +11,6 @@ namespace Notebook.Entities.Entities
     {
         public Folder()
         {
-            Users = new HashSet<UserFolder>();
-            Groups = new HashSet<GroupFolder>();
             Notes = new HashSet<FolderNote>();
         }
 
@@ -22,10 +20,8 @@ namespace Notebook.Entities.Entities
         public string Explanation { get; set; }
         public Visible Visible { get; set; }
         public DateTime CreateDate { get; set; }
-        public string OwnerID { get; set; }
-        public virtual User Owner { get; set; }
-        public virtual ICollection<UserFolder> Users { get; set; }
+        public virtual Group Group { get; set; }
+
         public virtual ICollection<FolderNote> Notes { get; set; }
-        public virtual ICollection<GroupFolder> Groups { get; set; }
     }
 }

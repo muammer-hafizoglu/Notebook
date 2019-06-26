@@ -30,9 +30,7 @@ namespace Notebook.Web.Controllers
             _userNoteManager = userNoteManager;
         }
 
-        [Route("~/profile/{list?}")]
-        [Route("~/{id?}/profile/{name?}")]
-        [Route("~/{id?}/profile/{list?}")]
+        [Route("~/profile/{id}/{name}/{list?}")]
         public IActionResult Profile(string id = "",string list = "")
         {
             User _user = null;

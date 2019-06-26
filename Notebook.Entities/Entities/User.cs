@@ -11,7 +11,6 @@ namespace Notebook.Entities.Entities
         public User()
         {
             Notes = new HashSet<Note>();
-            Folders = new HashSet<Folder>();
             Groups = new HashSet<Group>();
             SucscribedFolders = new HashSet<UserFolder>();
             SucscribedGroups = new HashSet<UserGroup>();
@@ -36,7 +35,6 @@ namespace Notebook.Entities.Entities
         public virtual UserSettings Settings { get; set; }
         public virtual ICollection<Note> Notes { get; set; }
         public virtual ICollection<Group> Groups { get; set; }
-        public virtual ICollection<Folder> Folders { get; set; }
         public virtual ICollection<Follow> Followers { get; set; }
         public virtual ICollection<Follow> Following { get; set; }
         public virtual ICollection<UserNote> SucscribedNotes { get; set; }

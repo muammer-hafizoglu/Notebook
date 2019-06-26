@@ -74,8 +74,13 @@ hr{
     font-size: 10px;
 }
 
-table .btn{
-    margin-left:4px;
+.alert-small {
+    padding: 3px;
+    margin-bottom: 0
+}
+
+table .btn {
+    margin-left: 4px;
 }
 input[type=text]{
     border-radius:3px;

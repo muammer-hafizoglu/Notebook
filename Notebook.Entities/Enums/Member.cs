@@ -9,6 +9,7 @@ namespace Notebook.Entities.Enums
         Owner,
         Manager,
         Member,
-        Favorite
+        Favorite,
+        Visitor
     }
 }

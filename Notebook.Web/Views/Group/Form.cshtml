@@ -22,20 +22,25 @@
                     </div>
                     <div class="form-group">
                         <label>@Localizer["Visibility"]</label>
-                        @foreach (var item in Enum.GetValues(typeof(Visible)))
-                        {
-                            <div class="checkbox">
-                                <label style="padding:0">
-                                    @Html.RadioButtonFor(a=>a.Visible,item.ToString()) @Localizer[item.ToString()]
-                                </label>
-                            </div>
-                        }
+                        <div id="private-alert" class="alert alert-warning alert-small">
+                            @Localizer["Nobody can see the group contents"]
+                        </div>
+                        <div class="checkbox">
+                            <label style="padding:0">
+                                @Html.RadioButtonFor(a => a.Visible, Visible.Private) @Localizer["Only me"]
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label style="padding:0">
+                                @Html.RadioButtonFor(a => a.Visible, Visible.Public) @Localizer["Open to everyone"]
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group membershipControl">
                         <label>@Localizer["Membership"]</label>
                         <div class="checkbox">
                             <label>
-                                @Html.CheckBoxFor(a=>a.IsRequiredApproval) @Localizer["Is required approval"] ?
+                                @Html.CheckBoxFor(a=>a.IsRequiredApproval) @Localizer["Admin approval required"]
                             </label>
                         </div>
                     </div>
@@ -62,9 +67,11 @@
         var _result = $("input[name=Visible]:checked").val();
         if (_result === "Public") {
             $(".membershipControl").show();
+            $("#private-alert").hide();
         }
         else {
             $(".membershipControl").hide();
+            $("#private-alert").show();
         }
     }
 </script>

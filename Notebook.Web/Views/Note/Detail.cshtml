@@ -10,7 +10,7 @@
 {
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
-        <li><a href="/@Model.OwnerID/profile">@Model.OwnerName</a></li>
+        <li><a href="/profile/@Model.OwnerID/@Model.OwnerName.ClearHtmlTagAndCharacter()">@Model.OwnerName</a></li>
         <li class="active">@Model.Title</li>
     </ol>
 
@@ -26,7 +26,7 @@
                     <ul class="list-group list-group-unbordered" style="color:#3D8CBC;">
                         <li class="list-group-item">
                             <i class="fa fa-user"></i>&nbsp;@Localizer["Autor"]
-                            <a href="/@Model.OwnerID/profile/groups" class="pull-right" style="font-weight:bold; color:darkblue">@Model.OwnerName</a>
+                            <a href="/profile/@Model.OwnerID/@Model.OwnerName.ClearHtmlTagAndCharacter()" class="pull-right" style="font-weight:bold; color:darkblue">@Model.OwnerName</a>
                         </li>
                         <li class="list-group-item">
                             <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <a class="pull-right">@Model.CreateDate.ToString("dddd, dd MMMM yyyy")</a>

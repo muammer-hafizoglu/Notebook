@@ -40,21 +40,23 @@
                         <input type="text" class="form-control" name="Explanation" value="@Model.Explanation" placeholder="@Localizer["Explanation"]" />
                     </div>
                     <div class="form-group">
-                        <textarea name="Content" class="form-control summernote">@Model.Content)</textarea>
+                        <textarea name="Content" class="form-control summernote">@Model.Content</textarea>
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" name="Tags" value="@Model.Tags" placeholder="@Localizer["Tags"]" />
                     </div>
                     <div class="form-group">
                         <label>@Localizer["Visible"]</label>
-                        @foreach (var item in Enum.GetValues(typeof(Visible)))
-                        {
-                            <div class="checkbox">
-                                <label style="padding-left:0">
-                                    <input type="radio" name="Visible" value="@item">&nbsp;@Localizer[item.ToString()]
-                                </label>
-                            </div>
-                        }
+                        <div class="checkbox">
+                            <label style="padding:0">
+                                @Html.RadioButtonFor(a => a.Visible, Visible.Private) @Localizer["Me and group members"]
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label style="padding:0">
+                                @Html.RadioButtonFor(a => a.Visible, Visible.Public) @Localizer["Open to everyone"]
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="n-modal-footer">
