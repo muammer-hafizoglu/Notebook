@@ -97,7 +97,7 @@ namespace Notebook.Web.Controllers
                 detail.Group = _folder.Group;
                 detail.NoteCount = _folderNoteManager.getMany(a => a.FolderID == _folder.ID).Count();
 
-                var _member = _folder.Group.Users.Where(a => a.UserID == _user.ID).FirstOrDefault();
+                var _member = _folder.Group.Users.Where(a => a.UserID == _user?.ID).FirstOrDefault();
                 detail.MemberType = (_member != null) ? _member.MemberType : Member.Visitor;
             }
 
