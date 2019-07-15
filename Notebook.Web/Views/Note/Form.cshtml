@@ -34,13 +34,16 @@
                 <div class="n-modal-body">
                     <div class="form-group">
                         @Html.HiddenFor(a => a.ID)
+                        @Html.HiddenFor(a => a.OwnerID)
+                        @Html.HiddenFor(a => a.GroupID)
+                        @Html.HiddenFor(a => a.FolderID)
                         <input type="text" class="form-control" name="Title" required value="@Model.Title" placeholder="@Localizer["Title"]" />
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" name="Explanation" value="@Model.Explanation" placeholder="@Localizer["Explanation"]" />
                     </div>
                     <div class="form-group">
-                        <textarea name="Content" class="form-control summernote">@Model.Content</textarea>
+                        <textarea name="Content" class="form-control summernote" required>@Model.Content</textarea>
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" name="Tags" value="@Model.Tags" placeholder="@Localizer["Tags"]" />

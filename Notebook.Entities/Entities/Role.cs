@@ -9,7 +9,7 @@ namespace Notebook.Entities.Entities
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None), MaxLength(8)]
         public string ID { get; set; }
         public string Name { get; set; }
-        public string Authorization { get; set; }
+        public string Permissions { get; set; }
 
     }
 }

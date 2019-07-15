@@ -7,10 +7,10 @@ namespace Notebook.Web.Filters
 {
     public class AccountFilterAttribute : ActionFilterAttribute
     {
-        private string _role;
-        public AccountFilterAttribute(string role = "")
+        private readonly string _permission;
+        public AccountFilterAttribute(string permission = "")
         {
-            _role = role;
+            _permission = permission;
         }
         
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -18,42 +18,44 @@ namespace Notebook.Web.Filters
             var user = context.HttpContext.Session.GetSession<User>("User");
             if (user == null)
             {
-                context.Result = new RedirectToRouteResult(new RouteValueDictionary(new
-                {
-                    action = "Login",
-                    controller = "Account"
-                }));
+                context.Result = new RedirectResult("/login");
             }
-            //else if(!string.IsNullOrEmpty(_role))
-            //{
-            //    if (_role.Contains(","))
-            //    {
-            //        string[] ops = _role.Split(",");
-            //        foreach (var o in ops)
-            //        {
-            //            if (!user.Roles.Contains(o))
-            //            {
-            //                ReturnError(context);
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        if (!user.Roles.Contains(_role))
-            //        {
-            //            ReturnError(context);
-            //        }
-            //    }
-            //}
+            else if (!string.IsNullOrEmpty(_permission))
+            {
+                if (user.Role != null)
+                {
+                    if (_permission.Contains(","))
+                    {
+                        string[] ops = _permission.Split(",");
+                        foreach (var o in ops)
+                        {
+                            if (!user.Role.Permissions.Contains(o))
+                            {
+                                ReturnError(context, "You are not authorized for view this page");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!user.Role.Permissions.Contains(_permission))
+                        {
+                            ReturnError(context, "You are not authorized for view this page");
+                        }
+                    }
+                }
+                else
+                {
+                    ReturnError(context, "You are not authorized for view this page");
+                }
+            }
         }
 
-        private void ReturnError(ActionExecutingContext context)
+        private void ReturnError(ActionExecutingContext context,string message = "")
         {
-            context.Result = new RedirectToRouteResult(new RouteValueDictionary(new
-            {
-                action = "PageNotFound",
-                controller = "Home"
-            }));
+            var cntrl = context.Controller as Controller;
+            cntrl.TempData["Error"] = message;
+
+            context.Result = new RedirectResult("/error-page");
         }
     }
 }

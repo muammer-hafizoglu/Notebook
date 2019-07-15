@@ -24,18 +24,27 @@ namespace Notebook.Web.Controllers
         
         public IActionResult Index()
         {
+            var user = _userManager.Cookie(HttpContext.Request.Cookies.GetCookies("Notebook"));
+            if (user != null)
+                HttpContext.Session.SetSession("User", user);
+
             return View();
         }
 
-        public IActionResult PageNotFound()
+        [Route("~/error-page")]
+        public IActionResult Error()
         {
             return View();
         }
-        public IActionResult Error()
+
+        [Route("~/save-error")]
+        public IActionResult SaveError()
         {
             var exception = HttpContext.Session.GetSession<ErrorModel>("Exception");
             if (exception != null)
             {
+                // TODO: Sistem hatalarını kaydet
+
                 HttpContext.Session.Remove("Exception");
                 TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = exception.Message });
             }

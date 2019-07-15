@@ -2,6 +2,22 @@
 
 @inject IViewLocalizer Localizer
 
+    <style>
+        .or-seperator {
+            margin: 20px 0 10px;
+            text-align: center;
+            border-top: 1px solid #ccc;
+        }
+
+            .or-seperator i {
+                padding: 0 10px;
+                background: #f7f7f7;
+                position: relative;
+                top: -11px;
+                z-index: 1;
+            }
+    </style>
+
 <div class="login-box" style="width:100%;">
     <div class="row">
         <div class="col-md-6">
@@ -28,6 +44,17 @@
             </div>
             <div class="col-md-6">
                 <div style="width:100%; max-width:350px; margin:auto">
+                    <div class="form-group">
+                        <a class="btn btn-social btn-google btn-block" asp-action="SocialMediaRegister" asp-route-provider="Google">
+                            <span class="fa fa-google"></span> @Localizer["Sign Up with Gmail"]
+                        </a>
+                        <a class="btn btn-social btn-facebook btn-block" asp-action="SocialMediaRegister" asp-route-provider="Facebook">
+                            <span class="fa fa-facebook"></span> @Localizer["Sign Up with Facebook"]
+                        </a>
+                    </div>
+                    <div class="or-seperator">
+                        <i>@Localizer["or"]</i>
+                    </div>
                     <form action="/Account/Register" method="post" onsubmit="return checkForm(this)">
                         @Html.AntiForgeryToken()
                         <div class="form-group has-feedback">

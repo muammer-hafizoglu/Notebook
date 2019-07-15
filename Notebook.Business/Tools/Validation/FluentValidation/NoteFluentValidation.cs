@@ -11,6 +11,7 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
         public NoteFluentValidation()
         {
             RuleFor(p => p.Title).NotEmpty();
+            RuleFor(p => p.OwnerID).NotEmpty();
             RuleFor(p => p.Content).NotEmpty();
         }
 
@@ -24,7 +25,7 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
 
                 foreach (var error in result.Errors)
                 {
-                    exceptionMessage += string.Format("Property Name: {0} | Message: {1} <br/>", error.PropertyName,error.ErrorMessage);
+                    exceptionMessage += string.Format("{1} <br/>", error.PropertyName,error.ErrorMessage);
                 }
 
                 throw new System.Exception(exceptionMessage);

@@ -24,24 +24,29 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cubes"></i>&nbsp;&nbsp;@Localizer["Applications"] <span class="caret"></span></a>
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="#"><i class="fa fa-calendar"></i>@Localizer["Calendar"]</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something else here</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Separated link</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">One more separated link</a></li>
+                                <li><a href="#"><i class="fa fa-tasks"></i>@Localizer["Task"]</a></li>
                             </ul>
                         </li>
-                        @*@if (Model.Roles.Contains("Admin"))
+                        @if (Model.Role != null && Model.Role.Permissions.Contains("VIEW_ADMINPANEL"))
 	                    {
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-briefcase"></i>&nbsp;&nbsp;@Localizer["Admin"] <span class="caret"></span></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-lock"></i>&nbsp;&nbsp;@Localizer["Admin"] <span class="caret"></span></a>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li><a href="/Admin/Settings"><i class="fa fa-cogs"></i>@Localizer["Settings"]</a></li>
-                                    <li><a href="/Admin/Users"><i class="fa fa-users"></i>@Localizer["Users"]</a></li>
+                                    @if (Model.Role.Permissions.Contains("EDIT_SETTINGS"))
+                                    {
+                                        <li><a href="/notebook-settings"><i class="fa fa-cogs"></i>@Localizer["Settings"]</a></li>
+                                    }
+                                    @if (Model.Role.Permissions.Contains("VIEW_USERS"))
+                                    {
+                                        <li><a href="/notebook-users"><i class="fa fa-users"></i>@Localizer["Users"]</a></li>
+                                    }
+                                    @if (Model.Role.Permissions.Contains("VIEW_ROLES"))
+                                    {
+                                        <li><a href="/notebook-roles"><i class="fa fa-sitemap"></i>@Localizer["Role Management"]</a></li>
+                                    }
                                 </ul>
                             </li>
-	                    }*@
+	                    }
                     </ul>
                     <form class="navbar-form navbar-left" role="search">
                         <div class="form-group">

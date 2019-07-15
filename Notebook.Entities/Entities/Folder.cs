@@ -11,7 +11,7 @@ namespace Notebook.Entities.Entities
     {
         public Folder()
         {
-            Notes = new HashSet<FolderNote>();
+            Notes = new HashSet<Note>();
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None), MaxLength(8)]
@@ -20,8 +20,10 @@ namespace Notebook.Entities.Entities
         public string Explanation { get; set; }
         public Visible Visible { get; set; }
         public DateTime CreateDate { get; set; }
+
+        public string GroupID { get; set; }
         public virtual Group Group { get; set; }
 
-        public virtual ICollection<FolderNote> Notes { get; set; }
+        public virtual ICollection<Note> Notes { get; set; }
     }
 }

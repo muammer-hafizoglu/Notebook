@@ -21,11 +21,12 @@ namespace Notebook.Web.Filters
         {
             context.HttpContext.Session.SetSession("Exception", new ErrorModel { Message = context.Exception.Message, Source = context.Exception.Source, StackTrace = context.Exception.StackTrace });
 
-            context.Result = new RedirectToRouteResult(new RouteValueDictionary(new
-            {
-                action = "Error",
-                controller = "Home"
-            }));
+            context.Result = new RedirectResult("/save-error");
+            //context.Result = new RedirectToRouteResult(new RouteValueDictionary(new
+            //{
+            //    action = "SaveError",
+            //    controller = "Home"
+            //}));
         }
     }
 }

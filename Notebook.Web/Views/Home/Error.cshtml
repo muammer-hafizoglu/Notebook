@@ -1,0 +1,22 @@
+﻿
+@inject IViewLocalizer Localizer
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Oops!</h2>
+        @if (TempData["Error"] != null)
+        {
+            <h1>@TempData["Error"].ToString()</h1>
+        }
+        else
+        {
+            <h2>@Localizer["Page not found"]</h2>
+
+            <h1><span>4</span><span>0</span><span>4</span></h1>
+        }
+    </div>
+</div>
+
+@{ 
+    TempData["Error"] = null;
+}

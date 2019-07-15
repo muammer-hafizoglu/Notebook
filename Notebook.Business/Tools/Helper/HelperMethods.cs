@@ -23,12 +23,5 @@ public class HelperMethods
 
     #endregion
 
-    #region File Operations
 
-    public static bool FileExists(string root)
-    {
-        return Directory.Exists(root);
-    }
-
-    #endregion
 }

@@ -1,5 +1,20 @@
-﻿
-@inject IViewLocalizer Localizer
+﻿@inject IViewLocalizer Localizer
+
+<style>
+    .or-seperator {
+        margin: 20px 0 10px;
+        text-align: center;
+        border-top: 1px solid #ccc;
+    }
+
+        .or-seperator i {
+            padding: 0 10px;
+            background: #f7f7f7;
+            position: relative;
+            top: -11px;
+            z-index: 1;
+        }
+</style>
 
 <div class="login-box" style="width:100%;">
     <div class="row">
@@ -17,21 +32,32 @@
         <div class="row">
             <div class="col-md-6">
                 <p>
-                    Lorem Ipsum, dizgi ve baskı endüstrisinde kullanılan mıgır metinlerdir. 
-                    Lorem Ipsum, adı bilinmeyen bir matbaacının bir hurufat numune kitabı oluşturmak üzere bir yazı 
-                    galerisini alarak karıştırdığı 1500'lerden beri endüstri standardı sahte metinler olarak kullanılmıştır. 
-                    Beşyüz yıl boyunca varlığını sürdürmekle kalmamış, aynı zamanda pek değişmeden elektronik dizgiye de sıçramıştır. 
-                    1960'larda Lorem Ipsum pasajları da içeren Letraset yapraklarının yayınlanması ile ve yakın zamanda Aldus PageMaker gibi Lorem Ipsum 
+                    Lorem Ipsum, dizgi ve baskı endüstrisinde kullanılan mıgır metinlerdir.
+                    Lorem Ipsum, adı bilinmeyen bir matbaacının bir hurufat numune kitabı oluşturmak üzere bir yazı
+                    galerisini alarak karıştırdığı 1500'lerden beri endüstri standardı sahte metinler olarak kullanılmıştır.
+                    Beşyüz yıl boyunca varlığını sürdürmekle kalmamış, aynı zamanda pek değişmeden elektronik dizgiye de sıçramıştır.
+                    1960'larda Lorem Ipsum pasajları da içeren Letraset yapraklarının yayınlanması ile ve yakın zamanda Aldus PageMaker gibi Lorem Ipsum
                     sürümleri içeren masaüstü yayıncılık yazılımları ile popüler olmuştur.
                 </p>
             </div>
             <div class="col-md-6">
                 <div style="width:100%; max-width:350px; margin:auto">
+                    <div class="form-group">
+                        <a class="btn btn-social btn-google btn-block" asp-action="SocialMediaLogin" asp-route-provider="Google">
+                            <span class="fa fa-google"></span> @Localizer["Sign in with Gmail"]
+                        </a>
+                        <a class="btn btn-social btn-facebook btn-block" asp-action="SocialMediaLogin" asp-route-provider="Facebook">
+                            <span class="fa fa-facebook"></span> @Localizer["Sign in with Facebook"]
+                        </a>
+                    </div>
+                    <div class="or-seperator">
+                        <i>@Localizer["or"]</i>
+                    </div>
                     <form action="/Account/Login" method="post">
                         @Html.AntiForgeryToken()
 
                         <div class="form-group has-feedback">
-                            <input type="text" class="form-control" placeholder="@Localizer["Email or username"]" name="Username">
+                            <input type="text" class="form-control" placeholder="@Localizer["Email or username"]" name="Email">
                             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                         </div>
                         <div class="form-group has-feedback">

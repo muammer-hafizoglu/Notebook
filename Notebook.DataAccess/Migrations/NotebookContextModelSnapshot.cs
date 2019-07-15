@@ -39,27 +39,6 @@ namespace Notebook.DataAccess.Migrations
                     b.ToTable("Folder");
                 });
 
-            modelBuilder.Entity("Notebook.Entities.Entities.FolderNote", b =>
-                {
-                    b.Property<string>("FolderID");
-
-                    b.Property<string>("NoteID");
-
-                    b.Property<DateTime>("CreateDate");
-
-                    b.Property<string>("ID")
-                        .IsRequired()
-                        .HasMaxLength(8);
-
-                    b.HasKey("FolderID", "NoteID");
-
-                    b.HasAlternateKey("ID");
-
-                    b.HasIndex("NoteID");
-
-                    b.ToTable("FolderNote");
-                });
-
             modelBuilder.Entity("Notebook.Entities.Entities.Follow", b =>
                 {
                     b.Property<string>("FollowerID");
@@ -105,27 +84,6 @@ namespace Notebook.DataAccess.Migrations
                     b.ToTable("Group");
                 });
 
-            modelBuilder.Entity("Notebook.Entities.Entities.GroupNote", b =>
-                {
-                    b.Property<string>("GroupID");
-
-                    b.Property<string>("NoteID");
-
-                    b.Property<DateTime>("CreateDate");
-
-                    b.Property<string>("ID")
-                        .IsRequired()
-                        .HasMaxLength(8);
-
-                    b.HasKey("GroupID", "NoteID");
-
-                    b.HasAlternateKey("ID");
-
-                    b.HasIndex("NoteID");
-
-                    b.ToTable("GroupNote");
-                });
-
             modelBuilder.Entity("Notebook.Entities.Entities.Log", b =>
                 {
                     b.Property<string>("ID")
@@ -147,9 +105,19 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<string>("Content");
 
+                    b.Property<int>("CopyCount");
+
                     b.Property<DateTime>("CreateDate");
 
                     b.Property<string>("Explanation");
+
+                    b.Property<string>("FolderID");
+
+                    b.Property<string>("GroupID");
+
+                    b.Property<bool>("OpenToComments");
+
+                    b.Property<bool>("OpenToCopy");
 
                     b.Property<string>("OwnerID");
 
@@ -165,19 +133,29 @@ namespace Notebook.DataAccess.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("FolderID");
+
+                    b.HasIndex("GroupID");
+
                     b.HasIndex("OwnerID");
 
                     b.ToTable("Note");
                 });
 
-            modelBuilder.Entity("Notebook.Entities.Entities.NotebookSettings", b =>
+            modelBuilder.Entity("Notebook.Entities.Entities.Permission", b =>
                 {
                     b.Property<string>("ID")
                         .HasMaxLength(8);
 
+                    b.Property<bool>("IsModule");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Value");
+
                     b.HasKey("ID");
 
-                    b.ToTable("NotebookSettings");
+                    b.ToTable("Permission");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.Role", b =>
@@ -185,9 +163,9 @@ namespace Notebook.DataAccess.Migrations
                     b.Property<string>("ID")
                         .HasMaxLength(8);
 
-                    b.Property<string>("Authorization");
-
                     b.Property<string>("Name");
+
+                    b.Property<string>("Permissions");
 
                     b.HasKey("ID");
 
@@ -196,9 +174,86 @@ namespace Notebook.DataAccess.Migrations
                     b.HasData(
                         new
                         {
-                            ID = "863a12r5",
-                            Authorization = "ADD_ROLE,EDIT_ROLE,NEW_ROLE,ADD_USER,EDIT_USER,NEW_USER,USER_ROLE",
-                            Name = "admin"
+                            ID = "56854644",
+                            Name = "Admin",
+                            Permissions = "VIEW_ADMINPANEL,VIEW_ROLE,ADD_ROLE,EDIT_ROLE,DELETE_ROLE,EDIT_SETTINGS,VIEW_USERS,EDIT_USERS,DELETE_USERS"
+                        });
+                });
+
+            modelBuilder.Entity("Notebook.Entities.Entities.Settings", b =>
+                {
+                    b.Property<string>("ID")
+                        .HasMaxLength(8);
+
+                    b.Property<string>("Address");
+
+                    b.Property<string>("DefaultLanguage");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Email");
+
+                    b.Property<string>("Facebook");
+
+                    b.Property<string>("Footer");
+
+                    b.Property<string>("Gmail");
+
+                    b.Property<string>("Host");
+
+                    b.Property<string>("Icon");
+
+                    b.Property<string>("Introduction");
+
+                    b.Property<bool>("IsMailActive");
+
+                    b.Property<bool>("IsMembershipOpen");
+
+                    b.Property<string>("Linkedin");
+
+                    b.Property<string>("Logo");
+
+                    b.Property<bool>("MembershipEmailControl");
+
+                    b.Property<string>("Metadata");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Password");
+
+                    b.Property<string>("Phone");
+
+                    b.Property<string>("Port");
+
+                    b.Property<string>("SingleFileSize");
+
+                    b.Property<string>("Title");
+
+                    b.Property<string>("TotalFileSize");
+
+                    b.Property<string>("Twitter");
+
+                    b.Property<string>("Username");
+
+                    b.Property<string>("WebAddress");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Settings");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = "45634df5",
+                            DefaultLanguage = "en-EN",
+                            Footer = "Copyright © 2014-2016 Almsaeed Studio. All rights reserved. ",
+                            Icon = "/favicon.ico",
+                            IsMailActive = false,
+                            IsMembershipOpen = true,
+                            Logo = "/notebook/images/logo.png",
+                            MembershipEmailControl = false,
+                            Title = "Notebook",
+                            WebAddress = "https://www.notebook.com"
                         });
                 });
 
@@ -239,9 +294,9 @@ namespace Notebook.DataAccess.Migrations
                             ID = "23m454h5",
                             Approve = true,
                             Avatar = "/notebook/images/avatar.png",
-                            CreateDate = new DateTime(2019, 6, 26, 13, 40, 7, 859, DateTimeKind.Local).AddTicks(7076),
-                            Email = "muammer.hafizogluu@gmail.com",
-                            LastActiveDate = new DateTime(2019, 6, 26, 13, 40, 7, 861, DateTimeKind.Local).AddTicks(3772),
+                            CreateDate = new DateTime(2019, 7, 13, 16, 46, 55, 992, DateTimeKind.Local).AddTicks(3726),
+                            Email = "mhaf69@gmail.com",
+                            LastActiveDate = new DateTime(2019, 7, 13, 16, 46, 55, 993, DateTimeKind.Local).AddTicks(2010),
                             Name = "Muammer Hafızoğlu",
                             Password = "D3CE20FCCBE7D116ECD0",
                             Username = "muammer.hafizoglu"
@@ -299,23 +354,22 @@ namespace Notebook.DataAccess.Migrations
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserNote", b =>
                 {
-                    b.Property<string>("UserID");
-
-                    b.Property<string>("NoteID");
+                    b.Property<string>("ID")
+                        .HasMaxLength(8);
 
                     b.Property<DateTime>("CreateDate");
 
-                    b.Property<string>("ID")
-                        .IsRequired()
-                        .HasMaxLength(8);
-
                     b.Property<int>("Member");
 
-                    b.HasKey("UserID", "NoteID");
+                    b.Property<string>("NoteID");
 
-                    b.HasAlternateKey("ID");
+                    b.Property<string>("UserID");
+
+                    b.HasKey("ID");
 
                     b.HasIndex("NoteID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("UserNote");
                 });
@@ -342,19 +396,6 @@ namespace Notebook.DataAccess.Migrations
                         .HasForeignKey("GroupID");
                 });
 
-            modelBuilder.Entity("Notebook.Entities.Entities.FolderNote", b =>
-                {
-                    b.HasOne("Notebook.Entities.Entities.Folder", "Folder")
-                        .WithMany("Notes")
-                        .HasForeignKey("FolderID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Notebook.Entities.Entities.Note", "Note")
-                        .WithMany("Folders")
-                        .HasForeignKey("NoteID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("Notebook.Entities.Entities.Follow", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.User", "Follower")
@@ -375,21 +416,16 @@ namespace Notebook.DataAccess.Migrations
                         .HasForeignKey("OwnerID");
                 });
 
-            modelBuilder.Entity("Notebook.Entities.Entities.GroupNote", b =>
-                {
-                    b.HasOne("Notebook.Entities.Entities.Group", "Group")
-                        .WithMany("Notes")
-                        .HasForeignKey("GroupID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Notebook.Entities.Entities.Note", "Note")
-                        .WithMany("Groups")
-                        .HasForeignKey("NoteID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("Notebook.Entities.Entities.Note", b =>
                 {
+                    b.HasOne("Notebook.Entities.Entities.Folder", "Folder")
+                        .WithMany("Notes")
+                        .HasForeignKey("FolderID");
+
+                    b.HasOne("Notebook.Entities.Entities.Group", "Group")
+                        .WithMany("Notes")
+                        .HasForeignKey("GroupID");
+
                     b.HasOne("Notebook.Entities.Entities.User", "Owner")
                         .WithMany("Notes")
                         .HasForeignKey("OwnerID");
@@ -429,14 +465,12 @@ namespace Notebook.DataAccess.Migrations
             modelBuilder.Entity("Notebook.Entities.Entities.UserNote", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.Note", "Note")
-                        .WithMany("Users")
-                        .HasForeignKey("NoteID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("NoteID");
 
                     b.HasOne("Notebook.Entities.Entities.User", "User")
                         .WithMany("SucscribedNotes")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserSettings", b =>

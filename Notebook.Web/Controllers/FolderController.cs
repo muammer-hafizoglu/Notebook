@@ -85,7 +85,12 @@ namespace Notebook.Web.Controllers
 
             FolderDetailModel detail = null;
             
-            var _folder = _folderManager.getMany(a => a.ID == ID).Include(a => a.Group).ThenInclude(b => b.Users).FirstOrDefault();
+            var _folder = _folderManager.getMany(a => a.ID == ID)
+                .Include(a => a.Group)
+                    .ThenInclude(b => b.Users)
+                .Include(a => a.Notes)
+                .FirstOrDefault();
+
             if (_folder != null)
             {
                 detail = new FolderDetailModel();
@@ -95,7 +100,7 @@ namespace Notebook.Web.Controllers
                 detail.CreateDate = _folder.CreateDate;
                 detail.Visible = _folder.Visible;
                 detail.Group = _folder.Group;
-                detail.NoteCount = _folderNoteManager.getMany(a => a.FolderID == _folder.ID).Count();
+                detail.NoteCount = _folder.Notes.Count();
 
                 var _member = _folder.Group.Users.Where(a => a.UserID == _user?.ID).FirstOrDefault();
                 detail.MemberType = (_member != null) ? _member.MemberType : Member.Visitor;
@@ -125,9 +130,9 @@ namespace Notebook.Web.Controllers
         public IActionResult Add(Folder _folder)
         {
             var _user = HttpContext.Session.GetSession<User>("User");
-
+         
             _folderManager.Add(_folder, _user.ID);
-
+         
             TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Redirect(TempData["BeforeUrl"].ToString());

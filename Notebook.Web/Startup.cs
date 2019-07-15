@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -18,6 +19,8 @@ using Notebook.DataAccess.DataAccess.Abstract;
 using Notebook.DataAccess.DataAccess.Concrete.EntityFramework;
 using Notebook.DataAccess.DataContext;
 using Notebook.Web.Filters;
+using Notebook.Web.Middlewares;
+using Notebook.Web.Tools.FileManager;
 using SimpleProxy.Extensions;
 using SimpleProxy.Strategies;
 using System;
@@ -44,7 +47,7 @@ namespace Notebook.Web
             services.AddScoped<DbContext, NotebookContext>();
 
             #endregion
-            
+
             #region Aspects
 
             services.EnableSimpleProxy(p => p
@@ -57,6 +60,7 @@ namespace Notebook.Web
             services.AddScoped<LogFilterAttribute>();
             services.AddScoped<AccountFilterAttribute>();
             services.AddScoped<ExceptionFilterAttribute>();
+            services.AddScoped<IFileManager,FileManager>();
             #endregion
 
             #region Managers
@@ -93,6 +97,9 @@ namespace Notebook.Web
 
             services.AddScopedWithProxy<IFolderNoteDal, EfFolderNoteDal>();
             services.AddScopedWithProxy<IFolderNoteManager, FolderNoteManager>();
+
+            services.AddScopedWithProxy<ISettingsDal, EfSettingsDal>();
+            services.AddScopedWithProxy<ISettingsManager, SettingsManager>();
             #endregion
 
             #region Session
@@ -146,6 +153,28 @@ namespace Notebook.Web
             services.AddAutoMapper();
 
             #endregion
+
+            #region Social Login
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration.GetSection("Authentication").GetValue<string>("GoogleClientId");
+                googleOptions.ClientSecret = Configuration.GetSection("Authentication").GetValue<string>("GoogleClientSecret");
+            })
+            .AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = Configuration.GetSection("Authentication").GetValue<string>("FacebookClientId");
+                facebookOptions.AppSecret = Configuration.GetSection("Authentication").GetValue<string>("FacebookClientSecret");
+            })
+            .AddCookie();
+
+            #endregion
         }
 
 
@@ -166,6 +195,7 @@ namespace Notebook.Web
                 app.UseHsts();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSession();

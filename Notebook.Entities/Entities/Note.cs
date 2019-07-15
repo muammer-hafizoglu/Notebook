@@ -9,14 +9,6 @@ namespace Notebook.Entities.Entities
 {
     public class Note : IEntity
     {
-        public Note()
-        {
-            Groups = new HashSet<GroupNote>();
-            Folders = new HashSet<FolderNote>();
-            Users = new HashSet<UserNote>();
-        }
-       
-
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None), MaxLength(8)]
         public string ID { get; set; }
         public string Title { get; set; }
@@ -27,10 +19,15 @@ namespace Notebook.Entities.Entities
         public DateTime UpdateDate { get; set; }
         public int ReadCount { get; set; }
         public string Tags { get; set; }
+        public bool OpenToCopy { get; set; }
+        public bool OpenToComments { get; set; }
+        public int CopyCount { get; set; }
+
         public string OwnerID { get; set; }
         public virtual User Owner { get; set; }
-        public virtual ICollection<UserNote> Users { get; set; }
-        public virtual ICollection<GroupNote> Groups { get; set; }
-        public virtual ICollection<FolderNote> Folders { get; set; }
+        public string GroupID { get; set; }
+        public virtual Group Group { get; set; }
+        public string FolderID { get; set; }
+        public virtual Folder Folder { get; set; }
     }
 }

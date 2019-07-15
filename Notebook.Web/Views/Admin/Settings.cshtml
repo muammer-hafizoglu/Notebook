@@ -1,205 +1,255 @@
-﻿@model NotebookSettings
+﻿@model Settings
 
 @inject IViewLocalizer Localizer
 
+<link href="/adminlte/components/summernote/summernote.css" rel="stylesheet" />
+<style>
+    .modal-backdrop{
+        display:none;
+    }
+</style>
 <div class="row">
     <div class="col-md-12">
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#settings" data-toggle="tab">@Localizer["General Settings"]</a></li>
-                <li><a href="#timeline" data-toggle="tab">Timeline</a></li>
-                <li><a href="#localization" data-toggle="tab">@Localizer["Localization"]</a></li>
-            </ul>
-            <div class="tab-content">
-                <div class="active tab-pane" id="settings">
-                    <!-- Post -->
-                    <div class="post">
-                        <div class="user-block">
-                            <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
-                            <span class="username">
-                                <a href="#">Jonathan Burke Jr.</a>
-                                <a href="#" class="pull-right btn-box-tool"><i class="fa fa-times"></i></a>
-                            </span>
-                            <span class="description">Shared publicly - 7:30 PM today</span>
-                        </div>
-                        <!-- /.user-block -->
-                        <p>
-                            Lorem ipsum represents a long-held tradition for designers,
-                            typographers and the like. Some people hate it and argue for
-                            its demise, but others ignore the hate as they create awesome
-                            tools to help create filler text for everyone from bacon lovers
-                            to Charlie Sheen fans.
-                        </p>
-                        <ul class="list-inline">
-                            <li><a href="#" class="link-black text-sm"><i class="fa fa-share margin-r-5"></i> Share</a></li>
-                            <li>
-                                <a href="#" class="link-black text-sm"><i class="fa fa-thumbs-o-up margin-r-5"></i> Like</a>
-                            </li>
-                            <li class="pull-right">
-                                <a href="#" class="link-black text-sm">
-                                    <i class="fa fa-comments-o margin-r-5"></i> Comments
-                                    (5)
-                                </a>
-                            </li>
-                        </ul>
+        <form action="/update-settings" method="post" enctype="multipart/form-data">
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#general" data-toggle="tab"><i class="fa fa-th-large"></i> @Localizer["General"]</a></li>
+                    <li><a href="#mail" data-toggle="tab"><i class="fa fa-envelope"></i> @Localizer["Mail"]</a></li>
+                    <li><a href="#membership" data-toggle="tab"><i class="fa fa-user-circle-o"></i> @Localizer["Membership"]</a></li>
+                    <li><a href="#contact" data-toggle="tab"><i class="fa fa-phone"></i> @Localizer["Contact"]</a></li>
+                    <li><a href="#seo" data-toggle="tab"><i class="fa fa-search"></i> @Localizer["Seo"]</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="active tab-pane" id="general">
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(a => a.ID)
 
-                        <input class="form-control input-sm" type="text" placeholder="Type a comment">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Name"]</label>
+                                    <input type="text" class="form-control" value="@Model.Name" name="Name" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Title"]</label>
+                                    <input type="text" class="form-control" value="@Model.Title" name="Title" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Web Address"]</label>
+                                    <input type="text" class="form-control" value="@Model.WebAddress" name="WebAddress" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Default Language"]</label>
+                                    <input type="text" class="form-control" value="@Model.DefaultLanguage" name="DefaultLanguage" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Default Language"]</label>
+                                    <input type="text" class="form-control" value="@Model.DefaultLanguage" name="DefaultLanguage" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>@Localizer["Logo"]</label><br />
+                                            <img src="@Model.Logo" style="height:24px; margin:10px auto 15px" />
+                                            @Html.HiddenFor(a => a.Logo)
+                                            <input type="file" name="Logo" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>@Localizer["Icon"]</label><br />
+                                            <img src="@Model.Icon" style="height:24px; margin:10px auto 15px" />
+                                            @Html.HiddenFor(a => a.Icon)
+                                            <input type="file" name="Icon" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>@Localizer["Introduction"]</label>
+                                    <textarea name="Introduction" class="form-control summernote">@Model.Introduction</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>@Localizer["Footer"]</label>
+                                    <textarea name="Footer" class="form-control summernote">@Model.Footer</textarea>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <div class="tab-pane" id="mail">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Username"]</label>
+                                    <input type="text" class="form-control" value="@Model.Username" name="Username" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Password"]</label>
+                                    <input type="text" class="form-control" value="@Model.Password" name="Password" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Mail"]</label>
+                                    <input type="text" class="form-control" value="@Model.Email" name="Email" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Host"]</label>
+                                    <input type="text" class="form-control" value="@Model.Host" name="Host" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Port"]</label>
+                                    <input type="text" class="form-control" value="@Model.Port" name="Port" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Is it active"] ?</label>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBoxFor(a => a.IsMailActive) @Localizer["Active"]
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="membership">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Total File Size"] (MB)</label>
+                                    <input type="number" class="form-control" value="@Model.TotalFileSize" name="TotalFileSize" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Single File Size"] (MB)</label>
+                                    <input type="number" class="form-control" value="@Model.SingleFileSize" name="SingleFileSize" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Is membership open"] ?</label>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBoxFor(a => a.IsMembershipOpen) @Localizer["Open"]
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Check email"] ?</label>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBoxFor(a => a.MembershipEmailControl) @Localizer["Active"]
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="contact">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Gmail"]</label>
+                                    <input type="text" class="form-control" value="@Model.Gmail" name="Gmail" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Phone"]</label>
+                                    <input type="text" class="form-control" value="@Model.Phone" name="Phone" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Facebook"]</label>
+                                    <input type="text" class="form-control" value="@Model.Facebook" name="Facebook" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Twitter"]</label>
+                                    <input type="text" class="form-control" value="@Model.Twitter" name="Twitter" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@Localizer["Linkedin"]</label>
+                                    <input type="text" class="form-control" value="@Model.Linkedin" name="Linkedin" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>@Localizer["Address"]</label>
+                                    <textarea name="Address" class="form-control summernote">@Model.Address</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="seo">
+                        <div class="form-group">
+                            <label>@Localizer["Description"]</label>
+                            <input type="text" class="form-control" value="@Model.Description" name="Description" />
+                        </div>
+                        <div class="form-group">
+                            <label>@Localizer["Metadata"]</label>
+                            <input type="text" class="form-control" value="@Model.Metadata" name="Metadata" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="fa fa-check"></i>&nbsp;Save
+                        </button>
+                    </div>
+
                 </div>
-                <!-- /.tab-pane -->
-                <div class="tab-pane" id="timeline">
-                    <!-- The timeline -->
-                    <ul class="timeline timeline-inverse">
-                        <!-- timeline time label -->
-                        <li class="time-label">
-                            <span class="bg-red">
-                                10 Feb. 2014
-                            </span>
-                        </li>
-                        <!-- /.timeline-label -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-envelope bg-blue"></i>
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 12:05</span>
-
-                                <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
-
-                                <div class="timeline-body">
-                                    Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
-                                    weebly ning heekya handango imeem plugg dopplr jibjab, movity
-                                    jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
-                                    quora plaxo ideeli hulu weebly balihoo...
-                                </div>
-                                <div class="timeline-footer">
-                                    <a class="btn btn-primary btn-xs">Read more</a>
-                                    <a class="btn btn-danger btn-xs">Delete</a>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-user bg-aqua"></i>
-
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 5 mins ago</span>
-
-                                <h3 class="timeline-header no-border">
-                                    <a href="#">Sarah Young</a> accepted your friend request
-                                </h3>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-comments bg-yellow"></i>
-
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 27 mins ago</span>
-
-                                <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
-
-                                <div class="timeline-body">
-                                    Take me to your leader!
-                                    Switzerland is small and neutral!
-                                    We are more like Germany, ambitious and misunderstood!
-                                </div>
-                                <div class="timeline-footer">
-                                    <a class="btn btn-warning btn-flat btn-xs">View comment</a>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline time label -->
-                        <li class="time-label">
-                            <span class="bg-green">
-                                3 Jan. 2014
-                            </span>
-                        </li>
-                        <!-- /.timeline-label -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-camera bg-purple"></i>
-
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>
-
-                                <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
-
-                                <div class="timeline-body">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <li>
-                            <i class="fa fa-clock-o bg-gray"></i>
-                        </li>
-                    </ul>
-                </div>
-                <!-- /.tab-pane -->
-
-                <div class="tab-pane" id="localization">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label for="inputName" class="col-sm-2 control-label">Name</label>
-
-                            <div class="col-sm-10">
-                                <input type="email" class="form-control" id="inputName" placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputEmail" class="col-sm-2 control-label">Email</label>
-
-                            <div class="col-sm-10">
-                                <input type="email" class="form-control" id="inputEmail" placeholder="Email">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputName" class="col-sm-2 control-label">Name</label>
-
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputName" placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputExperience" class="col-sm-2 control-label">Experience</label>
-
-                            <div class="col-sm-10">
-                                <textarea class="form-control" id="inputExperience" placeholder="Experience"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputSkills" class="col-sm-2 control-label">Skills</label>
-
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputSkills" placeholder="Skills">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <button type="submit" class="btn btn-danger">Submit</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <!-- /.tab-pane -->
             </div>
-            <!-- /.tab-content -->
-        </div>
+        </form>
     </div>
 </div>
+
+@section scripts{
+    <script src="/adminlte/components/summernote/summernote.min.js"></script>
+    <script>
+    $(".summernote").summernote({
+        height: 200,
+        placeholder: '@Localizer["Content"] ...',
+        toolbar: [
+            ['style', ['style']],
+            ['fontsize', ['fontsize']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'hr']],
+            ['view', ['fullscreen', 'codeview']],
+            ['help', ['help']]
+        ]
+    });
+    </script>
+}

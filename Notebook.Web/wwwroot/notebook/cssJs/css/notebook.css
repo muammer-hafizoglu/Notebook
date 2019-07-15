@@ -53,7 +53,10 @@ hr{
 .btn {
     border-radius: 3px;
 }
-
+.btn-xx{
+    padding:1px 7px;
+    font-size:11px;
+}
 /*--summernote---*/
 .note-group-select-from-files{
     display:none !important;
@@ -119,7 +122,7 @@ input[type=text]{
 }
 
 .box-header > .fa, .box-header > .glyphicon, .box-header > .ion, .box-header .box-title, .box-title {
-    font-size: 14px;
+    font-size: 16px;
     color: #3D8CBC;
     font-weight: bold;
 }

@@ -1,4 +1,5 @@
-﻿using Notebook.Business.Managers.Abstract;
+﻿using Microsoft.EntityFrameworkCore;
+using Notebook.Business.Managers.Abstract;
 using Notebook.Business.Tools.Logging;
 using Notebook.Business.Tools.Validation.FluentValidation;
 using Notebook.Core.Aspects.SimpleProxy.Caching;
@@ -30,6 +31,9 @@ namespace Notebook.Business.Managers.Concrete
             UsernameControl(model.Username);
 
             model.Password = model.Password.SHA256Encrypt();
+            model.CreateDate = DateTime.Now;
+            model.LastActiveDate = DateTime.Now;
+
             base.Add(model);
         }
 
@@ -44,7 +48,7 @@ namespace Notebook.Business.Managers.Concrete
 
         private void UsernameControl(string username)
         {
-            if (servisDal.getOne(a => a.Username == username) != null)
+            if (!string.IsNullOrEmpty(username) && servisDal.getOne(a => a.Username == username) != null)
             {
                 throw new Exception("This username is not available");
             }
@@ -61,6 +65,51 @@ namespace Notebook.Business.Managers.Concrete
         public override IQueryable<User> getAll()
         {
             return base.getAll();
+        }
+
+        public void LastActiveDateUpdate(User user)
+        {
+            user.LastActiveDate = DateTime.Now;
+
+            servisDal.Update(user);
+        }
+
+        public User Login(User user)
+        {
+            var _user = servisDal.getMany(a => (a.Username == user.Email || a.Email == user.Email) && a.Password == user.Password.SHA256Encrypt()).Include(a => a.Role).FirstOrDefault();
+            if (_user != null)
+            {
+                if (_user.Approve)
+                {
+                    LastActiveDateUpdate(_user);
+
+                    return _user;
+                }
+                else
+                {
+                    throw new Exception("Your account is not active");
+                }
+            }
+            else
+            {
+                throw new Exception("Username or password is wrong");
+            }
+        }
+
+        public User Cookie(string key)
+        {
+            User user = null;
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                user = servisDal.getMany(a => a.Email == key).Include(a => a.Role).FirstOrDefault();
+                if (user != null)
+                {
+                    LastActiveDateUpdate(user);
+                }
+            }
+
+            return user;
         }
     }
 }

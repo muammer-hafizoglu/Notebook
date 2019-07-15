@@ -8,7 +8,8 @@
 
 @if (Model != null)
 {
-    TempData["GroupID"] = @Model.Group.ID;
+    bool control1 = (Model.MemberType != Member.Visitor);
+    bool control2 = (Model.Group.Visible == Visible.Public && Model.Visible == Visible.Public);
 
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
@@ -16,50 +17,50 @@
         <li class="active">@Model.Name</li>
     </ol>
 
-    <div class="row">
-        <div class="col-md-3">
-            <div class="box box-primary">
-                <div class="box-body box-profile" style="padding:10px 15px;">
-                    <p class="text-center media-icon">F</p>
+    @if (control1 || control2)
+    {
+        <div class="row">
+            <div class="col-md-3">
+                <div class="box box-primary">
+                    <div class="box-body box-profile" style="padding:10px 15px;">
+                        <p class="text-center media-icon">F</p>
 
-                    <h3 class="text-center box-title">@Model.Name</h3>
+                        <h3 class="text-center box-title">@Model.Name</h3>
 
-                    <p class="text-muted text-center">@Model.Explanation</p>
-                    <p class="text-center">
-                        <label class="label label-success">@Localizer[Model.Visible.ToString()]</label>
-                    </p>
-                    <ul class="list-group list-group-unbordered" style="color:#9b9b9b;">
-                        <li class="list-group-item">
-                            <i class="fa fa-user"></i>&nbsp;@Localizer["Group"]
-                            <a href="/group/@Model.Group.ID/@Model.Group.Name.ClearHtmlTagAndCharacter()" class="pull-right" style="font-weight:bold; color:darkblue">@Model.Group.Name</a>
-                        </li>
-                        <li class="list-group-item">
-                            <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <span class="pull-right">@Model.CreateDate.ToString("dddd, dd MMMM yyyy")</span>
-                        </li>
-                        <li class="list-group-item">
-                            <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <span class="pull-right">@Model.NoteCount</span>
-                        </li>
-                    </ul>
+                        <p class="text-muted text-center">@Model.Explanation</p>
+                        <p class="text-center">
+                            <label class="label label-success">@Localizer[Model.Visible.ToString()]</label>
+                        </p>
+                        <ul class="list-group list-group-unbordered" style="color:#9b9b9b;">
+                            <li class="list-group-item">
+                                <i class="fa fa-user"></i>&nbsp;@Localizer["Group"]
+                                <a href="/group/@Model.Group.ID/@Model.Group.Name.ClearHtmlTagAndCharacter()" class="pull-right" style="font-weight:bold; color:darkblue">@Model.Group.Name</a>
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <span class="pull-right">@Model.CreateDate.ToString("dddd, dd MMMM yyyy")</span>
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <span class="pull-right">@Model.NoteCount</span>
+                            </li>
+                        </ul>
 
-                    @if (Model.MemberType == Member.Owner || Model.MemberType == Member.Manager)
-                    {
-                        <div class="text-center">
-                            <a class="btn btn-primary" data-type="modal" data-action="@Model.ID/edit-folder"><b>@Localizer["Edit"]</b></a>
-                            <a class="btn btn-danger" data-type="redirect" data-url="@TempData["BeforeUrl"]" data-action="@Model.ID/delete-folder" data-confirm="@Localizer["Are you sure you want to delete"]?"><b>@Localizer["Delete"]</b></a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-center">
-                            <a href="#" class="btn btn-primary"><b>@Localizer["Favorite"]</b></a>
-                        </div>
-                    }
+                        @if (Model.MemberType == Member.Owner || Model.MemberType == Member.Manager)
+                        {
+                            <div class="text-center">
+                                <a class="btn btn-primary" data-type="modal" data-action="@Model.ID/edit-folder"><b>@Localizer["Edit"]</b></a>
+                                <a class="btn btn-danger" data-type="redirect" data-url="@TempData["BeforeUrl"]" data-action="@Model.ID/delete-folder" data-confirm="@Localizer["Are you sure you want to delete"]?"><b>@Localizer["Delete"]</b></a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center">
+                                <a href="#" class="btn btn-primary"><b>@Localizer["Favorite"]</b></a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-9">
-            @if (Model.Visible == Visible.Public || ())
-            {
+            <div class="col-md-9">
                 <div class="nav-tabs-custom">
                     <div class="tab-content">
                         @{
@@ -67,9 +68,14 @@
                         }
                     </div>
                 </div>
-             }
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">@Localizer["This folder is private! Only group members can view "]</div>
+    }
+
 }
 else
 {

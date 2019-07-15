@@ -88,3 +88,18 @@ $(function () {
         }
     });
 })
+
+
+var loadData = function (_url, _skip = "0", _take = "0", _contentID = "datalist") {
+
+    var _ajaxOperations = new AjaxOperations();
+
+    _ajaxOperations.parameters = {
+        url: _url,
+        methodType: "post"
+    };
+
+    var _result = _ajaxOperations.run();
+
+    $("#" + _contentID).append(_result);
+}

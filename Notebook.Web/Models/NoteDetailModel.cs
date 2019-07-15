@@ -15,6 +15,7 @@ namespace Notebook.Web.Models
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public Visible Visible { get; set; }
+        public Member MemberType { get; set; }
         public string OwnerID { get; set; }
         public string OwnerName { get; set; }
         public int UserCount { get; set; }

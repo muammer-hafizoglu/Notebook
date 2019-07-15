@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace Notebook.Business.Managers.Abstract
 {
-    public interface IFolderNoteManager : IManager<FolderNote>
+    public interface ISettingsManager : IManager<Settings>
     {
-        void Add(string NoteID, string FolderID);
+
     }
 }

@@ -6,6 +6,6 @@ namespace Notebook.Business.Managers.Abstract
 {
     public interface IGroupNoteManager : IManager<GroupNote>
     {
-
+        void Add(string NoteID, string GroupID);
     }
 }
