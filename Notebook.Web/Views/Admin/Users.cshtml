@@ -2,6 +2,23 @@
 
 @inject IViewLocalizer Localizer
 
+<style>
+    .flip {
+        width: 100%;
+        position: relative;
+    }
+    .user-card{
+        box-shadow: 0 1px 4px 0 rgba(38,38,38,.3);
+    }
+    .user-card-header{
+        background-color: #f3f3f3;
+        padding:10px;
+    }
+    .user-card-body{
+        padding:10px;
+    }
+</style>
+
 <div class="row">
     <div class="col-md-12">
         <div class="box">
@@ -10,33 +27,65 @@
             </div>
             <div class="box-body" id="datalist">
                 <div class="row">
+                    <div class="col-md-12">
+
+                    </div>
+                </div>
+                <div class="row">
                     @if (Model.Datalist != null)
                     {
                         foreach (var item in Model.Datalist as List<User>)
                         {
-                            <div class="col-md-3" style="margin-bottom:15px">
-                                <div class="row">
-                                    <div class="col-xs-4 text-center">
-                                        <a href="/profile/@item.ID/@item.Name.ClearHtmlTagAndCharacter()" class="thumb m-r">
-                                            <img src="@(item.Avatar ?? "/notebook/images/avatar.png")" class="img-circle" height="50">
-                                        </a>
-                                        <small class="block text-muted" style="font-size:80%">@item.CreateDate.ToShortDateString()</small><br />
-                                        <small class="block text-muted label label-@(item.Approve ? "success" : "warning")">@(item.Approve ? "Active" : "Passive")</small><br />
-                                        <a class="btn btn-xx btn-primary m-t-xs" style="margin-top:5px" data-type="modal" data-action="/@item.ID/edit-user">
-                                            <i class="fa fa-edit"></i> Edit
-                                        </a>
-                                        <a class="btn btn-xx btn-danger m-t-xs" style="margin-top:5px" data-type="modal" data-action="/@item.ID/delete-user">
-                                            <i class="fa fa-trash"></i> Delete
-                                        </a>
-                                    </div>
-                                    <div class="col-xs-8" style="padding:0">
-                                        <small class="block text-muted">ID: @item.ID</small><br />
-                                        <small class="block text-muted">Name: @item.Name</small><br />
-                                        <small class="block text-muted">Username: @item.Username</small><br />
-                                        <small class="block text-muted">Email: @item.Email</small><br />
-                                        <small class="block text-muted">Groups: @item.Groups?.Count & Notes: @item.Notes?.Count</small><br />
-                                        <small class="block text-muted">Role: @item.Role?.Name</small><br />
-                                        <small class="block text-muted">Last Active: @item.LastActiveDate.ToShortDateString()</small><br />
+                            <div class="col-md-4" style="margin-bottom:15px">
+                                <div class="flip">
+                                    <div class="user-card">
+                                        <div class="user-card-header ">
+                                            <h5 style="margin:0">
+                                                <a href="/profile/@item.ID/@item.Name.ClearHtmlTagAndCharacter()">
+                                                    <i class="fa fa-user"></i> @item.Name
+                                                </a>
+                                                <small class="label label-@(item.Approve ? "success" : "warning")" style="float:right">@(item.Approve ? "Active" : "Passive")</small>
+                                            </h5>
+                                        </div>
+                                        <div class="user-card-body ">
+                                            <div class="row">
+                                                <div class="col-xs-4 text-center">
+                                                    <a href="/profile/@item.ID/@item.Name.ClearHtmlTagAndCharacter()" class="thumb m-r">
+                                                        <img src="@(item.Avatar ?? "/notebook/images/avatar.png")" class="img-circle" height="50">
+                                                    </a>
+                                                    <small class="block text-muted" style="font-size:80%">@item.CreateDate.ToShortDateString()</small><br />
+                                                    
+                                                    <a class="btn btn-xx btn-primary m-t-xs" style="margin-top:5px" data-type="modal" data-action="/@item.ID/edit-user">
+                                                        <i class="fa fa-edit"></i> Edit
+                                                    </a>
+                                                    <a class="btn btn-xx btn-danger m-t-xs" style="margin-top:5px" data-type="modal" data-action="/@item.ID/delete-user">
+                                                        <i class="fa fa-trash"></i> Delete
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-8" style="padding:0">
+                                                    <div class="row">
+                                                        <div class="col-xs-4 text-right" style="padding:0 5px 0 0;">
+                                                            <small class="block text-muted">ID:</small><br />
+                                                            <small class="block text-muted">Username:</small><br />
+                                                            <small class="block text-muted">Email:</small><br />
+                                                            <small class="block text-muted">Role:</small><br />
+                                                            <small class="block text-muted">Last Active:</small><br />
+                                                            <small class="block text-muted">Groups:</small><br />
+                                                            <small class="block text-muted">Notes:</small><br />
+                                                        </div>
+                                                        <div class="col-xs-4 text-left" style="padding-left:0">
+                                                            <small class="block text-muted">@item.ID</small><br />
+                                                            <small class="block text-muted">@item.Username</small><br />
+                                                            <small class="block text-muted">@item.Email</small><br />
+                                                            <small class="block text-muted">@item.Role?.Name</small><br />
+                                                            <small class="block text-muted">@item.LastActiveDate.ToShortDateString()</small><br />
+                                                            <small class="block text-muted">@item.Groups?.Count</small><br />
+                                                            <small class="block text-muted">@item.Notes?.Count</small><br />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
