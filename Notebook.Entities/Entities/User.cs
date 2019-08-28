@@ -10,11 +10,8 @@ namespace Notebook.Entities.Entities
     {
         public User()
         {
-            Notes = new HashSet<Note>();
-            Groups = new HashSet<Group>();
-            SucscribedFolders = new HashSet<UserFolder>();
-            SucscribedGroups = new HashSet<UserGroup>();
-            SucscribedNotes = new HashSet<UserNote>();
+            Groups = new HashSet<UserGroup>();
+            Notes = new HashSet<UserNote>();
             Followers = new HashSet<Follow>();
             Following = new HashSet<Follow>();
         }
@@ -27,18 +24,16 @@ namespace Notebook.Entities.Entities
         public string Name { get; set; }
         public string Info { get; set; }
         public bool Approve { get; set; }
+        public bool Lock { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime LastActiveDate { get; set; }
         public string Avatar { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual UserSettings Settings { get; set; }
-        public virtual ICollection<Note> Notes { get; set; }
-        public virtual ICollection<Group> Groups { get; set; }
         public virtual ICollection<Follow> Followers { get; set; }
         public virtual ICollection<Follow> Following { get; set; }
-        public virtual ICollection<UserNote> SucscribedNotes { get; set; }
-        public virtual ICollection<UserFolder> SucscribedFolders { get; set; }
-        public virtual ICollection<UserGroup> SucscribedGroups { get; set; }
+        public virtual ICollection<UserNote> Notes { get; set; }
+        public virtual ICollection<UserGroup> Groups { get; set; }
     }
 }

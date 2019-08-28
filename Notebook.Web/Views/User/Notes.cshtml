@@ -1,51 +1,112 @@
-﻿@model DataListPartialModel
+﻿@model ProfileModel
+
+@using Microsoft.AspNetCore.Html
 
 @inject IViewLocalizer Localizer
 
+@{
+    var activeUser = Context.Session.GetSession<User>("User");
+}
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="box">
-            <div class="box-header with-border">
-                <h3 class="box-title">@Localizer["Note List"]</h3>
-                @if (Model.Member == Member.Owner)
-                {
-                    <a class="btn btn-xs btn-success pull-right" data-action="add-note" data-type="modal">
-                        <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Add Note"]
-                    </a>
-                }
-                
-            </div>
-            <div class="box-body table-responsive">
-                <table class="table table-striped notelist">
-                    <thead class="table-header">
-                        <tr>
-                            <th>@Localizer["Name"]</th>
-                        </tr>
-                    </thead>
-                </table>
+@if (Model != null)
+{
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+        <li><a href="/@Model.User.Username">@Model.User.Name</a></li>
+        <li class="active">@Localizer["Notes"]</li>
+    </ol>
+    <div class="row">
+        @{ await Html.RenderPartialAsync("~/Views/User/UserInfo.cshtml", Model.User);}
+        <!-- /.col -->
+        <div class="col-md-9">
+            <div class="nav-tabs-custom">
+                @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
+
+                <div class="tab-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">@Localizer["Note List"]</h3>
+                                @if (Model.User.Status == Status.Owner)
+                                {
+                                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-note">
+                                        <i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["Add Note"]
+                                    </button>
+                                }
+                            </div>
+
+                            <form action="@Model.Data.Url">
+                                <div class="input-group search-panel">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            <span id="srcTxt">Filter</span> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li><a onclick="$search('ID')">ID</a></li>
+                                            <li><a onclick="$search('Title')">Title</a></li>
+                                            <li><a onclick="$search('Content')">Content</a></li>
+                                        </ul>
+                                    </div>
+                                    <input type="hidden" name="Filter" value="" id="filter">
+                                    <input type="text" class="form-control" name="Search" placeholder="Search ...">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
+                                    </span>
+                                    <span class="input-group-btn">
+                                        <a href="@Model.Data.Url" class="btn btn-default" type="submit"><span class="fa fa-list"></span></a>
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @if (Model.Data != null)
+                        {
+                            foreach (var item in Model.Data.Datalist as List<UserNote>)
+                            {
+                                var owner = item.Note.Users.FirstOrDefault(a => a.Status == Status.Owner).User;
+
+                                <div class="col-md-12">
+                                    <div class="model-card" style="background:@(item.Note.Visible == Visible.Private ? "#fff0db" : "inherit")">
+                                        <div class="model-card-header">
+                                            <small>
+                                                <i class="fa fa-calendar"></i> @item.Note.CreateDate.ToString("F")
+                                            </small>
+                                        </div>
+                                        <div class="model-card-body">
+                                            <img src="/notebook/images/n.png" class="img-circle model-card-img">
+                                            <a href="/@item.Note.ID/note-detail" class="model-card-title" style="font-size:15px;">
+                                                @item.Note.Title
+                                            </a><br />
+                                            <small>
+                                                @Html.Raw(item.Note.Explanation)
+                                            </small>
+                                        </div>
+                                        <div class="model-card-footer">
+                                            <div class="pull-left">
+                                                <a href="/@owner.Username" style="color:#ff6a00"><i class="fa fa-user"></i> @owner.Name</a>
+                                            </div>
+                                            <div class="pull-right">
+                                                <a href="/@item.ID/note-detail" style="color:cornflowerblue">@Localizer["Read more"] ...</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="box-footer">
+                        @Localizer["Total"]: @Model.Data.TotalData
+                        @Html.Raw(Model.Data.Pagination)
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-@Html.Script(
-    @<script>
-        var table = $(".notelist").DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ordering": false,
-            "ajax": {
-                "url": "/user-notes?userId=@Model.ID",
-                "type": "POST"
-            },
-            "columns": [
-                { "data": "name" }
-            ],
-            "language": {
-                "searchPlaceholder":"@Localizer["Search note name"]"
-            }
-        });
-    </script>
-)
+}
+else
+{
+    <div class="alert alert-warning">@Localizer["User not found"]</div>
+}
 

@@ -19,7 +19,7 @@
 
                 <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="/profile/@Model.ID/@Model.Name.ClearHtmlTagAndCharacter()"><i class="fa fa-user"></i>&nbsp;&nbsp;@Localizer["Profile"]</a></li>
+                        <li><a href="/@Model.Username"><i class="fa fa-user"></i>&nbsp;&nbsp;@Localizer["Profile"]</a></li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cubes"></i>&nbsp;&nbsp;@Localizer["Applications"] <span class="caret"></span></a>
                             <ul class="dropdown-menu" role="menu">
@@ -38,7 +38,7 @@
                                     }
                                     @if (Model.Role.Permissions.Contains("VIEW_USERS"))
                                     {
-                                        <li><a href="/notebook-users"><i class="fa fa-users"></i>@Localizer["Users"]</a></li>
+                                        <li><a href="/notebook-membership"><i class="fa fa-users"></i>@Localizer["Membership"]</a></li>
                                     }
                                     @if (Model.Role.Permissions.Contains("VIEW_ROLES"))
                                     {

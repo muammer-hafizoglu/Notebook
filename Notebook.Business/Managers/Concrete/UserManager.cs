@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Notebook.Business.Managers.Abstract;
+using Notebook.Business.Models;
 using Notebook.Business.Tools.Logging;
 using Notebook.Business.Tools.Validation.FluentValidation;
 using Notebook.Core.Aspects.SimpleProxy.Caching;
@@ -27,8 +28,8 @@ namespace Notebook.Business.Managers.Concrete
         [Validate(typeof(User),typeof(UserFluentValidation))]
         public override void Add(User model)
         {
-            EmailControl(model.Email);
-            UsernameControl(model.Username);
+            EmailControl(model);
+            UsernameControl(model);
 
             model.Password = model.Password.SHA256Encrypt();
             model.CreateDate = DateTime.Now;
@@ -37,20 +38,66 @@ namespace Notebook.Business.Managers.Concrete
             base.Add(model);
         }
 
-
-        private void EmailControl(string email)
+        [Validate(typeof(User), typeof(UserFluentValidation))]
+        public override void Update(User model)
         {
-            if (servisDal.getOne(a => a.Email == email) != null)
+            EmailControl(model);
+            UsernameControl(model);
+
+            var _user = servisDal.getMany(a => a.ID == model.ID).Include(a => a.Role).FirstOrDefault();
+            if (_user != null)
             {
-                throw new Exception("This email address is not available");
+                _user.Email = model.Email;
+                _user.Username = model.Username;
+                _user.Name = model.Name;
+                _user.Info = model.Info;
+                _user.Password = model.Password;
+                _user.Lock = model.Lock;
+            }
+
+            base.Update(_user);
+        }
+
+        private void EmailControl(User model)
+        {
+            var _user = servisDal.getOne(a => a.Email == model.Email);
+
+            if (_user != null)
+            {
+                if (!string.IsNullOrEmpty(model.ID))
+                {
+                    if (_user.ID != model.ID)
+                    {
+                        throw new Exception("This email address is not available");
+                    }
+                }
+                else
+                {
+                    throw new Exception("This email address is not available");
+                }
             }
         }
 
-        private void UsernameControl(string username)
+        private void UsernameControl(User model)
         {
-            if (!string.IsNullOrEmpty(username) && servisDal.getOne(a => a.Username == username) != null)
+            if (!string.IsNullOrEmpty(model.Username))
             {
-                throw new Exception("This username is not available");
+                var _user = servisDal.getOne(a => a.Username == model.Username);
+
+                if (_user != null)
+                {
+                    if (!string.IsNullOrEmpty(model.ID))
+                    {
+                        if (_user.ID != model.ID)
+                        {
+                            throw new Exception("This username is not available");
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("This username is not available");
+                    }
+                }
             }
         }
 
@@ -107,6 +154,32 @@ namespace Notebook.Business.Managers.Concrete
                 {
                     LastActiveDateUpdate(user);
                 }
+            }
+
+            return user;
+        }
+
+        public UserInfoModel GetUserInfo(string ID)
+        {
+            UserInfoModel user = null;
+
+            var _user = servisDal.getMany(a => a.Username == ID)
+                .Include(a => a.Groups)
+                .Include(a => a.Notes)
+                .FirstOrDefault();
+
+            if (_user != null)
+            {
+                user = new UserInfoModel();
+                user.ID = _user.ID;
+                user.Username = _user.Username;
+                user.Name = _user.Name;
+                user.Info = _user.Info;
+                user.CreateDate = _user.CreateDate;
+                user.Avatar = _user.Avatar;
+                user.Lock = _user.Lock;
+                user.GroupCount = _user.Groups.Count;
+                user.NoteCount = _user.Notes.Count;
             }
 
             return user;

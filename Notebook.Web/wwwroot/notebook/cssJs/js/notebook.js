@@ -55,6 +55,10 @@ var $modal = function (id) {
     }
 };
 
+var $search = function (ID) {
+    $('#filter,#srcTxt').val(ID).html(ID);
+}
+
 // Bootstrap Notification
 var $ntf = function (content, type = "success", _autoClose = "10000") {
     var _type = "success";

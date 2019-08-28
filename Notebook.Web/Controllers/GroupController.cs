@@ -18,95 +18,137 @@ namespace Notebook.Web.Controllers
     [TypeFilter(typeof(ExceptionFilterAttribute))]
     public class GroupController : Controller
     {
-        public string _lock = "<i class='fa fa-lock'></i> ";
-        public string _folderIcon = "<i class='fa fa-folder-open-o'></i> ";
-        public string _noteIcon = "<i class='fa fa-newspaper-o'></i> ";
-        public string _userIcon = "<i class='fa fa-user'></i> ";
-
         private IStringLocalizer<GroupController> _localizer;
         private IGroupManager _groupManager;
         private IUserManager _userManager;
         private IUserGroupManager _userGroupManager;
-        private IGroupFolderManager _groupFolderManager;
-        private IGroupNoteManager _groupNoteManager;
-        public GroupController(IStringLocalizer<GroupController> localizer,IGroupManager groupManager,IUserManager userManager, IUserGroupManager userGroupManager,
-            IGroupFolderManager groupFolderManager, IGroupNoteManager groupNoteManager)
+        private IFolderManager _folderManager;
+        private INoteManager _noteManager;
+        public GroupController(IStringLocalizer<GroupController> localizer,IGroupManager groupManager,IUserManager userManager, IUserGroupManager userGroupManager, 
+            IFolderManager folderManager, INoteManager noteManager)
         {
             _localizer = localizer;
             _groupManager = groupManager;
             _userManager = userManager;
             _userGroupManager = userGroupManager;
-            _groupFolderManager = groupFolderManager;
-            _groupNoteManager = groupNoteManager;
+            _folderManager = folderManager;
+            _noteManager = noteManager;
         }
-
-        #region List
-
-        [HttpPost]
-        [Route("~/groups")]
-        public JsonResult List(DatatableParameters parameters, string userId)
-        {
-            var sqlQuery = _userGroupManager.Table()
-                .Include(a => a.Group)
-                    .ThenInclude(b => b.Folders)
-                .Where(a=>a.UserID == userId)
-                .OrderByDescending(a=>a.Group.CreateDate) as IQueryable<UserGroup>;
-
-            var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
-
-            string search = Request.Form["search[value]"].ToString();
-            if (!string.IsNullOrEmpty(search))
-            {
-                sqlQuery = sqlQuery.Where(a => a.Group.Name.Contains(search)) as IQueryable<UserGroup>;
-            }
-
-            result.recordsFiltered = sqlQuery.Count();
-
-            result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(_ug =>
-                      new GroupModel
-                      {
-                          name = string.Format("<a href='/group/{0}/{3}'>{1}  {2}</a>", _ug.Group.ID, _ug.Group.Name, (_ug.Group.Visible == Visible.Private ? _lock : ""), _ug.Group.Name.ClearHtmlTagAndCharacter()),
-                          info = string.Format("{0}: {2} & {3}: {5}", _folderIcon, _localizer["Folder"], _ug.Group.Folders.Count(), _noteIcon, _localizer["Note"],_ug.Group.Notes.Count()),
-                          state = string.Format("{0}", (_ug.MemberType == Member.Owner ? _localizer["Owner"] : _localizer["Member"]))
-                      }).ToList();
-
-            return Json(result);
-        }
-
-        #endregion
 
         #region CRUD
 
-        [Route("~/group/{id}/{title}/{list?}")]
-        public IActionResult Detail(string id = "", string list = "")
+        [Route("~/{ID}/group-detail")]
+        public IActionResult Folders(Parameters parameters)
         {
-            var _activeUser = HttpContext.Session.GetSession<User>("User");
+            var _user = HttpContext.Session.GetSession<User>("User");
 
-            GroupDetailModel detail = null;
+            GroupDetailModel model = new GroupDetailModel();
 
-            var _group = _groupManager.getMany(a => a.ID == id)
-                .Include(a => a.Owner)
-                .Include(a => a.Folders)
-                .Include(a => a.Folders)
-                .FirstOrDefault();
+            model.Group = _groupManager.GetGroupInfo(parameters.ID, _user?.ID);
+            model.Navigation = new NavigationModel { List = "Folders", ID = parameters.ID };
+            model.Data = FolderList(
+                _folderManager.Table()
+                    .Where(a => a.Group.ID == model.Group.ID)
+                    .Include(a => a.Group)
+                    .OrderByDescending(a => a.CreateDate),
+                parameters,
+                $"/{parameters.ID}/group-detail");
 
-            if (_group != null)
+            return View(model);
+        }
+
+        private ObjectListModel FolderList(IQueryable<Folder> query, Parameters parameters, string url)
+        {
+            ObjectListModel result = new ObjectListModel();
+            result.Url = url;
+
+            if (!string.IsNullOrEmpty(parameters.Search))
             {
-                detail = new GroupDetailModel();
-                detail.ID = _group.ID;
-                detail.Name = _group.Name;
-                detail.Explanation = _group.Explanation;
-                detail.CreateDate = _group.CreateDate;
-                detail.Visible = _group.Visible;
-                detail.OwnerID = _group.OwnerID;
-                detail.OwnerName = _group.Owner.Name;
-                detail.FolderCount = _group.Folders.Count();
-                detail.NoteCount = _group.Notes.Count();
-                detail.UserCount = _userGroupManager.getMany(a => a.GroupID == _group.ID).Count();
-                detail.List = list;
+                url += url.Contains("?") ? "&" : "?";
+
+                switch (parameters.Filter)
+                {
+                    case "ID":
+                        {
+                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<Folder>;
+                            break;
+                        }
+                    case "Name":
+                        {
+                            query = query.Where(a => a.Name.Contains(parameters.Search)) as IOrderedQueryable<Folder>;
+                            break;
+                        }
+                }
+
+                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
             }
-            
-            return View(detail);
+
+            result.TotalData = query.Count();
+            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
+            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
+            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
+            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
+            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
+
+            return result;
+        }
+
+        [Route("~/{ID}/group-detail/notes")]
+        public IActionResult Notes(Parameters parameters)
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            GroupDetailModel model = new GroupDetailModel();
+
+            model.Group = _groupManager.GetGroupInfo(parameters.ID, _user.ID);
+            model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
+            model.Data = NoteList(
+                _noteManager.Table()
+                    .Where(a => a.Group.ID == model.Group.ID)
+                    .Include(a => a.Group)
+                    .Include(a => a.Users)
+                        .ThenInclude(b => b.User)
+                    .OrderByDescending(a => a.CreateDate),
+                parameters,
+                $"/{parameters.ID}/group-detail/notes");
+
+            return View(model);
+        }
+
+        private ObjectListModel NoteList(IQueryable<Note> query, Parameters parameters, string url)
+        {
+            ObjectListModel result = new ObjectListModel();
+            result.Url = url;
+
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                url += url.Contains("?") ? "&" : "?";
+
+                switch (parameters.Filter)
+                {
+                    case "ID":
+                        {
+                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<Note>;
+                            break;
+                        }
+                    case "Title":
+                        {
+                            query = query.Where(a => a.Title.Contains(parameters.Search)) as IOrderedQueryable<Note>;
+                            break;
+                        }
+                }
+
+                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
+            }
+
+            result.TotalData = query.Count();
+            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
+            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
+            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
+            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
+            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
+
+            return result;
         }
 
         [TypeFilter(typeof(AccountFilterAttribute))]
@@ -115,7 +157,7 @@ namespace Notebook.Web.Controllers
         [Route("~/{id?}/edit-group")]
         public IActionResult Form(string id = "")
         {
-            var _group = _groupManager.getOne(a => a.ID == id && a.OwnerID == HttpContext.Session.GetSession<User>("User").ID);
+            var _group = _groupManager.getOne(a => a.ID == id && a.UserID == HttpContext.Session.GetSession<User>("User").ID);
 
             return PartialView(_group ?? new Group { Visible = Visible.Public });
         }
@@ -127,14 +169,13 @@ namespace Notebook.Web.Controllers
         public IActionResult Add(Group _group)
         {
             var _user = HttpContext.Session.GetSession<User>("User");
-            _group.Owner = _user;
+           // _group.Users = _user;
 
             _groupManager.Add(_group);
             _groupManager.Save();
 
             // User - Group
-            _userGroupManager.Add(new UserGroup { Group = _group, User = _user, CreateDate = DateTime.Now });
-            _userGroupManager.Save();
+            _userGroupManager.Add(new UserGroup { Group = _group, User = _user, CreateDate = DateTime.Now, Status = Status.Owner });
 
             TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
@@ -166,7 +207,7 @@ namespace Notebook.Web.Controllers
         public JsonResult Delete(string id = "")
         {
             var _user = HttpContext.Session.GetSession<User>("User");
-            var _group = _groupManager.getOne(a => a.ID == id && a.OwnerID == _user.ID);
+            var _group = _groupManager.getOne(a => a.ID == id && a.UserID == _user.ID);
             if (_group != null)
             {
                 _groupManager.Delete(_group);

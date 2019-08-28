@@ -14,7 +14,7 @@ namespace Notebook.DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Notebook.Entities.Entities.Folder", b =>
@@ -73,13 +73,11 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("OwnerID");
+                    b.Property<string>("UserID");
 
                     b.Property<int>("Visible");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("OwnerID");
 
                     b.ToTable("Group");
                 });
@@ -119,8 +117,6 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<bool>("OpenToCopy");
 
-                    b.Property<string>("OwnerID");
-
                     b.Property<int>("ReadCount");
 
                     b.Property<string>("Tags");
@@ -129,6 +125,8 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<DateTime>("UpdateDate");
 
+                    b.Property<string>("UserID");
+
                     b.Property<int>("Visible");
 
                     b.HasKey("ID");
@@ -136,8 +134,6 @@ namespace Notebook.DataAccess.Migrations
                     b.HasIndex("FolderID");
 
                     b.HasIndex("GroupID");
-
-                    b.HasIndex("OwnerID");
 
                     b.ToTable("Note");
                 });
@@ -274,6 +270,8 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<DateTime>("LastActiveDate");
 
+                    b.Property<bool>("Lock");
+
                     b.Property<string>("Name");
 
                     b.Property<string>("Password");
@@ -294,37 +292,14 @@ namespace Notebook.DataAccess.Migrations
                             ID = "23m454h5",
                             Approve = true,
                             Avatar = "/notebook/images/avatar.png",
-                            CreateDate = new DateTime(2019, 7, 13, 16, 46, 55, 992, DateTimeKind.Local).AddTicks(3726),
+                            CreateDate = new DateTime(2019, 8, 28, 8, 53, 33, 724, DateTimeKind.Local).AddTicks(6516),
                             Email = "mhaf69@gmail.com",
-                            LastActiveDate = new DateTime(2019, 7, 13, 16, 46, 55, 993, DateTimeKind.Local).AddTicks(2010),
+                            LastActiveDate = new DateTime(2019, 8, 28, 8, 53, 33, 728, DateTimeKind.Local).AddTicks(1661),
+                            Lock = false,
                             Name = "Muammer Hafızoğlu",
                             Password = "D3CE20FCCBE7D116ECD0",
                             Username = "muammer.hafizoglu"
                         });
-                });
-
-            modelBuilder.Entity("Notebook.Entities.Entities.UserFolder", b =>
-                {
-                    b.Property<string>("ID")
-                        .HasMaxLength(8);
-
-                    b.Property<DateTime>("CreateDate");
-
-                    b.Property<string>("FolderID");
-
-                    b.Property<int>("MemberType");
-
-                    b.Property<bool>("Notification");
-
-                    b.Property<string>("UserID");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("FolderID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("UserFolder");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserGroup", b =>
@@ -339,9 +314,9 @@ namespace Notebook.DataAccess.Migrations
                         .IsRequired()
                         .HasMaxLength(8);
 
-                    b.Property<int>("MemberType");
-
                     b.Property<bool>("Notification");
+
+                    b.Property<int>("Status");
 
                     b.HasKey("UserID", "GroupID");
 
@@ -354,22 +329,23 @@ namespace Notebook.DataAccess.Migrations
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserNote", b =>
                 {
-                    b.Property<string>("ID")
-                        .HasMaxLength(8);
-
-                    b.Property<DateTime>("CreateDate");
-
-                    b.Property<int>("Member");
+                    b.Property<string>("UserID");
 
                     b.Property<string>("NoteID");
 
-                    b.Property<string>("UserID");
+                    b.Property<DateTime>("CreateDate");
 
-                    b.HasKey("ID");
+                    b.Property<string>("ID")
+                        .IsRequired()
+                        .HasMaxLength(8);
+
+                    b.Property<int>("Status");
+
+                    b.HasKey("UserID", "NoteID");
+
+                    b.HasAlternateKey("ID");
 
                     b.HasIndex("NoteID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("UserNote");
                 });
@@ -409,13 +385,6 @@ namespace Notebook.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Notebook.Entities.Entities.Group", b =>
-                {
-                    b.HasOne("Notebook.Entities.Entities.User", "Owner")
-                        .WithMany("Groups")
-                        .HasForeignKey("OwnerID");
-                });
-
             modelBuilder.Entity("Notebook.Entities.Entities.Note", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.Folder", "Folder")
@@ -425,10 +394,6 @@ namespace Notebook.DataAccess.Migrations
                     b.HasOne("Notebook.Entities.Entities.Group", "Group")
                         .WithMany("Notes")
                         .HasForeignKey("GroupID");
-
-                    b.HasOne("Notebook.Entities.Entities.User", "Owner")
-                        .WithMany("Notes")
-                        .HasForeignKey("OwnerID");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.User", b =>
@@ -436,17 +401,6 @@ namespace Notebook.DataAccess.Migrations
                     b.HasOne("Notebook.Entities.Entities.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleID");
-                });
-
-            modelBuilder.Entity("Notebook.Entities.Entities.UserFolder", b =>
-                {
-                    b.HasOne("Notebook.Entities.Entities.Folder", "Folder")
-                        .WithMany()
-                        .HasForeignKey("FolderID");
-
-                    b.HasOne("Notebook.Entities.Entities.User", "User")
-                        .WithMany("SucscribedFolders")
-                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserGroup", b =>
@@ -457,7 +411,7 @@ namespace Notebook.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Notebook.Entities.Entities.User", "User")
-                        .WithMany("SucscribedGroups")
+                        .WithMany("Groups")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -465,12 +419,14 @@ namespace Notebook.DataAccess.Migrations
             modelBuilder.Entity("Notebook.Entities.Entities.UserNote", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.Note", "Note")
-                        .WithMany()
-                        .HasForeignKey("NoteID");
+                        .WithMany("Users")
+                        .HasForeignKey("NoteID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Notebook.Entities.Entities.User", "User")
-                        .WithMany("SucscribedNotes")
-                        .HasForeignKey("UserID");
+                        .WithMany("Notes")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.UserSettings", b =>

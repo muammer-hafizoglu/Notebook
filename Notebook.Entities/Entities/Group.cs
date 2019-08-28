@@ -23,8 +23,7 @@ namespace Notebook.Entities.Entities
         public Visible Visible { get; set; }
         public DateTime CreateDate { get; set; }
         public bool IsRequiredApproval { get; set; }
-        public string OwnerID { get; set; }
-        public virtual User Owner { get; set; }
+        public string UserID { get; set; }
         public virtual ICollection<UserGroup> Users { get; set; }
         public virtual ICollection<Note> Notes { get; set; }
         public virtual ICollection<Folder> Folders { get; set; }

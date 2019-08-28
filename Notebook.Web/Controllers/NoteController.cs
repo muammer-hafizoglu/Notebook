@@ -24,98 +24,28 @@ namespace Notebook.Web.Controllers
         private IStringLocalizer<NoteController> _localizer;
         private INoteManager _noteManager;
         private IUserNoteManager _userNoteManager;
-        private IGroupNoteManager _groupNoteManager;
-        private IFolderNoteManager _folderNoteManager;
         private IGroupManager _groupManager;
         private IFolderManager _folderManager;
-        public NoteController(IStringLocalizer<NoteController> localizer, INoteManager noteManager, IGroupNoteManager groupNoteManager, 
-            IFolderNoteManager folderNoteManager, IGroupManager groupManager, IFolderManager folderManager, IUserNoteManager userNoteManager)
+        public NoteController(IStringLocalizer<NoteController> localizer, INoteManager noteManager, IGroupManager groupManager, IFolderManager folderManager, IUserNoteManager userNoteManager)
         {
             _localizer = localizer;
             _noteManager = noteManager;
             _userNoteManager = userNoteManager;
-            _groupNoteManager = groupNoteManager;
-            _folderNoteManager = folderNoteManager;
             _groupManager = groupManager;
             _folderManager = folderManager;
         }
 
-        #region List
-
-        [HttpPost]
-        [Route("~/user-notes")]
-        public JsonResult UserNotes(DatatableParameters parameters, string userId = "")
-        {
-            var sqlQuery = _noteManager.Table()
-                .OrderByDescending(a => a.CreateDate)
-                .Where(a => a.OwnerID == userId)
-                as IQueryable<Note>;
-
-            DatatableResult result = NoteList(parameters, ref sqlQuery);
-
-            return Json(result);
-        }
-
-        [HttpPost]
-        [Route("~/group-notes")]
-        public JsonResult GroupNotes(DatatableParameters parameters, string groupId = "")
-        {
-            var sqlQuery = _noteManager.Table()
-                .OrderByDescending(a => a.CreateDate)
-                .Where(a => a.GroupID == groupId)
-                as IQueryable<Note>;
-
-            DatatableResult result = NoteList(parameters, ref sqlQuery);
-
-            return Json(result);
-        }
-
-        [HttpPost]
-        [Route("~/folder-notes")]
-        public JsonResult FolderNotes(DatatableParameters parameters, string folderId = "")
-        {
-            var sqlQuery = _noteManager.Table()
-                .OrderByDescending(a => a.CreateDate)
-                .Where(a => a.FolderID == folderId)
-                as IQueryable<Note>;
-
-            DatatableResult result = NoteList(parameters, ref sqlQuery);
-
-            return Json(result);
-        }
-
-        private DatatableResult NoteList(DatatableParameters parameters, ref IQueryable<Note> sqlQuery)
-        {
-            var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
-
-            //Searching
-            string searchText = Request.Form["search[value]"].ToString();
-
-            sqlQuery = sqlQuery.Where(a => a.Title.Contains(searchText)) as IQueryable<Note>;
-
-            result.recordsFiltered = sqlQuery.Count();
-            result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(note =>
-                        new NoteModel
-                        {
-                            name = string.Format("<a href='/note/{0}/{1}'>{4} {2} {3}</a>",
-                                    note.ID, note.Title.ClearHtmlTagAndCharacter(), note.Title, (note.Visible == Visible.Private ? _lockIcon : ""), _noteIcon)
-                        }).ToList();
-            return result;
-        }
-
-        #endregion
-
         #region CRUD
 
         [HttpGet]
-        [Route("~/note/{id}/{title?}")]
-        public IActionResult Detail(string id = "", string list = "")
+        [Route("~/{ID}/note-detail/{title?}")]
+        public IActionResult Detail(string ID = "")
         {
             var _user = HttpContext.Session.GetSession<User>("User");
 
             NoteDetailModel detail = null;
 
-            var _note = _noteManager.getMany(a => a.ID == id).Include(a => a.Owner).FirstOrDefault();
+            var _note = _noteManager.getMany(a => a.ID == ID).Include(a => a.Users).FirstOrDefault();
             if (_note != null)
             {
                 detail = new NoteDetailModel();
@@ -126,11 +56,9 @@ namespace Notebook.Web.Controllers
                 detail.CreateDate = _note.CreateDate;
                 detail.UpdateDate = _note.UpdateDate;
                 detail.Visible = _note.Visible;
-                detail.OwnerID = _note.OwnerID;
-                detail.OwnerName = _note.Owner.Name;
+                detail.OwnerID = _note.UserID;
                 detail.ReadCount = _note.ReadCount;
                 detail.UserCount = _userNoteManager.getMany(a => a.NoteID == _note.ID).Count();
-                detail.List = list;
 
                 _noteManager.UpdateNoteReadCount(_note);
             }
@@ -146,9 +74,9 @@ namespace Notebook.Web.Controllers
         {
             var _sessionUser = HttpContext.Session.GetSession<User>("User");
 
-            var _note = _noteManager.getOne(a => a.ID == id && a.OwnerID == _sessionUser.ID);
+            var _note = _noteManager.getOne(a => a.ID == id && a.UserID == _sessionUser.ID);
 
-            return PartialView(_note ?? new Note { Visible = Visible.Public, OwnerID = _sessionUser.ID, GroupID = groupId, FolderID = folderId });
+            return PartialView(_note ?? new Note { Visible = Visible.Public, UserID = _sessionUser.ID, GroupID = groupId, FolderID = folderId });
         }
 
         [TypeFilter(typeof(AccountFilterAttribute))]
@@ -157,7 +85,10 @@ namespace Notebook.Web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Add(Note _note)
         {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
             _noteManager.Add(_note);
+            _userNoteManager.Add(new UserNote{ Note = _note, User = _user, CreateDate = DateTime.Now, Status = Status.Owner });
 
             TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 

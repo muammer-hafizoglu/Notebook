@@ -1,0 +1,33 @@
+﻿@model ProfileModel
+
+@inject IViewLocalizer Localizer
+
+@{
+    var activeUser = Context.Session.GetSession<User>("User");
+}
+
+@if (Model != null)
+{
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+        <li class="active">@Model.User.Name</li>
+    </ol>
+    <div class="row">
+        @{ await Html.RenderPartialAsync("~/Views/User/UserInfo.cshtml", Model.User);}
+        <!-- /.col -->
+        <div class="col-md-9">
+            <div class="nav-tabs-custom">
+                @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
+
+                <div class="tab-content">
+                    Timeline .....
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">@Localizer["User not found"]</div>
+}
+

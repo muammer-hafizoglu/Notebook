@@ -1,53 +1,110 @@
-﻿@model DataListPartialModel
+﻿@model GroupDetailModel
 
 @inject IViewLocalizer Localizer
 
+@{
+    var user = Context.Session.GetSession<User>("User");
+}
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="box">
-            <div class="box-header with-border">
-                <h3 class="box-title">@Localizer["Folder List"]</h3>
-                @if (Model.Member == Member.Owner || Model.Member == Member.Manager)
-                {
-                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?GroupID=@Model.ID">
-                        <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Add Folder"]
-                    </button>
-                }
+
+@if (Model != null)
+{
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+        <li><a href="/@Model.Group.UserID/groups">@Model.Group.UserName</a></li>
+        <li class="active">@Model.Group.Name</li>
+    </ol>
+    <div class="row">
+        @{ await Html.RenderPartialAsync("~/Views/Group/GroupInfo.cshtml", Model.Group);}
+        <!-- /.col -->
+        @if (Model.Group.Visible == Visible.Private && (Model.Group.Status == Status.Visitor || Model.Group.Status == Status.User || Model.Group.Status == Status.Wait))
+        {
+            <div class="col-md-9">
+                <div class="alert alert-warning">
+                    @Localizer["This group is private"]
+                </div>
             </div>
-            <div class="box-body table-responsive">
-                <table class="table table-striped dataTable">
-                    <thead class="table-header">
-                        <tr>
-                            <th>@Localizer["Name"]</th>
-                            <th>@Localizer["Content"]</th>
-                        </tr>
-                    </thead>
-                </table>
+        }
+        else
+        {
+            <div class="col-md-9">
+                <div class="nav-tabs-custom">
+                    @{ await Html.RenderPartialAsync("~/Views/Group/Navigation.cshtml", Model.Navigation);}
+
+                    <div class="tab-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">@Localizer["Folder List"]</h3>
+                                    @if (Model.Group.Status == Status.Owner || Model.Group.Status == Status.Manager)
+                                    {
+                                        <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-folder?GroupID=@Model.Group.ID">
+                                            <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Add Folder"]
+                                        </button>
+                                    }
+                                </div>
+
+                                <form action="@Model.Data.Url">
+                                    <div class="input-group search-panel">
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <span id="srcTxt">Filter</span> <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a onclick="$search('ID')">ID</a></li>
+                                                <li><a onclick="$search('Name')">@Localizer["Name"]</a></li>
+                                            </ul>
+                                        </div>
+                                        <input type="hidden" name="Filter" value="" id="filter">
+                                        <input type="text" class="form-control" name="Search" placeholder="Search ...">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
+                                        </span>
+                                        <span class="input-group-btn">
+                                            <a href="@Model.Data.Url" class="btn btn-default" type="submit"><span class="fa fa-list"></span></a>
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (Model.Data != null)
+                            {
+                                foreach (var item in Model.Data.Datalist as List<Folder>)
+                                {
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="model-card" style="background:@(item.Visible == Visible.Private ? "#fff0db" : "inherit")">
+                                            <div class="row">
+                                                <div class="col-xs-3 text-center">
+                                                    <i class="fa fa-folder-open-o" style="font-size:50px"></i><br />
+                                                </div>
+                                                <div class="col-xs-9">
+                                                    <a href="/@item.ID/folder-detail" class="model-card-title">
+                                                        @(item.Name.Length > 18 ? item.Name.Substring(0, 18) + "..." : item.Name)
+                                                    </a><br />
+                                                    <small style="color:#808080"><i class="fa fa-newspaper-o"></i> @Localizer["Notes"]: @item.Notes.Count</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="box-footer">
+                            @Localizer["Total"]: @Model.Data.TotalData
+                            @Html.Raw(Model.Data.Pagination)
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        }
     </div>
-</div>
+}
+else
+{
+    <div class="alert alert-warning">@Localizer["Group not found"]</div>
+}
 
-@Html.Script(
-    @<script>
-        var table = $(".dataTable").DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ordering": false,
-            "ajax": {
-                "url": "/group-folders?groupId=@Model.ID",
-                "type": "POST"
-            },
-            "columns": [
-                { "data": "name", },
-                { "data": "info", "className": "not-mobile" }
-               
-            ],
-            "language": {
-                "searchPlaceholder":"@Localizer["Search folder name"]"
-            }
-        });
-    </script>
-)
+
 

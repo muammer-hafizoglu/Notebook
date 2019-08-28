@@ -1,0 +1,45 @@
+﻿@media (max-width: 768px) {
+    body, a, ul, li, div, p, span, label, input, button, select, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+        font-size: 12px;
+    }
+
+    .box-header > .fa, .box-header > .glyphicon, .box-header > .ion, .box-header .box-title, .box-title {
+        font-size: 15px;
+        color: #3D8CBC;
+        font-weight: bold;
+    }
+
+    .not-mobile {
+        display: none !important;
+    }
+
+    .mobile {
+        display: block !important;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+        float: left;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        float: left;
+        margin-top: auto;
+        width: 150px;
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile {
+        display: none !important;
+    }
+
+    .n-modal-content {
+        width: 500px;
+        margin-top: 60px;
+    }
+
+    .n-modal-lg {
+        width: 1170px;
+    }
+}
+

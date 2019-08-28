@@ -19,16 +19,40 @@
     }
 </style>
 
+<ol class="breadcrumb">
+    <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+    <li class="active">@Localizer["Membership"]</li>
+</ol>
+
 <div class="row">
     <div class="col-md-12">
         <div class="box">
-            <div class="box-header with-border">
-                <h3 class="box-title">@Localizer["Users List"]</h3>
-            </div>
             <div class="box-body" id="datalist">
                 <div class="row">
                     <div class="col-md-12">
-
+                        <form action="@Model.Url">
+                            <div class="input-group search-panel">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                        <span id="srcTxt">Filter</span> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a onclick="$search('ID')">ID</a></li>
+                                        <li><a onclick="$search('Name')">Name</a></li>
+                                        <li><a onclick="$search('Username')">Username</a></li>
+                                        <li><a onclick="$search('Email')">Email</a></li>
+                                    </ul>
+                                </div>
+                                <input type="hidden" name="Filter" value="" id="filter">
+                                <input type="text" class="form-control" name="Search" placeholder="Search ...">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
+                                </span>
+                                <span class="input-group-btn">
+                                    <a href="@Model.Url" class="btn btn-default" type="submit"><span class="fa fa-list"></span></a>
+                                </span>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="row">
@@ -55,11 +79,11 @@
                                                     </a>
                                                     <small class="block text-muted" style="font-size:80%">@item.CreateDate.ToShortDateString()</small><br />
                                                     
-                                                    <a class="btn btn-xx btn-primary m-t-xs" style="margin-top:5px" data-type="modal" data-action="/@item.ID/edit-user">
-                                                        <i class="fa fa-edit"></i> Edit
+                                                    <a class="btn btn-xs btn-primary m-t-xs" style="margin-top:5px" data-type="modal" data-method="get" data-action="edit-user/@item.ID">
+                                                        <i class="fa fa-edit"></i>
                                                     </a>
-                                                    <a class="btn btn-xx btn-danger m-t-xs" style="margin-top:5px" data-type="modal" data-action="/@item.ID/delete-user">
-                                                        <i class="fa fa-trash"></i> Delete
+                                                    <a class="btn btn-xs btn-danger m-t-xs" style="margin-top:5px" data-type="modal" data-action="delete-user/@item.ID">
+                                                        <i class="fa fa-trash"></i>
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-8" style="padding:0">
@@ -92,23 +116,12 @@
                         }
                     }
                 </div>
-                
             </div>
             <div class="box-footer">
+                @Localizer["Total"]: @Model.TotalData
                 @Html.Raw(Model.Pagination)
             </div>
         </div>
     </div>
 </div>
 
-@section scripts{ 
-
-@*<script>
-    var total = 50;
-    var single = 20;
-    var take = 0;
-
-    loadData("/notebook-userlist");
-</script>*@
-
-}

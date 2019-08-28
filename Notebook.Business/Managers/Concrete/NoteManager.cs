@@ -1,8 +1,10 @@
-﻿using Notebook.Business.Managers.Abstract;
+﻿using Microsoft.EntityFrameworkCore;
+using Notebook.Business.Managers.Abstract;
 using Notebook.Business.Tools.Validation.FluentValidation;
 using Notebook.Core.Aspects.SimpleProxy.Validation;
 using Notebook.DataAccess.DataAccess.Abstract;
 using Notebook.Entities.Entities;
+using Notebook.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,29 +28,20 @@ namespace Notebook.Business.Managers.Concrete
         [Validate(typeof(Note), typeof(NoteFluentValidation))]
         public override void Add(Note note)
         {
-            var user = userDal.getOne(a => a.ID == note.OwnerID);
-            if (user != null)
-            {
-                note.Owner = user;
-                note.CreateDate = DateTime.Now;
+            if (!string.IsNullOrEmpty(note.GroupID))
+                note.Group = groupDal.getOne(a => a.ID == note.GroupID);
 
-                if (!string.IsNullOrEmpty(note.GroupID))
-                    note.Group = groupDal.getOne(a => a.ID == note.GroupID);
+            if (!string.IsNullOrEmpty(note.FolderID))
+                note.Folder = folderDal.getOne(a => a.ID == note.FolderID);
 
-                if (!string.IsNullOrEmpty(note.FolderID))
-                    note.Folder = folderDal.getOne(a => a.ID == note.FolderID);
+            note.CreateDate = DateTime.Now;
 
-                base.Add(note);
-            }
-            else
-            {
-                throw new Exception("User not found");
-            }
+            base.Add(note);
         }
 
         public void Delete(string NoteID, string UserID)
         {
-            var note = noteDal.getOne(a => a.ID == NoteID && a.OwnerID == UserID);
+            var note = noteDal.getOne(a => a.ID == NoteID && a.UserID == UserID);
 
             if (note != null)
                 base.Delete(note);
@@ -60,7 +53,7 @@ namespace Notebook.Business.Managers.Concrete
         public override void Update(Note model)
         {
             var _note = noteDal.getOne(a => a.ID == model.ID);
-            if (_note != null && _note.OwnerID == model.OwnerID)
+            if (_note != null && _note.UserID == model.UserID)
             {
                 // TODO: AutoMapper Uygulanacak
                 _note.Title = model.Title;

@@ -34,7 +34,7 @@
                 <div class="n-modal-body">
                     <div class="form-group">
                         @Html.HiddenFor(a => a.ID)
-                        @Html.HiddenFor(a => a.OwnerID)
+                        @Html.HiddenFor(a => a.UserID)
                         @Html.HiddenFor(a => a.GroupID)
                         @Html.HiddenFor(a => a.FolderID)
                         <input type="text" class="form-control" name="Title" required value="@Model.Title" placeholder="@Localizer["Title"]" />

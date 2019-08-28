@@ -39,6 +39,7 @@ namespace Notebook.Web.Controllers
             return View();
         }
 
+        [Route("~/login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Login(User user, string remember = "off")

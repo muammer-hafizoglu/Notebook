@@ -1,0 +1,69 @@
+﻿@model GroupInfoModel
+
+@inject IViewLocalizer Localizer
+
+<div class="col-md-3">
+    <!-- Profile Image -->
+    <div class="box box-primary">
+        <div class="box-body box-profile" style="padding:15px;">
+            <img class="profile-user-img img-responsive img-circle" src="~/notebook/images/g.png" alt="User profile picture">
+
+            <h3 class="text-center box-title">@Model.Name @Html.Raw(Model.Visible == Visible.Private ? "<i class='fa fa-lock'></i>" : "")</h3>
+            <p class="text-muted text-center">@Model.Explanation</p>
+            <ul class="list-group list-group-unbordered" style="color:#3D8CBC; padding:10px 10px;">
+                <li class="list-group-item">
+                    <i class="fa fa-user"></i>&nbsp;@Localizer["User"]
+                    <a href="/@Model.UserID" class="pull-right" style="font-weight:bold; color:darkblue">@Model.UserName</a>
+                </li>
+                <li class="list-group-item">
+                    <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <span class="pull-right">@Model.CreateDate.ToString("dd MMMM yyyy")</span>
+                </li>
+                <li class="list-group-item">
+                    <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"] <a class="pull-right">@Model.FolderCount</a>
+                </li>
+                <li class="list-group-item">
+                    <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <a class="pull-right">@Model.NoteCount</a>
+                </li>
+                <li class="list-group-item">
+                    <i class="fa fa-users"></i>&nbsp;@Localizer["Members"] <a class="pull-right">@Model.UserCount</a>
+                </li>
+            </ul>
+
+            @if (Model.Status == Status.Owner)
+            {
+                <div class="text-center">
+                    <a href="#" class="btn btn-primary"><b><i class="fa fa-cogs"></i> @Localizer["Edit"]</b></a>
+                </div>
+            }
+            else if (Model.Status == Status.Member)
+            {
+                <div class="text-center">
+                    <a href="#" class="btn btn-warning"><b>@Localizer["Unfollow"]</b></a>
+                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
+                </div>
+            }
+            else if (Model.Status == Status.Wait)
+            {
+                <div class="text-center">
+                    <a href="#" class="btn btn-danger"><b>@Localizer["Request Cancel"]</b></a>
+                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
+                </div>
+            }
+            else if (Model.Status == Status.User)
+            {
+                <div class="text-center">
+                    <a href="#" class="btn btn-info"><b>@Localizer["Follow"]</b></a>
+                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
+                </div>
+            }
+            else
+            {
+                <div class="text-center">
+                    <a href="/register" style="color:blue"><b>@Localizer["Sign up"]</b></a> or
+                    <a href="/login" style="color:blue"><b>@Localizer["Sign in for follow"]</b></a>
+                </div>
+            }
+        </div>
+        <!-- /.box-body -->
+    </div>
+</div>

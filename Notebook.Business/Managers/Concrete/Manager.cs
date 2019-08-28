@@ -28,7 +28,7 @@ namespace Notebook.Business.Managers.Concrete
         {
             string _guid = Guid.NewGuid().ToString().Substring(0, length);
 
-            while (serviceDal.getAll().Any(a=>a.ID == _guid))
+            while (serviceDal.getAll().Any(a => a.ID == _guid))
             {
                 _guid = Guid.NewGuid().ToString().Substring(0, length);
             }

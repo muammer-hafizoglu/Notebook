@@ -3,10 +3,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Notebook.DataAccess.Migrations
 {
-    public partial class _1 : Migration
+    public partial class a : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Group",
+                columns: table => new
+                {
+                    ID = table.Column<string>(maxLength: 8, nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Explanation = table.Column<string>(nullable: true),
+                    Visible = table.Column<int>(nullable: false),
+                    CreateDate = table.Column<DateTime>(nullable: false),
+                    IsRequiredApproval = table.Column<bool>(nullable: false),
+                    UserID = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Group", x => x.ID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Log",
                 columns: table => new
@@ -85,6 +102,28 @@ namespace Notebook.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Folder",
+                columns: table => new
+                {
+                    ID = table.Column<string>(maxLength: 8, nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Explanation = table.Column<string>(nullable: true),
+                    Visible = table.Column<int>(nullable: false),
+                    CreateDate = table.Column<DateTime>(nullable: false),
+                    GroupID = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Folder", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Folder_Group_GroupID",
+                        column: x => x.GroupID,
+                        principalTable: "Group",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -107,6 +146,43 @@ namespace Notebook.DataAccess.Migrations
                         name: "FK_User_Role_RoleID",
                         column: x => x.RoleID,
                         principalTable: "Role",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Note",
+                columns: table => new
+                {
+                    ID = table.Column<string>(maxLength: 8, nullable: false),
+                    Title = table.Column<string>(nullable: true),
+                    Explanation = table.Column<string>(nullable: true),
+                    Content = table.Column<string>(nullable: true),
+                    Visible = table.Column<int>(nullable: false),
+                    CreateDate = table.Column<DateTime>(nullable: false),
+                    UpdateDate = table.Column<DateTime>(nullable: false),
+                    ReadCount = table.Column<int>(nullable: false),
+                    Tags = table.Column<string>(nullable: true),
+                    OpenToCopy = table.Column<bool>(nullable: false),
+                    OpenToComments = table.Column<bool>(nullable: false),
+                    CopyCount = table.Column<int>(nullable: false),
+                    UserID = table.Column<string>(nullable: true),
+                    GroupID = table.Column<string>(nullable: true),
+                    FolderID = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Note", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Note_Folder_FolderID",
+                        column: x => x.FolderID,
+                        principalTable: "Folder",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Note_Group_GroupID",
+                        column: x => x.GroupID,
+                        principalTable: "Group",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -139,66 +215,32 @@ namespace Notebook.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Group",
+                name: "UserFolder",
                 columns: table => new
                 {
+                    FolderID = table.Column<string>(nullable: false),
+                    UserID = table.Column<string>(nullable: false),
                     ID = table.Column<string>(maxLength: 8, nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Explanation = table.Column<string>(nullable: true),
-                    Visible = table.Column<int>(nullable: false),
-                    CreateDate = table.Column<DateTime>(nullable: false),
-                    IsRequiredApproval = table.Column<bool>(nullable: false),
-                    OwnerID = table.Column<string>(nullable: true)
+                    Notification = table.Column<bool>(nullable: false),
+                    MemberType = table.Column<int>(nullable: false),
+                    CreateDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Group", x => x.ID);
+                    table.PrimaryKey("PK_UserFolder", x => new { x.UserID, x.FolderID });
+                    table.UniqueConstraint("AK_UserFolder_ID", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Group_User_OwnerID",
-                        column: x => x.OwnerID,
-                        principalTable: "User",
+                        name: "FK_UserFolder_Folder_FolderID",
+                        column: x => x.FolderID,
+                        principalTable: "Folder",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserSettings",
-                columns: table => new
-                {
-                    ID = table.Column<string>(maxLength: 8, nullable: false),
-                    UserID = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserSettings", x => x.ID);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserSettings_User_UserID",
+                        name: "FK_UserFolder_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Folder",
-                columns: table => new
-                {
-                    ID = table.Column<string>(maxLength: 8, nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Explanation = table.Column<string>(nullable: true),
-                    Visible = table.Column<int>(nullable: false),
-                    CreateDate = table.Column<DateTime>(nullable: false),
-                    GroupID = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Folder", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Folder_Group_GroupID",
-                        column: x => x.GroupID,
-                        principalTable: "Group",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -231,70 +273,17 @@ namespace Notebook.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Note",
+                name: "UserSettings",
                 columns: table => new
                 {
                     ID = table.Column<string>(maxLength: 8, nullable: false),
-                    Title = table.Column<string>(nullable: true),
-                    Explanation = table.Column<string>(nullable: true),
-                    Content = table.Column<string>(nullable: true),
-                    Visible = table.Column<int>(nullable: false),
-                    CreateDate = table.Column<DateTime>(nullable: false),
-                    UpdateDate = table.Column<DateTime>(nullable: false),
-                    ReadCount = table.Column<int>(nullable: false),
-                    Tags = table.Column<string>(nullable: true),
-                    OpenToCopy = table.Column<bool>(nullable: false),
-                    OpenToComments = table.Column<bool>(nullable: false),
-                    CopyCount = table.Column<int>(nullable: false),
-                    OwnerID = table.Column<string>(nullable: true),
-                    GroupID = table.Column<string>(nullable: true),
-                    FolderID = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Note", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Note_Folder_FolderID",
-                        column: x => x.FolderID,
-                        principalTable: "Folder",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Note_Group_GroupID",
-                        column: x => x.GroupID,
-                        principalTable: "Group",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Note_User_OwnerID",
-                        column: x => x.OwnerID,
-                        principalTable: "User",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserFolder",
-                columns: table => new
-                {
-                    ID = table.Column<string>(maxLength: 8, nullable: false),
-                    Notification = table.Column<bool>(nullable: false),
-                    MemberType = table.Column<int>(nullable: false),
-                    CreateDate = table.Column<DateTime>(nullable: false),
-                    FolderID = table.Column<string>(nullable: true),
                     UserID = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserFolder", x => x.ID);
+                    table.PrimaryKey("PK_UserSettings", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_UserFolder_Folder_FolderID",
-                        column: x => x.FolderID,
-                        principalTable: "Folder",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserFolder_User_UserID",
+                        name: "FK_UserSettings_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "ID",
@@ -305,27 +294,28 @@ namespace Notebook.DataAccess.Migrations
                 name: "UserNote",
                 columns: table => new
                 {
+                    NoteID = table.Column<string>(nullable: false),
+                    UserID = table.Column<string>(nullable: false),
                     ID = table.Column<string>(maxLength: 8, nullable: false),
                     CreateDate = table.Column<DateTime>(nullable: false),
-                    Member = table.Column<int>(nullable: false),
-                    NoteID = table.Column<string>(nullable: true),
-                    UserID = table.Column<string>(nullable: true)
+                    Member = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserNote", x => x.ID);
+                    table.PrimaryKey("PK_UserNote", x => new { x.UserID, x.NoteID });
+                    table.UniqueConstraint("AK_UserNote_ID", x => x.ID);
                     table.ForeignKey(
                         name: "FK_UserNote_Note_NoteID",
                         column: x => x.NoteID,
                         principalTable: "Note",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserNote_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -341,7 +331,7 @@ namespace Notebook.DataAccess.Migrations
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "ID", "Approve", "Avatar", "CreateDate", "Email", "Info", "LastActiveDate", "Name", "Password", "RoleID", "Username" },
-                values: new object[] { "23m454h5", true, "/notebook/images/avatar.png", new DateTime(2019, 7, 13, 16, 46, 55, 992, DateTimeKind.Local).AddTicks(3726), "mhaf69@gmail.com", null, new DateTime(2019, 7, 13, 16, 46, 55, 993, DateTimeKind.Local).AddTicks(2010), "Muammer Hafızoğlu", "D3CE20FCCBE7D116ECD0", null, "muammer.hafizoglu" });
+                values: new object[] { "23m454h5", true, "/notebook/images/avatar.png", new DateTime(2019, 8, 14, 14, 41, 26, 267, DateTimeKind.Local).AddTicks(5429), "mhaf69@gmail.com", null, new DateTime(2019, 8, 14, 14, 41, 26, 268, DateTimeKind.Local).AddTicks(3186), "Muammer Hafızoğlu", "D3CE20FCCBE7D116ECD0", null, "muammer.hafizoglu" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Folder_GroupID",
@@ -354,11 +344,6 @@ namespace Notebook.DataAccess.Migrations
                 column: "FollowingID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Group_OwnerID",
-                table: "Group",
-                column: "OwnerID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Note_FolderID",
                 table: "Note",
                 column: "FolderID");
@@ -367,11 +352,6 @@ namespace Notebook.DataAccess.Migrations
                 name: "IX_Note_GroupID",
                 table: "Note",
                 column: "GroupID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Note_OwnerID",
-                table: "Note",
-                column: "OwnerID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_RoleID",
@@ -384,11 +364,6 @@ namespace Notebook.DataAccess.Migrations
                 column: "FolderID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFolder_UserID",
-                table: "UserFolder",
-                column: "UserID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserGroup_GroupID",
                 table: "UserGroup",
                 column: "GroupID");
@@ -397,11 +372,6 @@ namespace Notebook.DataAccess.Migrations
                 name: "IX_UserNote_NoteID",
                 table: "UserNote",
                 column: "NoteID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserNote_UserID",
-                table: "UserNote",
-                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserSettings_UserID",
@@ -440,16 +410,16 @@ namespace Notebook.DataAccess.Migrations
                 name: "Note");
 
             migrationBuilder.DropTable(
-                name: "Folder");
-
-            migrationBuilder.DropTable(
-                name: "Group");
-
-            migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
+                name: "Folder");
+
+            migrationBuilder.DropTable(
                 name: "Role");
+
+            migrationBuilder.DropTable(
+                name: "Group");
         }
     }
 }

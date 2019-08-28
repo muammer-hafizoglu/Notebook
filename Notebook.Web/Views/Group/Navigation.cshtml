@@ -1,0 +1,8 @@
+﻿@model NavigationModel
+
+@inject IViewLocalizer Localizer
+
+<ul class="nav nav-tabs">
+    <li @(Model.List == "Folders" ? "class=active" : "")><a href="/@Model.ID/group-detail"><i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"]</a></li>
+    <li @(Model.List == "Notes" ? "class=active" : "")><a href="/@Model.ID/group-detail/notes"><i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["All Notes"]</a></li>
+</ul>

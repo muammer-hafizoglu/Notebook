@@ -12,7 +12,7 @@ namespace Notebook.Entities.Entities
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None), MaxLength(8)]
         public string ID { get; set; }
         public bool Notification { get; set; }
-        public Member MemberType { get; set; }
+        public Status Status { get; set; }
         public string GroupID { get; set; }
         public string UserID { get; set; }
         public DateTime CreateDate { get; set; }

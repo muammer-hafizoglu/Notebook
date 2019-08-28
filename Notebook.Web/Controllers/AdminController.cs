@@ -32,6 +32,8 @@ namespace Notebook.Web.Controllers
             _fileManager = fileManager;
         }
 
+        #region Notebook Settings
+
         [Route("~/notebook-settings")]
         [TypeFilter(typeof(AccountFilterAttribute), Arguments = new[] { "EDIT_SETTINGS" })]
         public IActionResult Settings()
@@ -40,7 +42,7 @@ namespace Notebook.Web.Controllers
 
             return View(settings ?? new Settings());
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("~/update-settings")]
@@ -77,63 +79,68 @@ namespace Notebook.Web.Controllers
             return Redirect("/notebook-settings");
         }
 
+        #endregion
+
         #region Userlist
 
         [TypeFilter(typeof(AccountFilterAttribute), Arguments = new[] { "VIEW_USERS" })]
-        [Route("~/notebook-users")]
-        public IActionResult Users(ParametersModel parameters)
+        [Route("~/notebook-membership")]
+        public IActionResult Users(Parameters parameters)
         {
-            var list = Datalist(_userManager.Table(), parameters, "/notebook-users");
+            var list = Datalist(_userManager.Table().OrderByDescending(a => a.CreateDate), parameters, "/notebook-membership");
 
             return View(list);
         }
 
-        private ObjectListModel Datalist(IQueryable<User> query, ParametersModel parameters, string url)
+        private ObjectListModel Datalist(IQueryable<User> query, Parameters parameters, string url)
         {
-            if (!string.IsNullOrEmpty(parameters.Filter) && !string.IsNullOrEmpty(parameters.Value))
+            ObjectListModel result = new ObjectListModel();
+            result.Url = url;
+            
+            if (!string.IsNullOrEmpty(parameters.Search))
             {
                 url += url.Contains("?") ? "&" : "?";
+
                 switch (parameters.Filter)
                 {
                     case "ID":
                         {
-                            query = query.Where(a => a.ID == parameters.Value) as IOrderedQueryable<User>;
-                            url += "Filter=ID&Filtre=" + parameters.Value;
+                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<User>;
                             break;
                         }
                     case "Name":
                         {
-                            query = query.Where(a => a.Name.Contains(parameters.Value)) as IOrderedQueryable<User>;
-                            url += "Filter=Name&Filtre=" + parameters.Value;
+                            query = query.Where(a => a.Name.Contains(parameters.Search)) as IOrderedQueryable<User>;
                             break;
                         }
                     case "Username":
                         {
-                            query = query.Where(a => a.Username.Contains(parameters.Value)) as IOrderedQueryable<User>;
-                            url += "Filter=Username&Filtre=" + parameters.Value;
+                            query = query.Where(a => a.Username.Contains(parameters.Search)) as IOrderedQueryable<User>;
                             break;
                         }
                     case "Email":
                         {
-                            query = query.Where(a => a.Email.Contains(parameters.Value)) as IOrderedQueryable<User>;
-                            url += "Filter=Email&Filtre=" + parameters.Value;
+                            query = query.Where(a => a.Email.Contains(parameters.Search)) as IOrderedQueryable<User>;
+                            break;
+                        }
+                    default:
+                        {
+                            query = query.Where(a => a.Name.Contains(parameters.Search) || a.Username.Contains(parameters.Search)) as IOrderedQueryable<User>;
                             break;
                         }
                 }
+
+                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
             }
 
-            ObjectListModel list = new ObjectListModel()
-            {
-                TotalData = query.Count(),
-                ShowInPage = (int.TryParse(parameters.Show, out int _show) ? _show : 30),
-                ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1
-            };
-
-            list.TotalPage = (int)Math.Ceiling((double)list.TotalData / list.ShowInPage);
-            list.Pagination = Helper.Pagination(url, list.ActivePage, list.TotalPage);
-            list.Datalist = query.Skip((list.ActivePage - 1) * list.ShowInPage).Take(list.ShowInPage).ToList();
-
-            return list;
+            result.TotalData = query.Count();
+            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
+            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
+            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
+            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
+            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
+            
+            return result;
         }
 
         #endregion
@@ -224,8 +231,8 @@ namespace Notebook.Web.Controllers
 
         [TypeFilter(typeof(AccountFilterAttribute), Arguments = new[] { "EDIT_USERS" })]
         [HttpGet]
-        [Route("~/{ID}/edit-user")]
-        public IActionResult EditUserPartial(string ID = "")
+        [Route("~/edit-user/{ID}")]
+        public IActionResult UserForm(string ID = "")
         {
             var _user = _userManager.getOne(a => a.ID == ID);
 
@@ -233,10 +240,20 @@ namespace Notebook.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditUserPartial(User model)
+        [ValidateAntiForgeryToken]
+        [Route("~/editUser")]
+        public IActionResult EditUser(User model, string NewPassword)
         {
-            return View();
+            if (!string.IsNullOrEmpty(NewPassword))
+            {
+                model.Password = NewPassword.SHA256Encrypt();
+            }
+
+            _userManager.Update(model);
+
+            return Redirect("/notebook-membership");
         }
         #endregion
+
     }
 }

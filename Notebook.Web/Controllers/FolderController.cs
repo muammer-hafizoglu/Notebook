@@ -19,94 +19,77 @@ namespace Notebook.Web.Controllers
     [TypeFilter(typeof(ExceptionFilterAttribute))]
     public class FolderController : Controller
     {
-        public string _lockIcon = "<i class='fa fa-lock'></i> ";
-        public string _noteIcon = "<i class='fa fa-newspaper-o'></i> ";
-        public string _userIcon = "<i class='fa fa-user'></i> ";
 
         private IStringLocalizer<FolderController> _localizer;
         private IFolderManager _folderManager;
         private IGroupManager _groupManager;
-        private IUserFolderManager _userFolderManager;
-        private IGroupFolderManager _groupFolderManager;
-        private IFolderNoteManager _folderNoteManager;
-        public FolderController(IStringLocalizer<FolderController> localizer,IFolderManager folderManager, IUserFolderManager userFolderManager, 
-            IGroupFolderManager groupFolderManager, IGroupManager groupManager, IFolderNoteManager folderNoteManager)
+        private INoteManager _noteManager;
+        public FolderController(IStringLocalizer<FolderController> localizer,IFolderManager folderManager, IGroupManager groupManager, INoteManager noteManager)
         {
             _localizer = localizer;
             _folderManager = folderManager;
             _groupManager = groupManager;
-            _userFolderManager = userFolderManager;
-            _groupFolderManager = groupFolderManager;
-            _folderNoteManager = folderNoteManager;
+            _noteManager = noteManager;
         }
-
-        #region List
-
-        [HttpPost]
-        [Route("~/group-folders")]
-        public JsonResult GroupFolders(DatatableParameters parameters, string groupId = "")
-        {
-            var sqlQuery = _folderManager.Table()
-                .Include(a => a.Group)
-                .Include(a => a.Notes)
-                .OrderByDescending(a => a.CreateDate)
-                .Where(a => a.Group.ID == groupId) as IQueryable<Folder>;
-
-            var result = new DatatableResult() { draw = parameters.draw, recordsTotal = sqlQuery.Count() };
-
-            #region Searching
-            string search = Request.Form["search[value]"].ToString();
-            if (!string.IsNullOrEmpty(search))
-            {
-                sqlQuery = sqlQuery.Where(a => a.Name.Contains(search)) as IQueryable<Folder>;
-            }
-
-            result.recordsFiltered = sqlQuery.Count();
-            #endregion
-
-            result.data = sqlQuery.Skip(parameters.start).Take(parameters.length).Select(a =>
-                      new FolderModel
-                      {
-                          name = string.Format("<a href='/folder/{0}/{1}'>{2}  {3}</a>", a.ID, a.Name.ClearHtmlTagAndCharacter(), a.Name, (a.Visible == Visible.Private ? _lockIcon : "")),
-                          info = string.Format("{0}: {1}", _noteIcon, a.Notes.Count())
-                      }).ToList();
-
-            return Json(result);
-        }
-
-        #endregion
 
         #region CRUD
 
-        [Route("~/folder/{ID}/{title}")]
-        public IActionResult Detail(string ID = "")
+        [Route("~/{ID}/folder-detail")]
+        public IActionResult Notes(Parameters parameters)
         {
             var _user = HttpContext.Session.GetSession<User>("User");
 
-            FolderDetailModel detail = null;
-            
-            var _folder = _folderManager.getMany(a => a.ID == ID)
-                .Include(a => a.Group)
-                    .ThenInclude(b => b.Users)
-                .Include(a => a.Notes)
-                .FirstOrDefault();
+            FolderDetailModel model = new FolderDetailModel();
 
-            if (_folder != null)
+            model.Folder = _folderManager.GetFolderInfo(parameters.ID, _user?.ID);
+            model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
+            model.Data = NoteList(
+                _noteManager.Table()
+                    .Where(a => a.Folder.ID == model.Folder.ID)
+                    .Include(a => a.Group)
+                    .Include(a => a.Users)
+                        .ThenInclude(b => b.User)
+                    .OrderByDescending(a => a.CreateDate),
+                parameters,
+                $"/{parameters.ID}/group-detail");
+
+            return View(model);
+        }
+
+        private ObjectListModel NoteList(IQueryable<Note> query, Parameters parameters, string url)
+        {
+            ObjectListModel result = new ObjectListModel();
+            result.Url = url;
+
+            if (!string.IsNullOrEmpty(parameters.Search))
             {
-                detail = new FolderDetailModel();
-                detail.ID = _folder.ID;
-                detail.Name = _folder.Name;
-                detail.Explanation = _folder.Explanation;
-                detail.CreateDate = _folder.CreateDate;
-                detail.Visible = _folder.Visible;
-                detail.Group = _folder.Group;
-                detail.NoteCount = _folder.Notes.Count();
+                url += url.Contains("?") ? "&" : "?";
 
-                var _member = _folder.Group.Users.Where(a => a.UserID == _user?.ID).FirstOrDefault();
-                detail.MemberType = (_member != null) ? _member.MemberType : Member.Visitor;
+                switch (parameters.Filter)
+                {
+                    case "ID":
+                        {
+                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<Note>;
+                            break;
+                        }
+                    case "Title":
+                        {
+                            query = query.Where(a => a.Title.Contains(parameters.Search)) as IOrderedQueryable<Note>;
+                            break;
+                        }
+                }
+
+                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
             }
 
-            return View(detail);
+            result.TotalData = query.Count();
+            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
+            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
+            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
+            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
+            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
+
+            return result;
         }
 
         [HttpGet]

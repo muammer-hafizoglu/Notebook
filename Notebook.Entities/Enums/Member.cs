@@ -10,6 +10,8 @@ namespace Notebook.Entities.Enums
         Manager,
         Member,
         Favorite,
+        Wait,
+        User,
         Visitor
     }
 }

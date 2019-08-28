@@ -83,20 +83,8 @@ namespace Notebook.Web
             services.AddScopedWithProxy<IUserGroupDal, EfUserGroupDal>();
             services.AddScopedWithProxy<IUserGroupManager, UserGroupManager>();
 
-            services.AddScopedWithProxy<IUserFolderDal, EfUserFolderDal>();
-            services.AddScopedWithProxy<IUserFolderManager, UserFolderManager>();
-
             services.AddScopedWithProxy<IUserNoteDal, EfUserNoteDal>();
             services.AddScopedWithProxy<IUserNoteManager, UserNoteManager>();
-
-            services.AddScopedWithProxy<IGroupFolderDal, EfGroupFolderDal>();
-            services.AddScopedWithProxy<IGroupFolderManager, GroupFolderManager>();
-
-            services.AddScopedWithProxy<IGroupNoteDal, EfGroupNoteDal>();
-            services.AddScopedWithProxy<IGroupNoteManager, GroupNoteManager>();
-
-            services.AddScopedWithProxy<IFolderNoteDal, EfFolderNoteDal>();
-            services.AddScopedWithProxy<IFolderNoteManager, FolderNoteManager>();
 
             services.AddScopedWithProxy<ISettingsDal, EfSettingsDal>();
             services.AddScopedWithProxy<ISettingsManager, SettingsManager>();

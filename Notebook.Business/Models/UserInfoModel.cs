@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Notebook.Entities.Enums;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace Notebook.Web.Models
+namespace Notebook.Business.Models
 {
-    public class UserProfileModel
+    public class UserInfoModel
     {
         public string ID { get; set; }
+        public string Username { get; set; }
         public string Name { get; set; }
         public string Info { get; set; }
         public DateTime CreateDate { get; set; }
@@ -17,8 +18,7 @@ namespace Notebook.Web.Models
         public int NoteCount { get; set; }
         public int FollowerCount { get; set; }
         public int FollowingCount { get; set; }
-        public string List { get; set; }
-
-        public bool Follower { get; set; }
+        public bool Lock { get; set; }
+        public Status Status { get; set; }
     }
 }

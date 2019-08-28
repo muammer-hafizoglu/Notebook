@@ -1,4 +1,5 @@
-﻿using Notebook.Entities.Entities;
+﻿using Notebook.Business.Models;
+using Notebook.Entities.Entities;
 using System;
 using System.Collections.Generic;
 
@@ -9,5 +10,6 @@ namespace Notebook.Business.Managers.Abstract
         void LastActiveDateUpdate(User user);
         User Login(User user);
         User Cookie(string key);
+        UserInfoModel GetUserInfo(string ID);
     }
 }

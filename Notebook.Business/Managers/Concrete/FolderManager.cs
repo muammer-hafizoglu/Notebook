@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Notebook.Business.Managers.Abstract;
+using Notebook.Business.Models;
 using Notebook.Business.Tools.Validation.FluentValidation;
 using Notebook.Core.Aspects.SimpleProxy.Validation;
 using Notebook.DataAccess.DataAccess.Abstract;
@@ -29,7 +30,7 @@ namespace Notebook.Business.Managers.Concrete
             if (_group != null)
             {
                 var _member = _group.Users.Where(a => a.UserID == UserID).FirstOrDefault();
-                if (_member != null && (_member.MemberType == Member.Owner || _member.MemberType == Member.Manager))
+                if (_member != null && (_member.Status == Status.Owner || _member.Status == Status.Manager))
                 {
                     model.Group = _group;
                     model.CreateDate = DateTime.Now;
@@ -53,7 +54,7 @@ namespace Notebook.Business.Managers.Concrete
             if (_folder != null)
             {
                 var _member = _folder.Group.Users.Where(a => a.UserID == UserID).FirstOrDefault();
-                if (_member != null && (_member.MemberType == Member.Owner || _member.MemberType == Member.Manager))
+                if (_member != null && (_member.Status == Status.Owner || _member.Status == Status.Manager))
                 {
                     base.Delete(_folder);
                 }
@@ -68,6 +69,34 @@ namespace Notebook.Business.Managers.Concrete
             }
         }
 
+        public FolderInfoModel GetFolderInfo(string FolderID, string UserID = "")
+        {
+            FolderInfoModel folder = null;
+
+            var _folder = servisDal.getMany(a => a.ID == FolderID)
+                .Include(a => a.Group)
+                    .ThenInclude(b => b.Users)
+                .Include(a => a.Notes)
+                .FirstOrDefault();
+
+            if (_folder != null)
+            {
+                folder = new FolderInfoModel();
+                folder.ID = _folder.ID;
+                folder.Name = _folder.Name;
+                folder.Explanation = _folder.Explanation;
+                folder.CreateDate = _folder.CreateDate;
+                folder.Visible = _folder.Visible;
+                folder.NoteCount = _folder.Notes.Count;
+                folder.Group = _folder.Group;
+
+                var _user = _folder.Group.Users.FirstOrDefault(a => a.UserID == UserID);
+                folder.Status = _user != null ? _user.Status : Status.Visitor;
+            }
+
+            return folder;
+        }
+
         [Validate(typeof(Folder), typeof(FolderFluentValidation))]
         public void Update(Folder model, string UserID)
         {
@@ -75,7 +104,7 @@ namespace Notebook.Business.Managers.Concrete
             if (_group != null)
             {
                 var _member = _group.Users.Where(a => a.UserID == UserID).FirstOrDefault();
-                if (_member != null && (_member.MemberType == Member.Owner || _member.MemberType == Member.Manager))
+                if (_member != null && (_member.Status == Status.Owner || _member.Status == Status.Manager))
                 {
                     var _folder = servisDal.getOne(a => a.ID == model.ID);
                     if (_folder != null)

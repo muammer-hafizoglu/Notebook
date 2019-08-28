@@ -11,7 +11,7 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
         public NoteFluentValidation()
         {
             RuleFor(p => p.Title).NotEmpty();
-            RuleFor(p => p.OwnerID).NotEmpty();
+            RuleFor(p => p.UserID).NotEmpty();
             RuleFor(p => p.Content).NotEmpty();
         }
 
