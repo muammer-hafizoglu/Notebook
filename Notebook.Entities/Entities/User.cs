@@ -12,7 +12,7 @@ namespace Notebook.Entities.Entities
         {
             Groups = new HashSet<UserGroup>();
             Notes = new HashSet<UserNote>();
-            Followers = new HashSet<Follow>();
+            Follower = new HashSet<Follow>();
             Following = new HashSet<Follow>();
         }
 
@@ -31,7 +31,7 @@ namespace Notebook.Entities.Entities
 
         public virtual Role Role { get; set; }
         public virtual UserSettings Settings { get; set; }
-        public virtual ICollection<Follow> Followers { get; set; }
+        public virtual ICollection<Follow> Follower { get; set; }
         public virtual ICollection<Follow> Following { get; set; }
         public virtual ICollection<UserNote> Notes { get; set; }
         public virtual ICollection<UserGroup> Groups { get; set; }

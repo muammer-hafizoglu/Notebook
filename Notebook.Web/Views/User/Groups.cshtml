@@ -7,7 +7,7 @@
 }
 
 
-@if (Model != null)
+@if (Model.User != null)
 {
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
@@ -20,82 +20,79 @@
         <div class="col-md-9">
             <div class="nav-tabs-custom">
                 @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
-                <div class="tab-content">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="box-header with-border">
-                                <h3 class="box-title">@Localizer["Group List"]</h3>
-                                @if (Model.User.Status == Status.Owner)
-                                {
-                                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-group">
-                                        <i class="fa fa-clone"></i>&nbsp;@Localizer["Add Group"]
-                                    </button>
-                                }
-                            </div>
 
-                            <form action="@Model.Data.Url">
-                                <div class="input-group search-panel">
-                                    <div class="input-group-btn">
-                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                            <span id="srcTxt">Filter</span> <span class="caret"></span>
+                @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
+                {
+                    <div class="tab-content">
+                        <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
+                        <p>@Localizer["Follow to see this user's posts"]</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="tab-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">@Localizer["Group List"]</h3>
+                                    @if (Model.User.Status == Status.Owner)
+                                    {
+                                        <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-group">
+                                            <i class="fa fa-clone"></i>&nbsp;@Localizer["Add Group"]
                                         </button>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a onclick="$search('ID')">ID</a></li>
-                                            <li><a onclick="$search('Name')">Name</a></li>
-                                            <li><a onclick="$search('Username')">Username</a></li>
-                                            <li><a onclick="$search('Email')">Email</a></li>
-                                        </ul>
-                                    </div>
-                                    <input type="hidden" name="Filter" value="" id="filter">
-                                    <input type="text" class="form-control" name="Search" placeholder="Search ...">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
-                                    </span>
-                                    <span class="input-group-btn">
-                                        <a href="@Model.Data.Url" class="btn btn-default" type="submit"><span class="fa fa-list"></span></a>
-                                    </span>
+                                    }
                                 </div>
-                            </form>
+
+                                @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (Model.Data != null)
+                            {
+                                foreach (var item in Model.Data.Datalist as List<UserGroup>)
+                                {
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="model-card">
+                                            <div class="row">
+                                                <div class="col-xs-4 text-center" style="padding:0px 10px 0 10px">
+
+                                                    <a href="/@item.Group.ID/group-detail" class="model-card-title">
+                                                        <i class="fa fa-clone" style="font-size:60px; color:#3C8DBC;"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-8" style="padding-left:0">
+                                                    <a href="/@item.Group.ID/group-detail" class="model-card-title">
+                                                        @Html.Raw(item.Group.Visible == Visible.Private ? "<i class='fa fa-lock'></i>" : "")
+                                                        @(item.Group.Name.Length > 17 ? item.Group.Name.Substring(0, 17) + "..." : item.Group.Name)
+                                                    </a>
+                                                    <hr style="margin:5px 0" />
+                                                    <div class="row">
+                                                        <div class="col-xs-4 text-center">
+                                                            <small style="color:#808080">@Localizer["Members"]</small><br />
+                                                            <b>@item.Group.Users.Where(a => a.Status == Status.Member || a.Status == Status.Manager).Count()</b>
+                                                        </div>
+                                                        <div class="col-xs-4 text-center">
+                                                            <small style="color:#808080">@Localizer["Folders"]</small><br />
+                                                            <b>@item.Group.Folders.Count</b>
+                                                        </div>
+                                                        <div class="col-xs-4 text-center">
+                                                            <small style="color:#808080">@Localizer["Notes"]</small><br />
+                                                            <b>@item.Group.Notes.Count</b>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="box-footer">
+                            @Localizer["Total"]: @Model.Data.TotalData
+                            @Html.Raw(Model.Data.Pagination)
                         </div>
                     </div>
-                    <div class="row">
-                        @if (Model.Data != null)
-                        {
-                            foreach (var item in Model.Data.Datalist as List<UserGroup>)
-                            {
-                                <div class="col-md-4 col-sm-6">
-                                    <div class="model-card" style="background:@(item.Group.Visible == Visible.Private ? "#fff0db" : "inherit")">
-                                        <div class="model-card-header">
-                                            <a href="/@item.Group.ID/group-detail" class="model-card-title">
-                                                <img src="/notebook/images/g.png" class="img-circle model-card-img">
-                                                @(item.Group.Name.Length > 20 ? item.Group.Name.Substring(0, 20) + "..." : item.Group.Name)
-                                            </a><br />
-                                        </div>
-                                        <div class="model-card-body">
-                                            <a href="/@item.User.Username"  style="color:#ff6a00; font-weight:bold">@item.User.Name</a><br />
-                                            <small style="color:#808080"><i class="fa fa-calendar"></i> @item.Group.CreateDate.ToShortDateString()</small>
-                                            <div class="model-card-content">
-                                                @Html.Raw(item.Group.Explanation)
-                                            </div>
-                                        </div>
-                                        <div class="model-card-footer">
-                                            <div class="pull-left">
-                                                <small style="color:#808080"><i class="fa fa-folder-open-o"></i> @Localizer["Folders"]: @item.Group.Folders.Count</small>
-                                            </div>
-                                            <div class="pull-right">
-                                                <small style="color:#808080"><i class="fa fa-newspaper-o"></i> @Localizer["Notes"]: @item.Group.Notes.Count</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        }
-                    </div>
-                    <div class="box-footer">
-                        @Localizer["Total"]: @Model.Data.TotalData
-                        @Html.Raw(Model.Data.Pagination)
-                    </div>
-                </div>
+                }
             </div>
         </div>
     </div>

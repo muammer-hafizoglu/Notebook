@@ -10,10 +10,12 @@ using Notebook.Core.CrossCuttingConcerns.Caching.MemoryCache;
 using Notebook.Core.CrossCuttingConcerns.Logging;
 using Notebook.DataAccess.DataAccess.Abstract;
 using Notebook.Entities.Entities;
+using Notebook.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Notebook.Business.Managers.Concrete
 {
@@ -25,11 +27,52 @@ namespace Notebook.Business.Managers.Concrete
             servisDal = _servisDal;
         }
 
+        public UserInfoModel GetUserInfo(string ID, string UserID = "")
+        {
+            UserInfoModel user = null;
+
+            var _user = servisDal.getMany(a => a.Username == ID)
+                .Include(a => a.Groups)
+                .Include(a => a.Notes)
+                .Include(a => a.Follower)
+                    .ThenInclude(b => b.Follower)
+                .Include(a => a.Following)
+                .FirstOrDefault();
+
+            if (_user != null)
+            {
+                user = new UserInfoModel();
+                user.ID = _user.ID;
+                user.Username = _user.Username;
+                user.Name = _user.Name;
+                user.Info = _user.Info;
+                user.CreateDate = _user.CreateDate;
+                user.Avatar = _user.Avatar;
+                user.Lock = _user.Lock;
+                user.GroupCount = _user.Groups.Count;
+                user.NoteCount = _user.Notes.Count;
+                user.FollowerCount = _user.Follower.Where(a => a.Status == Status.Follow).Count();
+                user.FollowingCount = _user.Following.Count;
+                user.WaitingUserCount = _user.Follower.Where(a => a.Status == Status.Wait).Count();
+
+                var follow = _user.Follower.FirstOrDefault(a => a.FollowerID == UserID);
+
+                user.Status = (user.ID == UserID) ? Status.Owner : follow != null ? follow.Status :
+                    !string.IsNullOrEmpty(UserID) ? Status.User : Status.Visitor;
+            }
+
+            return user;
+        }
+
         [Validate(typeof(User),typeof(UserFluentValidation))]
         public override void Add(User model)
         {
             EmailControl(model);
-            UsernameControl(model);
+
+            if (!string.IsNullOrEmpty(model.Username))
+                UsernameControl(model);
+            else
+                model.Username = CreatUsername();
 
             model.Password = model.Password.SHA256Encrypt();
             model.CreateDate = DateTime.Now;
@@ -42,7 +85,11 @@ namespace Notebook.Business.Managers.Concrete
         public override void Update(User model)
         {
             EmailControl(model);
-            UsernameControl(model);
+
+            if (!string.IsNullOrEmpty(model.Username))
+                UsernameControl(model);
+            else
+                model.Username = CreatUsername();
 
             var _user = servisDal.getMany(a => a.ID == model.ID).Include(a => a.Role).FirstOrDefault();
             if (_user != null)
@@ -80,25 +127,36 @@ namespace Notebook.Business.Managers.Concrete
 
         private void UsernameControl(User model)
         {
-            if (!string.IsNullOrEmpty(model.Username))
-            {
-                var _user = servisDal.getOne(a => a.Username == model.Username);
+            var _user = servisDal.getOne(a => a.Username == model.Username);
 
-                if (_user != null)
+            if (_user != null)
+            {
+                if (!string.IsNullOrEmpty(model.ID))
                 {
-                    if (!string.IsNullOrEmpty(model.ID))
-                    {
-                        if (_user.ID != model.ID)
-                        {
-                            throw new Exception("This username is not available");
-                        }
-                    }
-                    else
+                    if (_user.ID != model.ID)
                     {
                         throw new Exception("This username is not available");
                     }
                 }
+                else
+                {
+                    throw new Exception("This username is not available");
+                }
             }
+        }
+
+        private string CreatUsername()
+        {
+            Random random = new Random();
+
+            string username = "user" + random.Next(111111, 999999).ToString();
+
+            while (servisDal.getOne(a => a.Username == username) != null)
+            {
+                username = "user" + random.Next(1111, 9999).ToString();
+            }
+
+            return username;
         }
 
         //[Cache(typeof(MemoryCacheManager), 20)]
@@ -159,30 +217,22 @@ namespace Notebook.Business.Managers.Concrete
             return user;
         }
 
-        public UserInfoModel GetUserInfo(string ID)
+        public async Task<User> CookieAsync(string key)
         {
-            UserInfoModel user = null;
+            User user = null;
 
-            var _user = servisDal.getMany(a => a.Username == ID)
-                .Include(a => a.Groups)
-                .Include(a => a.Notes)
-                .FirstOrDefault();
-
-            if (_user != null)
+            if (!string.IsNullOrEmpty(key))
             {
-                user = new UserInfoModel();
-                user.ID = _user.ID;
-                user.Username = _user.Username;
-                user.Name = _user.Name;
-                user.Info = _user.Info;
-                user.CreateDate = _user.CreateDate;
-                user.Avatar = _user.Avatar;
-                user.Lock = _user.Lock;
-                user.GroupCount = _user.Groups.Count;
-                user.NoteCount = _user.Notes.Count;
+                user = await servisDal.getMany(a => a.Email == key).Include(a => a.Role).FirstOrDefaultAsync();
+                if (user != null)
+                {
+                    LastActiveDateUpdate(user);
+                }
             }
 
             return user;
         }
+
+        
     }
 }

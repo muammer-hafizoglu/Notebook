@@ -6,7 +6,7 @@
     var activeUser = Context.Session.GetSession<User>("User");
 }
 
-@if (Model != null)
+@if (Model.User != null)
 {
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
@@ -19,9 +19,20 @@
             <div class="nav-tabs-custom">
                 @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
 
-                <div class="tab-content">
-                    Timeline .....
-                </div>
+                @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
+                {
+                    <div class="tab-content">
+                        <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
+                        <p>@Localizer["Follow to see this user's posts"]</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="tab-content">
+                        Timeline .....
+                    </div>
+                }
+                
             </div>
         </div>
     </div>

@@ -65,29 +65,32 @@ namespace Notebook.Web
 
             #region Managers
 
-            services.AddScopedWithProxy<IUserDal, EfUserDal>();
-            services.AddScopedWithProxy<IUserManager, UserManager>();
+            services.AddScoped<IUserDal, EfUserDal>();
+            services.AddScoped<IUserManager, UserManager>();
 
-            services.AddScopedWithProxy<ILogDal, EfLogDal>();
-            services.AddScopedWithProxy<ILogManager, LogManager>();
+            services.AddScoped<ILogDal, EfLogDal>();
+            services.AddScoped<ILogManager, LogManager>();
 
-            services.AddScopedWithProxy<IGroupDal, EfGroupDal>();
-            services.AddScopedWithProxy<IGroupManager, GroupManager>();
+            services.AddScoped<IGroupDal, EfGroupDal>();
+            services.AddScoped<IGroupManager, GroupManager>();
 
-            services.AddScopedWithProxy<IFolderDal, EfFolderDal>();
-            services.AddScopedWithProxy<IFolderManager, FolderManager>();
+            services.AddScoped<IFolderDal, EfFolderDal>();
+            services.AddScoped<IFolderManager, FolderManager>();
 
-            services.AddScopedWithProxy<INoteDal, EfNoteDal>();
-            services.AddScopedWithProxy<INoteManager, NoteManager>();
+            services.AddScoped<INoteDal, EfNoteDal>();
+            services.AddScoped<INoteManager, NoteManager>();
 
-            services.AddScopedWithProxy<IUserGroupDal, EfUserGroupDal>();
-            services.AddScopedWithProxy<IUserGroupManager, UserGroupManager>();
+            services.AddScoped<IUserGroupDal, EfUserGroupDal>();
+            services.AddScoped<IUserGroupManager, UserGroupManager>();
 
-            services.AddScopedWithProxy<IUserNoteDal, EfUserNoteDal>();
-            services.AddScopedWithProxy<IUserNoteManager, UserNoteManager>();
+            services.AddScoped<IUserNoteDal, EfUserNoteDal>();
+            services.AddScoped<IUserNoteManager, UserNoteManager>();
 
-            services.AddScopedWithProxy<ISettingsDal, EfSettingsDal>();
-            services.AddScopedWithProxy<ISettingsManager, SettingsManager>();
+            services.AddScoped<IFollowDal, EfFollowDal>();
+            services.AddScoped<IFollowManager, FollowManager>();
+
+            services.AddScoped<ISettingsDal, EfSettingsDal>();
+            services.AddScoped<ISettingsManager, SettingsManager>();
             #endregion
 
             #region Session

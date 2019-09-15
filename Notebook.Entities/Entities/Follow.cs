@@ -1,4 +1,5 @@
 ﻿using Notebook.Core.EntityRepository.Entities;
+using Notebook.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,6 +13,8 @@ namespace Notebook.Entities.Entities
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None), MaxLength(8)]
         public string ID { get; set; }
         public bool Notification { get; set; }
+        public Status Status { get; set; }
+        public DateTime CreateDate { get; set; }
 
         public string FollowerID { get; set; }
         public string FollowingID { get; set; }

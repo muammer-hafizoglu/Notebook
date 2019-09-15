@@ -12,8 +12,8 @@
             <p class="text-muted text-center">@Model.Explanation</p>
             <ul class="list-group list-group-unbordered" style="color:#3D8CBC; padding:10px 10px;">
                 <li class="list-group-item">
-                    <i class="fa fa-user"></i>&nbsp;@Localizer["User"]
-                    <a href="/@Model.UserID" class="pull-right" style="font-weight:bold; color:darkblue">@Model.UserName</a>
+                    <i class="fa fa-user"></i>&nbsp;@Localizer["Owner"]
+                    <a href="/@Model.User.Username/groups" class="pull-right" style="font-weight:bold; color:darkblue">@Model.User.Name</a>
                 </li>
                 <li class="list-group-item">
                     <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <span class="pull-right">@Model.CreateDate.ToString("dd MMMM yyyy")</span>
@@ -22,45 +22,86 @@
                     <i class="fa fa-folder-open-o"></i>&nbsp;@Localizer["Folders"] <a class="pull-right">@Model.FolderCount</a>
                 </li>
                 <li class="list-group-item">
-                    <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <a class="pull-right">@Model.NoteCount</a>
+                    <i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["Notes"] <a class="pull-right">@Model.NoteCount</a>
                 </li>
                 <li class="list-group-item">
-                    <i class="fa fa-users"></i>&nbsp;@Localizer["Members"] <a class="pull-right">@Model.UserCount</a>
+                    <i class="fa fa-paw"></i>&nbsp;@Localizer["Members"] <a class="pull-right">@Model.UserCount</a>
                 </li>
+                @if (Model.Status == Status.Owner || Model.Status == Status.Manager)
+                {
+                    <li class="list-group-item">
+                        <i class="fa fa-hourglass-o"></i>&nbsp;@Localizer["Waiting approval"] <a class="pull-right">@Model.WaitingUser</a>
+                    </li>
+                }
             </ul>
 
             @if (Model.Status == Status.Owner)
             {
                 <div class="text-center">
-                    <a href="#" class="btn btn-primary"><b><i class="fa fa-cogs"></i> @Localizer["Edit"]</b></a>
+                    <button class="btn btn-primary btn-sm" data-type="modal" data-action="@Model.ID/edit-group" title="@Localizer["Edit"]">
+                        <i class="fa fa-cog"></i> @Localizer["Edit"]
+                    </button>
+                    <button class="btn btn-danger btn-sm" title="@Localizer["Remove"]"
+                            data-type="redirect"
+                            data-confirm="@Localizer["Are you sure you want to delete"] ?"
+                            data-url="/@Model.User.Username/groups"
+                            data-action="@Model.ID/delete-group">
+                        <i class="fa fa-trash-o"></i> @Localizer["Remove"]
+                    </button>
                 </div>
             }
-            else if (Model.Status == Status.Member)
+            else if (Model.Visible != Visible.Private)
             {
-                <div class="text-center">
-                    <a href="#" class="btn btn-warning"><b>@Localizer["Unfollow"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
-                </div>
-            }
-            else if (Model.Status == Status.Wait)
-            {
-                <div class="text-center">
-                    <a href="#" class="btn btn-danger"><b>@Localizer["Request Cancel"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
-                </div>
-            }
-            else if (Model.Status == Status.User)
-            {
-                <div class="text-center">
-                    <a href="#" class="btn btn-info"><b>@Localizer["Follow"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
-                </div>
+                if (Model.Status == Status.Member || Model.Status == Status.Manager)
+                {
+                    <div class="text-center">
+                        <button class="btn btn-danger btn-sm"
+                                data-type="redirect"
+                                data-url="/@Model.ID/group-detail"
+                                data-action="@Model.ID/exit-group">
+                            <i class="fa fa-close"></i> @Localizer["Exit group"]
+                        </button>
+                    </div>
+                }
+                else if (Model.Status == Status.Wait)
+                {
+                    <div class="text-center">
+                        <button class="btn btn-warning btn-sm"
+                                data-type="redirect"
+                                data-url="/@Model.ID/group-detail"
+                                data-action="@Model.ID/exit-group">
+                            <i class="fa fa-close"></i> @Localizer["Request Cancel"]
+                        </button>
+                    </div>
+                }
+                else if (Model.Status == Status.User)
+                {
+                    <div class="text-center">
+                        <button class="btn btn-info btn-sm"
+                                data-type="redirect"
+                                data-url="/@Model.ID/group-detail"
+                                data-action="@Model.ID/join-group">
+                            <i class="fa fa-reply-all"></i> @Localizer["Request to join class"]
+                        </button>
+                    </div>
+                }
+                else if (Model.Status == Status.Blocked)
+                {
+                    <div class="text-center">
+                        <label style="color:red">@Localizer["Blocked"]</label>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center">
+                        <a href="/login?ReturnUrl=/@Model.ID/group-detail" style="color:blue"><b>@Localizer["Sign in for to join class"]</b></a>
+                    </div>
+                }
             }
             else
             {
                 <div class="text-center">
-                    <a href="/register" style="color:blue"><b>@Localizer["Sign up"]</b></a> or
-                    <a href="/login" style="color:blue"><b>@Localizer["Sign in for follow"]</b></a>
+                    <label style="color:orange">@Localizer["This group is closed to membership"]</label>
                 </div>
             }
         </div>

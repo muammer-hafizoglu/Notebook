@@ -87,60 +87,9 @@ namespace Notebook.Web.Controllers
         [Route("~/notebook-membership")]
         public IActionResult Users(Parameters parameters)
         {
-            var list = Datalist(_userManager.Table().OrderByDescending(a => a.CreateDate), parameters, "/notebook-membership");
+            var list = DataListOperations.List(_userManager.Table().OrderByDescending(a => a.CreateDate), parameters, "/notebook-membership");
 
             return View(list);
-        }
-
-        private ObjectListModel Datalist(IQueryable<User> query, Parameters parameters, string url)
-        {
-            ObjectListModel result = new ObjectListModel();
-            result.Url = url;
-            
-            if (!string.IsNullOrEmpty(parameters.Search))
-            {
-                url += url.Contains("?") ? "&" : "?";
-
-                switch (parameters.Filter)
-                {
-                    case "ID":
-                        {
-                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<User>;
-                            break;
-                        }
-                    case "Name":
-                        {
-                            query = query.Where(a => a.Name.Contains(parameters.Search)) as IOrderedQueryable<User>;
-                            break;
-                        }
-                    case "Username":
-                        {
-                            query = query.Where(a => a.Username.Contains(parameters.Search)) as IOrderedQueryable<User>;
-                            break;
-                        }
-                    case "Email":
-                        {
-                            query = query.Where(a => a.Email.Contains(parameters.Search)) as IOrderedQueryable<User>;
-                            break;
-                        }
-                    default:
-                        {
-                            query = query.Where(a => a.Name.Contains(parameters.Search) || a.Username.Contains(parameters.Search)) as IOrderedQueryable<User>;
-                            break;
-                        }
-                }
-
-                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
-            }
-
-            result.TotalData = query.Count();
-            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
-            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
-            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
-            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
-            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
-            
-            return result;
         }
 
         #endregion

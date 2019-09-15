@@ -16,9 +16,11 @@ namespace Notebook.Business.Managers.Concrete
     public class GroupManager : Manager<Group>, IGroupManager
     {
         private IGroupDal servisDal;
-        public GroupManager(IGroupDal _servisDal) : base(_servisDal)
+        private IUserManager userManager;
+        public GroupManager(IGroupDal _servisDal, IUserManager _userManager) : base(_servisDal)
         {
             servisDal = _servisDal;
+            userManager = _userManager;
         }
 
         [Validate(typeof(Group), typeof(GroupFluentValidation))]
@@ -32,7 +34,7 @@ namespace Notebook.Business.Managers.Concrete
         [Validate(typeof(Group), typeof(GroupFluentValidation))]
         public override void Update(Group model)
         {
-            var _group = servisDal.getOne(a => a.ID == model.ID);
+            var _group = base.getOne(a => a.ID == model.ID);
             if (_group != null)
             {
                 // TODO: AutoMapper Uygulanacak
@@ -49,26 +51,35 @@ namespace Notebook.Business.Managers.Concrete
             }
         }
 
-        public Member MembershipControl(string GroupID, string UserID)
+        public void Delete(string GroupID, string UserID)
         {
-            var _memberType = Member.Visitor;
-
-            var _group = servisDal.getMany(a => a.ID == GroupID).Include(a => a.Users).FirstOrDefault();
-            //if (_group != null)
-            //{
-            //    var _member = _group.Users.Where(a => a.UserID == UserID).FirstOrDefault();
-            //    if (_member != null)
-            //        _memberType = _member.Status;
-            //}
-
-            return _memberType;
+            var _group = base.getMany(a => a.ID == GroupID)
+                .Include(a => a.Users)
+                    .ThenInclude(b => b.User)
+                .FirstOrDefault();
+            if (_group != null)
+            {
+                var _member = _group.Users.Where(a => a.UserID == UserID).FirstOrDefault();
+                if (_member != null && (_member.Status == Status.Owner || _member.Status == Status.Manager))
+                {
+                    base.Delete(_group);
+                }
+                else
+                {
+                    throw new Exception("Authorization error");
+                }
+            }
+            else
+            {
+                throw new Exception("Group not found");
+            }
         }
 
         public GroupInfoModel GetGroupInfo(string GroupID, string UserID = "")
         {
             GroupInfoModel group = null;
 
-            var _group = servisDal.getMany(a => a.ID == GroupID)
+            var _group = base.getMany(a => a.ID == GroupID)
                 .Include(a => a.Users)
                     .ThenInclude(b => b.User)
                 .Include(a => a.Folders)
@@ -85,15 +96,16 @@ namespace Notebook.Business.Managers.Concrete
                 group.Visible = _group.Visible;
                 group.FolderCount = _group.Folders.Count;
                 group.NoteCount = _group.Notes.Count;
-                group.UserCount = _group.Users.Count;
-                group.Status = _group.Users.Any(a => a.UserID == UserID) ? _group.Users.FirstOrDefault(a => a.UserID == UserID).Status : Status.Visitor;
+                group.UserCount = _group.Users.Where(a => a.Status == Status.Member || a.Status == Status.Manager).Count();
+                group.WaitingUser = _group.Users.Where(a => a.Status == Status.Wait).Count();
+                group.User = _group.Users.FirstOrDefault(a => a.Status == Status.Owner).User;
 
-                var _owner = _group.Users.FirstOrDefault(a => a.Status == Status.Owner);
-                group.UserID = _owner.User.Username;
-                group.UserName = _owner.User.Name;
+                var user = _group.Users.FirstOrDefault(a => a.UserID == UserID);
+                group.Status = user != null ? user.Status : !string.IsNullOrEmpty(UserID) ? Status.User : Status.Visitor;
             }
 
             return group;
         }
+
     }
 }

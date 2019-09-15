@@ -120,4 +120,31 @@
   <data name="Create" xml:space="preserve">
     <value>Hesap</value>
   </data>
+  <data name="I agree to the terms" xml:space="preserve">
+    <value>Şartları kabul ediyorum</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Giriş Yap</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>İsim</value>
+  </data>
+  <data name="or" xml:space="preserve">
+    <value>veya</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Şifre</value>
+  </data>
+  <data name="Password Confirm" xml:space="preserve">
+    <value>Şifre Onayı</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Üye Ol</value>
+  </data>
+  <data name="Sign Up with Facebook" xml:space="preserve">
+    <value>Facebook ile üye ol</value>
+  </data>
+  <data name="Sign Up with Gmail" xml:space="preserve">
+    <value>Gmail ile üye ol</value>
+  </data>
 </root>

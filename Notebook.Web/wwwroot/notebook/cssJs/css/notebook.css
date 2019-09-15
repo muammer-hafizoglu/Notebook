@@ -17,6 +17,10 @@ body, a, ul, li, div, p, span, label, input, button, select, h1, h2, h3, h4, h5,
     font-size: 13px;
     outline: none;
 }
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 a{
     color:black;
 }
@@ -75,6 +79,10 @@ input[type=text]{
     border-radius:3px;
     font-size:13px;
     height:32px;
+}
+
+label{
+    line-height:1.2 !important;
 }
 
 .breadcrumb{
@@ -316,10 +324,10 @@ table.dataTable thead .sorting_desc {
 
 .model-card {
     border-radius: 5px;
-    box-shadow: 0 0 3px #808080;
-    padding: 15px;
+    box-shadow: 0 0 2px #3C8DBC;
+    padding: 10px;
     margin: 10px auto 10px;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 .model-card-header{

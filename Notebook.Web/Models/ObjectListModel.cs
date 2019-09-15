@@ -7,6 +7,10 @@ namespace Notebook.Web.Models
 {
     public class ObjectListModel
     {
+        public ObjectListModel()
+        {
+            Filters = new List<string>();
+        }
         public object Datalist { get; set; }
         public int TotalData { get; set; }
         public int TotalPage { get; set; }
@@ -15,5 +19,6 @@ namespace Notebook.Web.Models
         public string Pagination { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
+        public List<string> Filters { get; set; }
     }
 }

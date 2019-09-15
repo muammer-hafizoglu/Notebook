@@ -22,45 +22,106 @@ namespace Notebook.Web.Controllers
         private IUserManager _userManager;
         private IUserGroupManager _userGroupManager;
         private IUserNoteManager _userNoteManager;
-        public UserController(IUserManager userManager, IUserGroupManager userGroupManager, IUserNoteManager userNoteManager)
+        private IFollowManager _followManager;
+        public UserController(IUserManager userManager, IUserGroupManager userGroupManager, IUserNoteManager userNoteManager, IFollowManager followManager)
         {
             _userManager = userManager;
             _userGroupManager = userGroupManager;
             _userNoteManager = userNoteManager;
+            _followManager = followManager;
         }
 
-        private UserInfoModel GetUser(string ID)
+        
+        #region Follow
+
+        [Route("~/{ID}/follow-user")]
+        [HttpGet]
+        public JsonResult Follow(string ID = "")
         {
-            //UserInfoModel user = null;
+            var _user = HttpContext.Session.GetSession<User>("User");
 
-            //var _user = _userManager.getOne(a => a.Username == ID);
+            _followManager.Follow(ID, _user?.Username);
 
-            //if (_user != null)
-            //{
-            //    user = new UserInfoModel();
-            //    user.ID = _user.ID;
-            //    user.Username = _user.Username;
-            //    user.Name = _user.Name;
-            //    user.Info = _user.Info;
-            //    user.CreateDate = _user.CreateDate;
-            //    user.Avatar = _user.Avatar;
-            //    user.Lock = _user.Lock;
-            //    user.GroupCount = _userGroupManager.getMany(a => a.UserID == _user.ID).Count();
-            //    user.NoteCount = _userNoteManager.getMany(a => a.UserID == _user.ID).Count();
-            //}
+            return Json("");
+        }
 
-            //return user;
-            return _userManager.GetUserInfo(ID);
+        [Route("~/{ID}/unfollow-user")]
+        [HttpGet]
+        public JsonResult Unfollow(string ID = "")
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            _followManager.Unfollow(ID, _user?.Username);
+
+            return Json("");
+        }
+
+        [Route("~/{ID}/delete-follow")]
+        [HttpGet]
+        public JsonResult DeleteFollow(string ID = "")
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            _followManager.Delete(ID, _user?.Username);
+
+            return Json("");
+        }
+
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        [HttpGet]
+        [Route("~/{ID?}/edit-follow")]
+        public IActionResult EditFollow(string ID = "")
+        {
+            var follow = _followManager.getOne(a => a.ID == ID);
+
+            return PartialView(follow);
+        }
+
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        [HttpPost]
+        [Route("~/editFollow")]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditFollowPost(Follow follow)
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            var _follow = _followManager.getOne(a => a.ID == follow.ID);
+            _follow.Status = follow.Status;
+
+            _followManager.Update(_follow);
+
+            return Redirect(TempData["BeforeUrl"].ToString());
+        }
+
+        #endregion
+
+        #region List
+
+        private ProfileModel GetUserDetailModel(Parameters parameters)
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+            var user = _userManager.GetUserInfo(parameters.ID, _user?.ID);
+
+            if (user != null)
+            {
+                ProfileModel model = new ProfileModel();
+                model.User = user;
+
+                return model;
+            }
+
+            return null;
         }
 
         [Route("~/{ID}")]
-        public IActionResult Timeline(string ID = "")
+        public IActionResult Timeline(Parameters parameters)
         {
-            ProfileModel model = new ProfileModel();
-
-            model.User = GetUser(ID);
-            model.Navigation = new NavigationModel { List = "Timeline", ID = ID };
-            //model.Data = 
+            var model = GetUserDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Timeline", ID = parameters.ID };
+                //model.Data = 
+            }
 
             return View(model);
         }
@@ -68,19 +129,22 @@ namespace Notebook.Web.Controllers
         [Route("~/{ID}/groups")]
         public IActionResult Groups(Parameters parameters)
         {
-            ProfileModel model = new ProfileModel();
+            var model = GetUserDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Groups", ID = parameters.ID };
+                model.Data = GroupList(
+                    _userGroupManager.Table()
+                        .Where(a => a.UserID == model.User.ID)
+                        .Include(a => a.User)
+                        .Include(a => a.Group.Notes)
+                        .Include(a => a.Group.Folders)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/groups");
 
-            model.User = GetUser(parameters.ID);
-            model.Navigation = new NavigationModel { List = "Groups", ID = parameters.ID };
-            model.Data = GroupList(
-                _userGroupManager.Table()
-                    .Where(a => a.UserID == model.User.ID)
-                    .Include(a => a.User)
-                    .Include(a => a.Group.Notes)
-                    .Include(a => a.Group.Folders)
-                    .OrderByDescending(a => a.CreateDate), 
-                parameters, 
-                $"/{parameters.ID}/groups");
+                model.Data.Filters.AddRange(new String[] { "Name" });
+            }
 
             return View(model);
         }
@@ -94,29 +158,12 @@ namespace Notebook.Web.Controllers
             {
                 url += url.Contains("?") ? "&" : "?";
 
-                switch (parameters.Filter)
-                {
-                    case "ID":
-                        {
-                            query = query.Where(a => a.Group.ID == parameters.Search) as IOrderedQueryable<UserGroup>;
-                            break;
-                        }
-                    case "Name":
-                        {
-                            query = query.Where(a => a.Group.Name.Contains(parameters.Search)) as IOrderedQueryable<UserGroup>;
-                            break;
-                        }
-                }
+                query = query.Where(a => EF.Property<string>(a.Group, parameters.Filter).Contains(parameters.Search)) as IOrderedQueryable<UserGroup>;
 
                 url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
             }
 
-            result.TotalData = query.Count();
-            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
-            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
-            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
-            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
-            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
+            result = DataListOperations.ListOperation(result, query, parameters, url);
 
             return result;
         }
@@ -124,18 +171,21 @@ namespace Notebook.Web.Controllers
         [Route("~/{ID}/notes")]
         public IActionResult Notes(Parameters parameters)
         {
-            ProfileModel model = new ProfileModel();
+            var model = GetUserDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
+                model.Data = NoteList(
+                    _userNoteManager.Table()
+                        .Where(a => a.UserID == model.User.ID)
+                        .Include(a => a.User)
+                        .Include(a => a.Note)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/notes");
 
-            model.User = GetUser(parameters.ID);
-            model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
-            model.Data = NoteList(
-                _userNoteManager.Table()
-                    .Where(a => a.UserID == model.User.ID)
-                    .Include(a => a.User)
-                    .Include(a => a.Note)
-                    .OrderByDescending(a => a.CreateDate),
-                parameters,
-                $"/{parameters.ID}/notes");
+                model.Data.Filters.AddRange(new String[]{ "Title","Content"});
+            }
 
             return View(model);
         }
@@ -149,36 +199,98 @@ namespace Notebook.Web.Controllers
             {
                 url += url.Contains("?") ? "&" : "?";
 
-                switch (parameters.Filter)
-                {
-                    case "ID":
-                        {
-                            query = query.Where(a => a.Note.ID == parameters.Search) as IOrderedQueryable<UserNote>;
-                            break;
-                        }
-                    case "Title":
-                        {
-                            query = query.Where(a => a.Note.Title.Contains(parameters.Search)) as IOrderedQueryable<UserNote>;
-                            break;
-                        }
-                    case "Content":
-                        {
-                            query = query.Where(a => a.Note.Content.Contains(parameters.Search)) as IOrderedQueryable<UserNote>;
-                            break;
-                        }
-                }
+                query = query.Where(a => EF.Property<string>(a.Note, parameters.Filter).Contains(parameters.Search)) as IOrderedQueryable<UserNote>;
 
                 url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
             }
 
-            result.TotalData = query.Count();
-            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
-            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
-            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
-            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
-            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
+            result = DataListOperations.ListOperation(result, query, parameters, url);
 
             return result;
         }
+
+        [Route("~/{ID}/followers")]
+        public IActionResult Followers(Parameters parameters)
+        {
+            var model = GetUserDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Followers", ID = parameters.ID };
+                model.Data = FollowerList(
+                    _followManager.Table()
+                        .Where(a => a.FollowingID == model.User.ID)
+                        .Include(a => a.Follower)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/notes");
+
+                model.Data.Filters.AddRange(new String[] { "Name", "Username" });
+            }
+
+            return View(model);
+        }
+
+        private ObjectListModel FollowerList(IQueryable<Follow> query, Parameters parameters, string url)
+        {
+            ObjectListModel result = new ObjectListModel();
+            result.Url = url;
+
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                url += url.Contains("?") ? "&" : "?";
+
+                query = query.Where(a => EF.Property<string>(a.Follower, parameters.Filter).Contains(parameters.Search)) as IOrderedQueryable<Follow>;
+
+                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
+            }
+
+            result = DataListOperations.ListOperation(result, query, parameters, url);
+
+            return result;
+        }
+
+        [Route("~/{ID}/following")]
+        public IActionResult Following(Parameters parameters)
+        {
+            var model = GetUserDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Following", ID = parameters.ID };
+                model.Data = FollowingList(
+                    _followManager.Table()
+                        .Where(a => a.FollowerID == model.User.ID)
+                        .Include(a => a.Following)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/notes");
+
+                model.Data.Filters.AddRange(new String[] { "Name", "Username" });
+            }
+
+            return View(model);
+        }
+
+        private ObjectListModel FollowingList(IQueryable<Follow> query, Parameters parameters, string url)
+        {
+            ObjectListModel result = new ObjectListModel();
+            result.Url = url;
+
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                url += url.Contains("?") ? "&" : "?";
+
+                query = query.Where(a => EF.Property<string>(a.Following, parameters.Filter).Contains(parameters.Search)) as IOrderedQueryable<Follow>;
+
+                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
+            }
+
+            result = DataListOperations.ListOperation(result, query, parameters, url);
+
+            return result;
+        }
+
+        
+
+        #endregion
     }
 }

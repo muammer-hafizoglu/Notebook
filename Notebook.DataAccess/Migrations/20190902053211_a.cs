@@ -120,7 +120,7 @@ namespace Notebook.DataAccess.Migrations
                         column: x => x.GroupID,
                         principalTable: "Group",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,6 +134,7 @@ namespace Notebook.DataAccess.Migrations
                     Name = table.Column<string>(nullable: true),
                     Info = table.Column<string>(nullable: true),
                     Approve = table.Column<bool>(nullable: false),
+                    Lock = table.Column<bool>(nullable: false),
                     CreateDate = table.Column<DateTime>(nullable: false),
                     LastActiveDate = table.Column<DateTime>(nullable: false),
                     Avatar = table.Column<string>(nullable: true),
@@ -178,13 +179,13 @@ namespace Notebook.DataAccess.Migrations
                         column: x => x.FolderID,
                         principalTable: "Folder",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Note_Group_GroupID",
                         column: x => x.GroupID,
                         principalTable: "Group",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -194,7 +195,8 @@ namespace Notebook.DataAccess.Migrations
                     FollowerID = table.Column<string>(nullable: false),
                     FollowingID = table.Column<string>(nullable: false),
                     ID = table.Column<string>(maxLength: 8, nullable: false),
-                    Notification = table.Column<bool>(nullable: false)
+                    Notification = table.Column<bool>(nullable: false),
+                    Status = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -215,35 +217,6 @@ namespace Notebook.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserFolder",
-                columns: table => new
-                {
-                    FolderID = table.Column<string>(nullable: false),
-                    UserID = table.Column<string>(nullable: false),
-                    ID = table.Column<string>(maxLength: 8, nullable: false),
-                    Notification = table.Column<bool>(nullable: false),
-                    MemberType = table.Column<int>(nullable: false),
-                    CreateDate = table.Column<DateTime>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserFolder", x => new { x.UserID, x.FolderID });
-                    table.UniqueConstraint("AK_UserFolder_ID", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_UserFolder_Folder_FolderID",
-                        column: x => x.FolderID,
-                        principalTable: "Folder",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserFolder_User_UserID",
-                        column: x => x.UserID,
-                        principalTable: "User",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserGroup",
                 columns: table => new
                 {
@@ -251,7 +224,7 @@ namespace Notebook.DataAccess.Migrations
                     UserID = table.Column<string>(nullable: false),
                     ID = table.Column<string>(maxLength: 8, nullable: false),
                     Notification = table.Column<bool>(nullable: false),
-                    MemberType = table.Column<int>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
                     CreateDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -298,7 +271,7 @@ namespace Notebook.DataAccess.Migrations
                     UserID = table.Column<string>(nullable: false),
                     ID = table.Column<string>(maxLength: 8, nullable: false),
                     CreateDate = table.Column<DateTime>(nullable: false),
-                    Member = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -330,8 +303,8 @@ namespace Notebook.DataAccess.Migrations
 
             migrationBuilder.InsertData(
                 table: "User",
-                columns: new[] { "ID", "Approve", "Avatar", "CreateDate", "Email", "Info", "LastActiveDate", "Name", "Password", "RoleID", "Username" },
-                values: new object[] { "23m454h5", true, "/notebook/images/avatar.png", new DateTime(2019, 8, 14, 14, 41, 26, 267, DateTimeKind.Local).AddTicks(5429), "mhaf69@gmail.com", null, new DateTime(2019, 8, 14, 14, 41, 26, 268, DateTimeKind.Local).AddTicks(3186), "Muammer Hafızoğlu", "D3CE20FCCBE7D116ECD0", null, "muammer.hafizoglu" });
+                columns: new[] { "ID", "Approve", "Avatar", "CreateDate", "Email", "Info", "LastActiveDate", "Lock", "Name", "Password", "RoleID", "Username" },
+                values: new object[] { "23m454h5", true, "/notebook/images/avatar.png", new DateTime(2019, 9, 2, 8, 32, 11, 541, DateTimeKind.Local).AddTicks(2580), "mhaf69@gmail.com", null, new DateTime(2019, 9, 2, 8, 32, 11, 544, DateTimeKind.Local).AddTicks(779), false, "Muammer Hafızoğlu", "D3CE20FCCBE7D116ECD0", null, "muammer.hafizoglu" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Folder_GroupID",
@@ -357,11 +330,6 @@ namespace Notebook.DataAccess.Migrations
                 name: "IX_User_RoleID",
                 table: "User",
                 column: "RoleID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserFolder_FolderID",
-                table: "UserFolder",
-                column: "FolderID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserGroup_GroupID",
@@ -393,9 +361,6 @@ namespace Notebook.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Settings");
-
-            migrationBuilder.DropTable(
-                name: "UserFolder");
 
             migrationBuilder.DropTable(
                 name: "UserGroup");

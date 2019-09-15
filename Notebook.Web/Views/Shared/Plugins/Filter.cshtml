@@ -1,0 +1,30 @@
+﻿@model ObjectListModel
+
+@inject IViewLocalizer Localizer
+
+@if (Model.Filters.Count > 0)
+{
+    <form action="@Model.Url">
+        <div class="input-group search-panel">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span id="srcTxt">@Localizer[Model.Filters.First()]</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    @foreach (var item in Model.Filters)
+                    {
+                        <li><a onclick="$search('@item')">@Localizer[item]</a></li>
+                    }
+                </ul>
+            </div>
+            <input type="hidden" name="Filter" value="Title" id="filter">
+            <input type="text" class="form-control" name="Search" placeholder="@Localizer["Search"] ...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
+            </span>
+            <span class="input-group-btn">
+                <a href="@Model.Url" class="btn btn-default" type="submit"><span class="fa fa-list"></span></a>
+            </span>
+        </div>
+    </form>
+}

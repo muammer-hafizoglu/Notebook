@@ -23,38 +23,19 @@
                 </li>
             </ul>
 
-            @if (Model.Status == Status.Owner)
+            @if (Model.Status == Status.Owner || Model.Status == Status.Manager)
             {
                 <div class="text-center">
-                    <a href="#" class="btn btn-primary"><b><i class="fa fa-cogs"></i> @Localizer["Edit"]</b></a>
-                </div>
-            }
-            else if (Model.Status == Status.Member)
-            {
-                <div class="text-center">
-                    <a href="#" class="btn btn-warning"><b>@Localizer["Unfollow"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
-                </div>
-            }
-            else if (Model.Status == Status.Wait)
-            {
-                <div class="text-center">
-                    <a href="#" class="btn btn-danger"><b>@Localizer["Request Cancel"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
-                </div>
-            }
-            else if (Model.Status == Status.User)
-            {
-                <div class="text-center">
-                    <a href="#" class="btn btn-info"><b>@Localizer["Follow"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
-                </div>
-            }
-            else
-            {
-                <div class="text-center">
-                    <a href="/register" style="color:blue"><b>@Localizer["Sign up"]</b></a> or
-                    <a href="/login" style="color:blue"><b>@Localizer["Sign in for follow"]</b></a>
+                    <button class="btn btn-primary btn-sm" data-type="modal" data-action="@Model.ID/edit-folder" title="@Localizer["Edit"]">
+                        <i class="fa fa-cog"></i> @Localizer["Edit"]
+                    </button>
+                    <button class="btn btn-danger btn-sm" title="@Localizer["Remove"]"
+                            data-type="redirect"
+                            data-confirm="@Localizer["Are you sure you want to delete"] ?"
+                            data-url="@("/"+Model.Group.ID+"/group-detail")"
+                            data-action="@Model.ID/delete-folder">
+                        <i class="fa fa-trash-o"></i> @Localizer["Remove"]
+                    </button>
                 </div>
             }
         </div>

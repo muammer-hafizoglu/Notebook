@@ -27,7 +27,7 @@
                             <label>@Localizer["Visibility"]</label>
                             <div class="checkbox">
                                 <label style="padding:0">
-                                    @Html.RadioButtonFor(a => a.Visible, Visible.Private) @Localizer["Me and group members"]
+                                    @Html.RadioButtonFor(a => a.Visible, Visible.Private) @Localizer["Only group members"]
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -39,8 +39,8 @@
                     }
                     else
                     {
-                        <div class="alert alert-warning alert-small">
-                            @Localizer["This folder will also be private because the group is private"]
+                        <div class="text-left">
+                            *@Localizer["Only I'll see because the group is private"]
                         </div>
                     }
                 </div>

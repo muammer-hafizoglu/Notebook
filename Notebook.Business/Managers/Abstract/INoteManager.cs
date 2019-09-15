@@ -1,4 +1,5 @@
-﻿using Notebook.Entities.Entities;
+﻿using Notebook.Business.Models;
+using Notebook.Entities.Entities;
 using System;
 using System.Collections.Generic;
 
@@ -8,5 +9,7 @@ namespace Notebook.Business.Managers.Abstract
     {
         void Delete(string NoteID, string UserID);
         void UpdateNoteReadCount(Note note);
+
+        NoteInfoModel GetNoteInfo(string NoteID, string UserID = "");
     }
 }

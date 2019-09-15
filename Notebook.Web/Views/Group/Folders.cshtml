@@ -11,26 +11,26 @@
 {
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
-        <li><a href="/@Model.Group.UserID/groups">@Model.Group.UserName</a></li>
+        <li><a href="/@Model.Group.User.Username/groups">@Model.Group.User.Name</a></li>
         <li class="active">@Model.Group.Name</li>
     </ol>
     <div class="row">
         @{ await Html.RenderPartialAsync("~/Views/Group/GroupInfo.cshtml", Model.Group);}
-        <!-- /.col -->
-        @if (Model.Group.Visible == Visible.Private && (Model.Group.Status == Status.Visitor || Model.Group.Status == Status.User || Model.Group.Status == Status.Wait))
-        {
-            <div class="col-md-9">
-                <div class="alert alert-warning">
-                    @Localizer["This group is private"]
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="col-md-9">
-                <div class="nav-tabs-custom">
-                    @{ await Html.RenderPartialAsync("~/Views/Group/Navigation.cshtml", Model.Navigation);}
 
+        <div class="col-md-9">
+            <div class="nav-tabs-custom">
+                @{ await Html.RenderPartialAsync("~/Views/Group/Navigation.cshtml", Model.Navigation);}
+
+                @if (Model.Group.Visible == Visible.Private && Model.Group.Status != Status.Owner)
+                {
+                    <div class="alert alert-warning" style="margin-top:10px">@Localizer["This group is private"]</div>
+                }
+                else if (Model.Group.Status == Status.Blocked)
+                {
+                    <div class="alert alert-danger" style="margin-top:10px">@Localizer["Blocked"]</div>
+                }
+                else
+                {
                     <div class="tab-content">
                         <div class="row">
                             <div class="col-md-12">
@@ -44,27 +44,7 @@
                                     }
                                 </div>
 
-                                <form action="@Model.Data.Url">
-                                    <div class="input-group search-panel">
-                                        <div class="input-group-btn">
-                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                                <span id="srcTxt">Filter</span> <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a onclick="$search('ID')">ID</a></li>
-                                                <li><a onclick="$search('Name')">@Localizer["Name"]</a></li>
-                                            </ul>
-                                        </div>
-                                        <input type="hidden" name="Filter" value="" id="filter">
-                                        <input type="text" class="form-control" name="Search" placeholder="Search ...">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
-                                        </span>
-                                        <span class="input-group-btn">
-                                            <a href="@Model.Data.Url" class="btn btn-default" type="submit"><span class="fa fa-list"></span></a>
-                                        </span>
-                                    </div>
-                                </form>
+                                @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
                             </div>
                         </div>
                         <div class="row">
@@ -86,7 +66,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 }
                             }
@@ -96,9 +75,10 @@
                             @Html.Raw(Model.Data.Pagination)
                         </div>
                     </div>
-                </div>
+                }
+
             </div>
-        }
+        </div>
     </div>
 }
 else

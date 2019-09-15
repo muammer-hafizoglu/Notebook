@@ -18,6 +18,7 @@ namespace Notebook.Business.Models
         public int NoteCount { get; set; }
         public int FollowerCount { get; set; }
         public int FollowingCount { get; set; }
+        public int WaitingUserCount { get; set; }
         public bool Lock { get; set; }
         public Status Status { get; set; }
     }

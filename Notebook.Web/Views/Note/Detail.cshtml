@@ -1,4 +1,4 @@
-﻿@model NoteDetailModel
+﻿@model NoteInfoModel
 
 @inject IViewLocalizer Localizer
 
@@ -8,56 +8,113 @@
 
 @if (Model != null)
 {
+    var control = true;
+    var member = (Model.Group != null) ? (Model.Group.Status == Status.Owner || Model.Group.Status == Status.Manager || Model.Group.Status == Status.Member) ? true : false : false;
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
-        <li><a href="/profile/@Model.OwnerID/@Model.OwnerName.ClearHtmlTagAndCharacter()">@Model.OwnerName</a></li>
+        <li><a href="/@Model.User.Username">@Model.User.Name</a></li>
+        @if (Model.Folder != null)
+        {
+            <li><a href="/@Model.Folder.Group.ID/group-detail">@Model.Folder.Group.Name</a></li>
+            <li><a href="/@Model.Folder.ID/folder-detail">@Model.Folder.Name</a></li>
+        }
+        else if (Model.Group != null)
+        {
+            <li><a href="/@Model.Group.ID/group-detail/notes">@Model.Group.Name</a></li>
+        }
+
         <li class="active">@Model.Title</li>
     </ol>
 
     <div class="row">
-        <div class="col-md-3">
-            <div class="box box-primary">
-                <div class="box-body box-profile">
-                    <p class="text-center media-icon">N</p>
+        <div class="col-md-12">
+            @if (Model.Visible == Visible.Private)
+            {
+                if (Model.Group == null && Model.Status != Status.Owner)
+                {
+                    control = false;
+                }
+                else if (Model.Group != null && !member)
+                {
+                    control = false;
+                }
+            }
+            else
+            {
+                if (Model.Folder != null && Model.Folder.Visible == Visible.Private && !member)
+                {
+                    control = false;
+                }
+                if(Model.Group != null && Model.Group.Visible == Visible.Private && Model.Group.Status != Status.Owner)
+                {
+                    control = false;
+                }
+            }
 
-                    <h3 class="text-center box-title">@Model.Title</h3>
+            @if (control)
+            {
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        <p style="margin:0">
+                            <div class="pull-left">
+                                <small><i class="fa fa-calendar"></i>&nbsp; @Model.CreateDate.ToString("F")</small>
+                            </div>
+                            <div class="pull-right">
+                                @if (Model.Status == Status.Owner)
+                                {
+                                    <button class="btn btn-default btn-xs" data-type="modal" data-action="@Model.ID/edit-note" title="@Localizer["Edit"]">
+                                        <i class="fa fa-cog"></i> @Localizer["Edit"]
+                                    </button>
+                                    <button class="btn btn-danger btn-xs" title="@Localizer["Remove"]"
+                                            data-type="redirect"
+                                            data-confirm="@Localizer["Are you sure you want to delete"] ?"
+                                            data-url="@(Model.Folder != null ? "/"+Model.Folder.ID+"/folder-detail" : Model.Group != null ? "/"+Model.Group.ID+"/group-detail/notes" : "/"+Model.User.Username+"/notes")"
+                                            data-action="@Model.ID/delete-note">
+                                        <i class="fa fa-trash-o"></i> @Localizer["Remove"]
+                                    </button>
+                                }
+                                else
+                                {
+                                    if (Model.Status == Status.Visitor)
+                                    {
+                                        <button class="btn btn-default btn-xs" title="@Localizer["Favorite"]">
+                                            <i class="fa fa-heart-o"></i>
+                                        </button>
+                                        <button class="btn btn-default btn-xs" title="@Localizer["Read Later"]">
+                                            <i class="fa fa-hourglass-o"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-@(Model.Status == Status.Favorite ? "primary":"default") btn-xs" title="@Localizer[Model.Status == Status.Favorite ? "Remove from favorites":"Add Favorite"]">
+                                            <i class="fa fa-heart-o"></i>
+                                        </button>
+                                        <button class="btn btn-@(Model.Status == Status.ReadLater ? "success":"default") btn-xs" title="@Localizer[Model.Status == Status.Favorite ? "Remove from read later list":"Read later"]">
+                                            <i class="fa fa-hourglass-o"></i>
+                                        </button>
+                                    }
+                                }
 
-                    <p class="text-muted text-center">@Model.Explanation</p><br />
-                    <ul class="list-group list-group-unbordered" style="color:#3D8CBC;">
-                        <li class="list-group-item">
-                            <i class="fa fa-user"></i>&nbsp;@Localizer["Autor"]
-                            <a href="/profile/@Model.OwnerID/@Model.OwnerName.ClearHtmlTagAndCharacter()" class="pull-right" style="font-weight:bold; color:darkblue">@Model.OwnerName</a>
-                        </li>
-                        <li class="list-group-item">
-                            <i class="fa fa-calendar"></i>&nbsp;@Localizer["Date"] <a class="pull-right">@Model.CreateDate.ToString("dddd, dd MMMM yyyy")</a>
-                        </li>
-                        <li class="list-group-item">
-                            <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Read Count"] <a class="pull-right">@Model.ReadCount</a>
-                        </li>
-                        <li class="list-group-item">
-                            <i class="fa fa-comment-o"></i>&nbsp;@Localizer["Comments"] <a class="pull-right">28</a>
-                        </li>
-                    </ul>
-                    <div class="text-center">
-                        @if (_user != null && Model.OwnerID == _user.ID)
-                        {
-                            <a data-type="modal" data-action="@Model.ID/edit-note" class="btn btn-primary"><b>@Localizer["Edit"]</b></a>
-                            <a class="btn btn-danger" data-type="redirect" data-url="@TempData["BeforeUrl"]" data-method="post" data-action="@Model.ID/delete-note" data-confirm="@Localizer["Are you sure you want to delete"]?"><b>@Localizer["Remove"]</b></a>
-                        }
-                        else
-                        {
-                            <a href="#" class="btn btn-primary"><b>Add to favorites</b></a>
-                        }
+                            </div>
+                        </p><br />
+
+                        <h3 class="box-title" style="font-size:17px;">@Model.Title</h3>
+
+                        <p>
+                            <div class="pull-left">
+                                <a href="/@Model.User.Username" style="font-weight:bold; color:#ff6a00"><i class="fa fa-user"></i>&nbsp;@Model.User.Name</a>&nbsp;&nbsp;
+                                <small><i class="fa fa-eye"></i>&nbsp;@Model.ReadCount</small>
+                            </div>
+                        </p><br />
+
+                        <p>@Html.Raw(Model.Content)</p>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-9">
-            <div class="box">
-                <div class="box-body">
-                    @Html.Raw(Model.Content)
-                </div>
-            </div>
+            }
+            else
+            {
+                <div class="alert alert-warning" style="margin-top:10px">@Localizer["This note is private"]</div>
+            }
         </div>
     </div>
 }

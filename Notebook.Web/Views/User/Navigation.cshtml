@@ -2,8 +2,10 @@
 
 @inject IViewLocalizer Localizer
 
-<ul class="nav nav-tabs">
-    <li @(Model.List == "Timeline" ? "class=active" : "")><a href="/@Model.ID"><i class="fa fa-hourglass-o"></i>&nbsp;@Localizer["Timeline"]</a></li>
-    <li @(Model.List == "Groups" ? "class=active" : "")><a href="/@Model.ID/groups"><i class="fa fa-clone"></i>&nbsp;@Localizer["Groups"]</a></li>
-    <li @(Model.List == "Notes" ? "class=active" : "")><a href="/@Model.ID/notes"><i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["All Notes"]</a></li>
-</ul>
+    <ul class="nav nav-tabs">
+        <li @(Model.List == "Timeline" ? "class=active" : "")><a href="/@Model.ID"><i class="fa fa-hourglass-o"></i>&nbsp;@Localizer["Timeline"]</a></li>
+        <li @(Model.List == "Groups" ? "class=active" : "")><a href="/@Model.ID/groups"><i class="fa fa-clone"></i>&nbsp;@Localizer["Groups"]</a></li>
+        <li @(Model.List == "Notes" ? "class=active" : "")><a href="/@Model.ID/notes"><i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["All Notes"]</a></li>
+        <li @(Model.List == "Followers" ? "class=active" : "")><a href="/@Model.ID/followers"><i class="fa fa-user-circle-o"></i>&nbsp;@Localizer["Followers"]</a></li>
+        <li @(Model.List == "Following" ? "class=active" : "")><a href="/@Model.ID/following"><i class="fa fa-heart-o"></i>&nbsp;@Localizer["Following"]</a></li>
+    </ul>

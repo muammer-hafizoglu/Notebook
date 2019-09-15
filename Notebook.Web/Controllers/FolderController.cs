@@ -32,65 +32,50 @@ namespace Notebook.Web.Controllers
             _noteManager = noteManager;
         }
 
-        #region CRUD
+        #region List
+
+        private FolderDetailModel GetFolderDetailModel(Parameters parameters)
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+            var _folder = _folderManager.GetFolderInfo(parameters.ID, _user?.ID);
+
+            if (_folder != null)
+            {
+                FolderDetailModel model = new FolderDetailModel();
+                model.Folder = _folder;
+
+                return model;
+            }
+
+            return null;
+        }
 
         [Route("~/{ID}/folder-detail")]
         public IActionResult Notes(Parameters parameters)
         {
-            var _user = HttpContext.Session.GetSession<User>("User");
+            var model = GetFolderDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
+                model.Data = DataListOperations.List(
+                    _noteManager.Table()
+                        .Where(a => a.Folder.ID == model.Folder.ID)
+                        .Include(a => a.Group)
+                        .Include(a => a.Users)
+                            .ThenInclude(b => b.User)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/group-detail");
 
-            FolderDetailModel model = new FolderDetailModel();
-
-            model.Folder = _folderManager.GetFolderInfo(parameters.ID, _user?.ID);
-            model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
-            model.Data = NoteList(
-                _noteManager.Table()
-                    .Where(a => a.Folder.ID == model.Folder.ID)
-                    .Include(a => a.Group)
-                    .Include(a => a.Users)
-                        .ThenInclude(b => b.User)
-                    .OrderByDescending(a => a.CreateDate),
-                parameters,
-                $"/{parameters.ID}/group-detail");
+                model.Data.Filters.AddRange(new String[] { "Title", "Content" });
+            }
 
             return View(model);
         }
 
-        private ObjectListModel NoteList(IQueryable<Note> query, Parameters parameters, string url)
-        {
-            ObjectListModel result = new ObjectListModel();
-            result.Url = url;
+        #endregion
 
-            if (!string.IsNullOrEmpty(parameters.Search))
-            {
-                url += url.Contains("?") ? "&" : "?";
-
-                switch (parameters.Filter)
-                {
-                    case "ID":
-                        {
-                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<Note>;
-                            break;
-                        }
-                    case "Title":
-                        {
-                            query = query.Where(a => a.Title.Contains(parameters.Search)) as IOrderedQueryable<Note>;
-                            break;
-                        }
-                }
-
-                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
-            }
-
-            result.TotalData = query.Count();
-            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
-            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
-            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
-            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
-            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
-
-            return result;
-        }
+        #region CRUD
 
         [HttpGet]
         [Route("~/add-folder")]

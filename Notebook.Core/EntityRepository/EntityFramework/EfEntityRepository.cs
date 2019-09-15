@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Notebook.Core.EntityRepository.EntityFramework
 {
-    public class EfEntityRepository<T> : IEntityRepository<T> where T : class, IEntity
+    public class EfEntityRepository<T> : IEntityRepository<T>  where T : class, IEntity
     {
         private DbContext context;
         public EfEntityRepository(DbContext _context)
@@ -17,11 +17,13 @@ namespace Notebook.Core.EntityRepository.EntityFramework
         public void Add(T model)
         {
             context.Entry(model).State = EntityState.Added;
+            context.SaveChanges();
         }
 
         public void Delete(T model)
         {
             context.Entry(model).State = EntityState.Deleted;
+            context.SaveChanges();
         }
 
         public IQueryable<T> getAll()
@@ -42,6 +44,7 @@ namespace Notebook.Core.EntityRepository.EntityFramework
         public void Update(T model)
         {
             context.Entry(model).State = EntityState.Modified;
+            context.SaveChanges();
         }
 
         public void Save(bool Disposing = false)

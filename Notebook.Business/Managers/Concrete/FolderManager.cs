@@ -50,7 +50,11 @@ namespace Notebook.Business.Managers.Concrete
 
         public void Delete(string FolderID, string UserID)
         {
-            var _folder = servisDal.getMany(a => a.ID == FolderID).Include(a => a.Group).ThenInclude(b => b.Users).FirstOrDefault();
+            var _folder = servisDal.getMany(a => a.ID == FolderID)
+                .Include(a => a.Notes)
+                .Include(a => a.Group)
+                    .ThenInclude(b => b.Users)
+                .FirstOrDefault();
             if (_folder != null)
             {
                 var _member = _folder.Group.Users.Where(a => a.UserID == UserID).FirstOrDefault();
@@ -90,8 +94,8 @@ namespace Notebook.Business.Managers.Concrete
                 folder.NoteCount = _folder.Notes.Count;
                 folder.Group = _folder.Group;
 
-                var _user = _folder.Group.Users.FirstOrDefault(a => a.UserID == UserID);
-                folder.Status = _user != null ? _user.Status : Status.Visitor;
+                var user = _folder.Group.Users.FirstOrDefault(a => a.UserID == UserID);
+                folder.Status = user != null ? user.Status : !string.IsNullOrEmpty(UserID) ? Status.User : Status.Visitor;
             }
 
             return folder;

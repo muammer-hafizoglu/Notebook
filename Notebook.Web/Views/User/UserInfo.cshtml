@@ -16,47 +16,87 @@
                     <i class="fa fa-clone"></i>&nbsp;@Localizer["Groups"] <a class="pull-right">@Model.GroupCount</a>
                 </li>
                 <li class="list-group-item">
-                    <i class="fa fa-file-text-o"></i>&nbsp;@Localizer["Notes"] <a class="pull-right">@Model.NoteCount</a>
+                    <i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["Notes"] <a class="pull-right">@Model.NoteCount</a>
                 </li>
                 <li class="list-group-item">
-                    <i class="fa fa-users"></i>&nbsp;@Localizer["Followers"] <a class="pull-right">@Model.FollowerCount</a>
+                    <i class="fa fa-user-circle-o"></i>&nbsp;@Localizer["Followers"] <a class="pull-right">@Model.FollowerCount</a>
                 </li>
                 <li class="list-group-item">
-                    <i class="fa fa-users"></i>&nbsp;@Localizer["Following"] <a class="pull-right">@Model.FollowingCount</a>
+                    <i class="fa fa-heart-o"></i>&nbsp;@Localizer["Following"] <a class="pull-right">@Model.FollowingCount</a>
                 </li>
+                @if (Model.Status == Status.Owner && Model.WaitingUserCount > 0)
+                {
+                    <li class="list-group-item">
+                        <i class="fa fa-hourglass-o"></i>&nbsp;@Localizer["Follow Request"] <a class="pull-right">@Model.WaitingUserCount</a>
+                    </li>
+                }
             </ul>
 
             @if (Model.Status == Status.Owner)
             {
                 <div class="text-center">
-                    <a href="#" class="btn btn-primary"><b><i class="fa fa-cogs"></i> Settings</b></a>
+                    <button class="btn btn-info btn-sm"
+                            data-type="redirect"
+                            data-url="/@Model.ID/group-detail"
+                            data-action="@Model.ID/exit-group">
+                        <i class="fa fa-cogs"></i> @Localizer["Settings"]
+                    </button>
                 </div>
             }
-            else if (Model.Status == Status.Member)
+            else if (Model.Status == Status.Follow)
             {
                 <div class="text-center">
-                    <a href="#" class="btn btn-warning"><b>@Localizer["Unfollow"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
+                    <button class="btn btn-warning btn-sm"
+                            data-type="redirect"
+                            data-url="/@Model.Username"
+                            data-action="@Model.Username/unfollow-user">
+                        <i class="fa fa-thumbs-o-down"></i> @Localizer["Unfollow"]
+                    </button>
+                    <button class="btn btn-success btn-sm"
+                            data-type="redirect"
+                            data-url="/@Model.ID/group-detail"
+                            data-action="@Model.ID/exit-group">
+                        <i class="fa fa-envelope-o"></i> @Localizer["Message"]
+                    </button>
                 </div>
             }
             else if (Model.Status == Status.Wait)
             {
                 <div class="text-center">
-                    <a href="#" class="btn btn-danger"><b>@Localizer["Request Cancel"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
+                    <button class="btn btn-warning btn-sm"
+                            data-type="redirect"
+                            data-url="/@Model.Username"
+                            data-action="@Model.Username/unfollow-user">
+                        <i class="fa fa-close"></i> @Localizer["Request Cancel"]
+                    </button>
+                    <button class="btn btn-success btn-sm"
+                            data-type="redirect"
+                            data-url="/@Model.ID/group-detail"
+                            data-action="@Model.ID/exit-group">
+                        <i class="fa fa-envelope-o"></i> @Localizer["Message"]
+                    </button>
                 </div>
             }
             else if (Model.Status == Status.User)
             {
                 <div class="text-center">
-                    <a href="#" class="btn btn-info"><b>@Localizer["Follow"]</b></a>
-                    <a href="#" class="btn btn-success"><b>@Localizer["Message"]</b></a>
+                    <button class="btn btn-primary btn-sm"
+                            data-type="redirect"
+                            data-url="/@Model.Username"
+                            data-action="@Model.Username/follow-user">
+                        <i class="fa fa-thumbs-o-up"></i> @Localizer["Follow"]
+                    </button>
+                    <button class="btn btn-success btn-sm"
+                            data-type="redirect"
+                            data-url="/@Model.ID/group-detail"
+                            data-action="@Model.ID/exit-group">
+                        <i class="fa fa-envelope-o"></i> @Localizer["Message"]
+                    </button>
                 </div>
             }
             else
             {
                 <div class="text-center">
-                    <a href="/register" style="color:blue"><b>@Localizer["Sign up"]</b></a> or
                     <a href="/login" style="color:blue"><b>@Localizer["Sign in for follow"]</b></a>
                 </div>
             }

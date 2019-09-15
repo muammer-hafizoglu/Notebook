@@ -35,87 +35,92 @@ namespace Notebook.Web.Controllers
             _noteManager = noteManager;
         }
 
-        #region CRUD
+        #region List
+
+        private GroupDetailModel GetGroupDetailModel(Parameters parameters)
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+            var _group = _groupManager.GetGroupInfo(parameters.ID, _user?.ID);
+
+            if (_group != null)
+            {
+                GroupDetailModel model = new GroupDetailModel();
+                model.Group = _group;
+
+                return model;
+            }
+
+            return null;
+        }
 
         [Route("~/{ID}/group-detail")]
         public IActionResult Folders(Parameters parameters)
         {
-            var _user = HttpContext.Session.GetSession<User>("User");
-
-            GroupDetailModel model = new GroupDetailModel();
-
-            model.Group = _groupManager.GetGroupInfo(parameters.ID, _user?.ID);
-            model.Navigation = new NavigationModel { List = "Folders", ID = parameters.ID };
-            model.Data = FolderList(
-                _folderManager.Table()
-                    .Where(a => a.Group.ID == model.Group.ID)
-                    .Include(a => a.Group)
-                    .OrderByDescending(a => a.CreateDate),
-                parameters,
-                $"/{parameters.ID}/group-detail");
-
-            return View(model);
-        }
-
-        private ObjectListModel FolderList(IQueryable<Folder> query, Parameters parameters, string url)
-        {
-            ObjectListModel result = new ObjectListModel();
-            result.Url = url;
-
-            if (!string.IsNullOrEmpty(parameters.Search))
+            var model = GetGroupDetailModel(parameters);
+            if (model != null)
             {
-                url += url.Contains("?") ? "&" : "?";
+                model.Navigation = new NavigationModel { List = "Folders", ID = parameters.ID };
+                model.Data = DataListOperations.List(
+                    _folderManager.Table()
+                        .Where(a => a.Group.ID == model.Group.ID)
+                        .Include(a => a.Group)
+                        .Include(a => a.Notes)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/group-detail");
 
-                switch (parameters.Filter)
-                {
-                    case "ID":
-                        {
-                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<Folder>;
-                            break;
-                        }
-                    case "Name":
-                        {
-                            query = query.Where(a => a.Name.Contains(parameters.Search)) as IOrderedQueryable<Folder>;
-                            break;
-                        }
-                }
-
-                url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
+                model.Data.Filters.AddRange(new String[] { "Name" });
             }
 
-            result.TotalData = query.Count();
-            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
-            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
-            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
-            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
-            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
-
-            return result;
+            return View(model);
         }
 
         [Route("~/{ID}/group-detail/notes")]
         public IActionResult Notes(Parameters parameters)
         {
-            var _user = HttpContext.Session.GetSession<User>("User");
+            var model = GetGroupDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
+                model.Data = DataListOperations.List(
+                    _noteManager.Table()
+                        .Where(a => a.Group.ID == model.Group.ID)
+                        .Include(a => a.Group)
+                        .Include(a => a.Users)
+                            .ThenInclude(b => b.User)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/group-detail/notes");
 
-            GroupDetailModel model = new GroupDetailModel();
-
-            model.Group = _groupManager.GetGroupInfo(parameters.ID, _user.ID);
-            model.Navigation = new NavigationModel { List = "Notes", ID = parameters.ID };
-            model.Data = NoteList(
-                _noteManager.Table()
-                    .Where(a => a.Group.ID == model.Group.ID)
-                    .Include(a => a.Group)
-                    .Include(a => a.Users)
-                        .ThenInclude(b => b.User)
-                    .OrderByDescending(a => a.CreateDate),
-                parameters,
-                $"/{parameters.ID}/group-detail/notes");
+                model.Data.Filters.AddRange(new String[] { "Title", "Content" });
+            }
 
             return View(model);
         }
 
-        private ObjectListModel NoteList(IQueryable<Note> query, Parameters parameters, string url)
+        [Route("~/{ID}/group-detail/members")]
+        public IActionResult Members(Parameters parameters)
+        {
+            var model = GetGroupDetailModel(parameters);
+            if (model != null)
+            {
+                model.Navigation = new NavigationModel { List = "Members", ID = parameters.ID };
+                model.Data = MemberList(
+                    _userGroupManager.Table()
+                        .Where(a => a.Group.ID == model.Group.ID)
+                        .Include(a => a.Group)
+                        .Include(a => a.User)
+                        .OrderByDescending(a => a.CreateDate),
+                    parameters,
+                    $"/{parameters.ID}/group-detail/members");
+
+                model.Data.Filters.AddRange(new String[] { "Name", "Username" });
+            }
+
+            return View(model);
+        }
+
+        private ObjectListModel MemberList(IQueryable<UserGroup> query, Parameters parameters, string url)
         {
             ObjectListModel result = new ObjectListModel();
             result.Url = url;
@@ -124,42 +129,35 @@ namespace Notebook.Web.Controllers
             {
                 url += url.Contains("?") ? "&" : "?";
 
-                switch (parameters.Filter)
-                {
-                    case "ID":
-                        {
-                            query = query.Where(a => a.ID == parameters.Search) as IOrderedQueryable<Note>;
-                            break;
-                        }
-                    case "Title":
-                        {
-                            query = query.Where(a => a.Title.Contains(parameters.Search)) as IOrderedQueryable<Note>;
-                            break;
-                        }
-                }
+                query = query.Where(a => EF.Property<string>(a.User, parameters.Filter).Contains(parameters.Search)) as IOrderedQueryable<UserGroup>;
 
                 url += "Filter=" + parameters.Filter + "&Search=" + parameters.Search;
             }
 
-            result.TotalData = query.Count();
-            result.ShowInPage = int.TryParse(parameters.Show, out int _show) ? _show : 30;
-            result.ActivePage = int.TryParse(parameters.Page, out int _page) ? _page : 1;
-            result.TotalPage = (int)Math.Ceiling((double)result.TotalData / result.ShowInPage);
-            result.Pagination = Helper.Pagination(url, result.ActivePage, result.TotalPage);
-            result.Datalist = query.Skip((result.ActivePage - 1) * result.ShowInPage).Take(result.ShowInPage).ToList();
+            result = DataListOperations.ListOperation(result, query, parameters, url);
 
             return result;
         }
 
+        #endregion
+
+        #region Add-Edit-Delete
+
         [TypeFilter(typeof(AccountFilterAttribute))]
         [HttpGet]
         [Route("~/add-group")]
-        [Route("~/{id?}/edit-group")]
-        public IActionResult Form(string id = "")
+        [Route("~/{ID?}/edit-group")]
+        public IActionResult Form(string ID = "")
         {
-            var _group = _groupManager.getOne(a => a.ID == id && a.UserID == HttpContext.Session.GetSession<User>("User").ID);
+            var _user = HttpContext.Session.GetSession<User>("User");
+            var _userGroup = _userGroupManager
+                            .getMany(a => a.GroupID == ID && a.UserID == _user.ID)
+                            .Include(a => a.Group)
+                            .FirstOrDefault();
 
-            return PartialView(_group ?? new Group { Visible = Visible.Public });
+            var _group = _userGroup != null ? _userGroup.Group : new Group { Visible = Visible.Public };
+
+            return PartialView(_group);
         }
 
         [TypeFilter(typeof(AccountFilterAttribute))]
@@ -169,10 +167,8 @@ namespace Notebook.Web.Controllers
         public IActionResult Add(Group _group)
         {
             var _user = HttpContext.Session.GetSession<User>("User");
-           // _group.Users = _user;
 
             _groupManager.Add(_group);
-            _groupManager.Save();
 
             // User - Group
             _userGroupManager.Add(new UserGroup { Group = _group, User = _user, CreateDate = DateTime.Now, Status = Status.Owner });
@@ -190,7 +186,6 @@ namespace Notebook.Web.Controllers
             if (!string.IsNullOrEmpty(_group.ID))
             {
                 _groupManager.Update(_group);
-                _groupManager.Save();
 
                 TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
             }
@@ -203,25 +198,83 @@ namespace Notebook.Web.Controllers
         }
 
         [HttpGet]
-        [Route("~/{id?}/delete-group")]
-        public JsonResult Delete(string id = "")
+        [Route("~/{ID?}/delete-group")]
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        public JsonResult Delete(string ID = "")
         {
             var _user = HttpContext.Session.GetSession<User>("User");
-            var _group = _groupManager.getOne(a => a.ID == id && a.UserID == _user.ID);
-            if (_group != null)
-            {
-                _groupManager.Delete(_group);
-                _groupManager.Save();
 
-                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
-            }
-            else
-            {
-                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Group not found"] });
-                
-            }
+            _groupManager.Delete(ID, _user.ID);
+
+            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Json("");
+        }
+
+        #endregion
+
+        #region Member Operaitons
+
+        [HttpGet]
+        [Route("~/{ID?}/join-group")]
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        public JsonResult Join(string ID = "")
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            _userGroupManager.Join(ID, _user.ID);
+
+            return Json("");
+        }
+
+        [HttpGet]
+        [Route("~/{ID?}/exit-group")]
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        public JsonResult Exit(string ID = "")
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            _userGroupManager.Exit(ID, _user.ID);
+
+            return Json("");
+        }
+
+        [HttpGet]
+        [Route("~/{ID?}/delete-member")]
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        public JsonResult DeleteMember(string ID = "")
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            _userGroupManager.Delete(ID, _user.ID);
+
+            return Json("");
+        }
+
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        [HttpGet]
+        [Route("~/{ID?}/edit-member")]
+        public IActionResult EditMember(string ID = "")
+        {
+            var member = _userGroupManager.getOne(a => a.ID == ID);
+
+            return PartialView(member);
+        }
+
+        [TypeFilter(typeof(AccountFilterAttribute))]
+        [HttpPost]
+        [Route("~/editMember")]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditMemberPost(UserGroup member)
+        {
+            var _user = HttpContext.Session.GetSession<User>("User");
+
+            var _member = _userGroupManager.getOne(a => a.ID == member.ID);
+            _member.Status = member.Status;
+
+            _userGroupManager.Update(_member);
+
+            return Redirect(TempData["BeforeUrl"].ToString());
         }
         #endregion
     }

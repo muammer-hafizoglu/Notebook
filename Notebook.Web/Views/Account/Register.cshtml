@@ -16,6 +16,9 @@
                 top: -11px;
                 z-index: 1;
             }
+        .login-box, .register-box{
+            margin:2% auto;
+        }
     </style>
 
 <div class="login-box" style="width:100%;">
@@ -58,12 +61,16 @@
                     <form action="/Account/Register" method="post" onsubmit="return checkForm(this)">
                         @Html.AntiForgeryToken()
                         <div class="form-group has-feedback">
-                            <input type="text" class="form-control" placeholder="@Localizer["Name"]" name="Name" value="@Model.Name">
+                            <input type="text" class="form-control" placeholder="@Localizer["Name"]" name="Name" value="@Model.Name" required>
                             <span class="glyphicon glyphicon-user form-control-feedback"></span>
                         </div>
                         <div class="form-group has-feedback">
-                            <input type="email" class="form-control" placeholder="@Localizer["Email"]" name="Email" value="@Model.Email">
+                            <input type="email" class="form-control" placeholder="@Localizer["Email"]" name="Email" value="@Model.Email" required>
                             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <input type="text" class="form-control" placeholder="@Localizer["Username"]" name="Username" value="@Model.Username" required>
+                            <span class="glyphicon glyphicon-user form-control-feedback"></span>
                         </div>
                         <div class="form-group has-feedback">
                             <input type="password" class="form-control" placeholder="@Localizer["Password"]" name="Password" value="@Model.Password" required min="6">

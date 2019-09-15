@@ -9,8 +9,8 @@ using Notebook.DataAccess.DataContext;
 namespace Notebook.DataAccess.Migrations
 {
     [DbContext(typeof(NotebookContext))]
-    [Migration("20190822105858_b")]
-    partial class b
+    [Migration("20190902053211_a")]
+    partial class a
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,6 +52,8 @@ namespace Notebook.DataAccess.Migrations
                         .HasMaxLength(8);
 
                     b.Property<bool>("Notification");
+
+                    b.Property<int>("Status");
 
                     b.HasKey("FollowerID", "FollowingID");
 
@@ -272,6 +274,8 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<DateTime>("LastActiveDate");
 
+                    b.Property<bool>("Lock");
+
                     b.Property<string>("Name");
 
                     b.Property<string>("Password");
@@ -292,9 +296,10 @@ namespace Notebook.DataAccess.Migrations
                             ID = "23m454h5",
                             Approve = true,
                             Avatar = "/notebook/images/avatar.png",
-                            CreateDate = new DateTime(2019, 8, 22, 13, 58, 58, 123, DateTimeKind.Local).AddTicks(4544),
+                            CreateDate = new DateTime(2019, 9, 2, 8, 32, 11, 541, DateTimeKind.Local).AddTicks(2580),
                             Email = "mhaf69@gmail.com",
-                            LastActiveDate = new DateTime(2019, 8, 22, 13, 58, 58, 126, DateTimeKind.Local).AddTicks(5991),
+                            LastActiveDate = new DateTime(2019, 9, 2, 8, 32, 11, 544, DateTimeKind.Local).AddTicks(779),
+                            Lock = false,
                             Name = "Muammer Hafızoğlu",
                             Password = "D3CE20FCCBE7D116ECD0",
                             Username = "muammer.hafizoglu"
@@ -368,18 +373,19 @@ namespace Notebook.DataAccess.Migrations
                 {
                     b.HasOne("Notebook.Entities.Entities.Group", "Group")
                         .WithMany("Folders")
-                        .HasForeignKey("GroupID");
+                        .HasForeignKey("GroupID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.Follow", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.User", "Follower")
-                        .WithMany("Followers")
+                        .WithMany("Following")
                         .HasForeignKey("FollowerID")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Notebook.Entities.Entities.User", "Following")
-                        .WithMany("Following")
+                        .WithMany("Follower")
                         .HasForeignKey("FollowingID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -388,11 +394,13 @@ namespace Notebook.DataAccess.Migrations
                 {
                     b.HasOne("Notebook.Entities.Entities.Folder", "Folder")
                         .WithMany("Notes")
-                        .HasForeignKey("FolderID");
+                        .HasForeignKey("FolderID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Notebook.Entities.Entities.Group", "Group")
                         .WithMany("Notes")
-                        .HasForeignKey("GroupID");
+                        .HasForeignKey("GroupID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.User", b =>

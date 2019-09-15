@@ -26,15 +26,12 @@ namespace Notebook.Web.Controllers
         }
 
         [Route("~/login")]
-        public IActionResult Login()
+        public IActionResult Login(string ReturnUrl = "")
         {
-            var user = _userManager.Cookie(HttpContext.Request.Cookies.GetCookies("Notebook"));
-            if (user != null)
-            {
-                HttpContext.Session.SetSession("User", user);
+            var user = HttpContext.Session.GetSession<User>("User");
 
+            if (user != null)
                 return RedirectToAction("Index", "Home");
-            }
 
             return View();
         }

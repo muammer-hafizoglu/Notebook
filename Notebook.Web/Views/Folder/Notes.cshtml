@@ -7,8 +7,10 @@
 }
 
 
-@if (Model != null)
+@if (Model.Folder != null)
 {
+    var status = Model.Folder.Status;
+
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
         <li><a href="/@Model.Folder.Group.ID/group-detail">@Model.Folder.Group.Name</a></li>
@@ -16,89 +18,81 @@
     </ol>
     <div class="row">
         @{ await Html.RenderPartialAsync("~/Views/Folder/FolderInfo.cshtml", Model.Folder);}
-        <!-- /.col -->
+
         <div class="col-md-9">
             <div class="nav-tabs-custom">
                 @{ await Html.RenderPartialAsync("~/Views/Folder/Navigation.cshtml", Model.Navigation);}
 
-                <div class="tab-content">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="box-header with-border">
-                                <h3 class="box-title">@Localizer["Note List"]</h3>
-                                @if (Model.Folder.Status == Status.Owner || Model.Folder.Status == Status.Manager)
-                                {
-                                    <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-note?FolderID=@Model.Folder.ID">
-                                        <i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["Add Note"]
-                                    </button>
-                                }
-                            </div>
-
-                            <form action="@Model.Data.Url">
-                                <div class="input-group search-panel">
-                                    <div class="input-group-btn">
-                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                            <span id="srcTxt">Filter</span> <span class="caret"></span>
+                @if (Model.Folder.Group.Visible == Visible.Private && status != Status.Owner)
+                {
+                    <div class="alert alert-warning" style="margin-top:15px;">@Localizer["Only group owner can see"]</div>
+                }
+                else if (Model.Folder.Visible == Visible.Private && !(status == Status.Owner || status == Status.Manager || status == Status.Member))
+                {
+                    <div class="alert alert-warning" style="margin-top:15px;">@Localizer["Only group members can see"]</div>
+                }
+                else
+                {
+                    <div class="tab-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">@Localizer["Note List"]</h3>
+                                    @if (Model.Folder.Status == Status.Owner || Model.Folder.Status == Status.Manager)
+                                    {
+                                        <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-note?FolderID=@Model.Folder.ID">
+                                            <i class="fa fa-newspaper-o"></i>&nbsp;@Localizer["Add Note"]
                                         </button>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a onclick="$search('ID')">ID</a></li>
-                                            <li><a onclick="$search('Title')">@Localizer["Title"]</a></li>
-                                        </ul>
-                                    </div>
-                                    <input type="hidden" name="Filter" value="" id="filter">
-                                    <input type="text" class="form-control" name="Search" placeholder="Search ...">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
-                                    </span>
-                                    <span class="input-group-btn">
-                                        <a href="@Model.Data.Url" class="btn btn-default" type="submit"><span class="fa fa-list"></span></a>
-                                    </span>
+                                    }
                                 </div>
-                            </form>
+
+                                @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (Model.Data != null)
+                            {
+                                foreach (var item in Model.Data.Datalist as List<Note>)
+                                {
+                                    var owner = item.Users.FirstOrDefault(a => a.Status == Status.Owner).User;
+
+                                    <div class="col-md-12">
+                                        <div class="model-card" style="background:@(item.Visible == Visible.Private ? "#fff0db" : "inherit")">
+                                            <div class="model-card-header">
+                                                <small>
+                                                    <i class="fa fa-calendar"></i> @item.CreateDate.ToString("F")
+                                                </small>
+                                            </div>
+                                            <div class="model-card-body">
+                                                <img src="/notebook/images/n.png" class="img-circle model-card-img">
+                                                <a href="/@item.ID/note-detail" class="model-card-title" style="font-size:15px;">
+                                                    @item.Title
+                                                </a><br />
+                                                <small>
+                                                    @Html.Raw((!string.IsNullOrEmpty(item.Explanation) && item.Explanation.Length > 500) ? item.Explanation.Substring(0, 500) : item.Explanation)
+                                                </small>
+                                            </div>
+                                            <div class="model-card-footer">
+                                                <div class="pull-left">
+                                                    <a href="/@owner.Username" style="color:#ff6a00"><i class="fa fa-user"></i> @owner.Name</a>
+                                                </div>
+                                                <div class="pull-right">
+                                                    <a href="/@item.ID/note-detail" style="color:cornflowerblue">@Localizer["Read more"] ...</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="box-footer">
+                            @Localizer["Total"]: @Model.Data.TotalData
+                            @Html.Raw(Model.Data.Pagination)
                         </div>
                     </div>
-                    <div class="row">
-                        @if (Model.Data != null)
-                        {
-                            foreach (var item in Model.Data.Datalist as List<Note>)
-                            {
-                                var owner = item.Users.FirstOrDefault(a => a.Status == Status.Owner).User;
+                }
 
-                                <div class="col-md-12">
-                                    <div class="model-card" style="background:@(item.Visible == Visible.Private ? "#fff0db" : "inherit")">
-                                        <div class="model-card-header">
-                                            <small>
-                                                <i class="fa fa-calendar"></i> @item.CreateDate.ToString("F")
-                                            </small>
-                                        </div>
-                                        <div class="model-card-body">
-                                            <img src="/notebook/images/n.png" class="img-circle model-card-img">
-                                            <a href="/@item.ID/note-detail"  class="model-card-title" style="font-size:15px;">
-                                                @item.Title
-                                            </a><br />
-                                            <small>
-                                                @Html.Raw((!string.IsNullOrEmpty(item.Explanation) && item.Explanation.Length > 500) ? item.Explanation.Substring(0, 500) : item.Explanation)
-                                            </small>
-                                        </div>
-                                        <div class="model-card-footer">
-                                            <div class="pull-left">
-                                                <a href="/@owner.Username" style="color:#ff6a00"><i class="fa fa-user"></i> @owner.Name</a>
-                                            </div>
-                                            <div class="pull-right">
-                                                <a href="/@item.ID/note-detail" style="color:cornflowerblue">@Localizer["Read more"] ...</a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            }
-                        }
-                    </div>
-                    <div class="box-footer">
-                        @Localizer["Total"]: @Model.Data.TotalData
-                        @Html.Raw(Model.Data.Pagination)
-                    </div>
-                </div>
             </div>
         </div>
     </div>

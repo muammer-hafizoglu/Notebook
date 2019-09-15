@@ -117,49 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Add" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
   <data name="Add Group" xml:space="preserve">
     <value>Grup Ekle</value>
   </data>
-  <data name="Filter" xml:space="preserve">
-    <value>Filtrele</value>
+  <data name="Admin approval required" xml:space="preserve">
+    <value>Admin Onayı Gerektirir</value>
   </data>
-  <data name="Folders" xml:space="preserve">
-    <value>Klasörler</value>
+  <data name="Close" xml:space="preserve">
+    <value>Kapat</value>
   </data>
-  <data name="Group List" xml:space="preserve">
-    <value>Grup Listesi</value>
+  <data name="Edit Group" xml:space="preserve">
+    <value>Grup Düzenle</value>
   </data>
-  <data name="Groups" xml:space="preserve">
-    <value>Gruplar</value>
+  <data name="Explanation" xml:space="preserve">
+    <value>Açıklama</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Anasayfa</value>
-  </data>
-  <data name="Members" xml:space="preserve">
-    <value>Üyeler</value>
+  <data name="Membership" xml:space="preserve">
+    <value>Üyelik</value>
   </data>
   <data name="Name" xml:space="preserve">
     <value>İsim</value>
   </data>
-  <data name="Notes" xml:space="preserve">
-    <value>Notlar</value>
+  <data name="Nobody can see the group contents" xml:space="preserve">
+    <value>Kimse grup içeriğini göremez</value>
   </data>
-  <data name="Private" xml:space="preserve">
-    <value>Kapalı</value>
+  <data name="Only me" xml:space="preserve">
+    <value>Sadece Ben</value>
   </data>
-  <data name="Public" xml:space="preserve">
+  <data name="Open to everyone" xml:space="preserve">
     <value>Herkese Açık</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Ara</value>
+  <data name="Update" xml:space="preserve">
+    <value>Güncelle</value>
   </data>
-  <data name="Total" xml:space="preserve">
-    <value>Toplam</value>
-  </data>
-  <data name="User not found" xml:space="preserve">
-    <value>Kullanıcı bulunamadı</value>
-  </data>
-  <data name="Username" xml:space="preserve">
-    <value>Kullanıcı Adı</value>
+  <data name="Visibility" xml:space="preserve">
+    <value>Görünürlük</value>
   </data>
 </root>

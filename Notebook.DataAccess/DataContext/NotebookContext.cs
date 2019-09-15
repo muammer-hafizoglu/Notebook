@@ -75,11 +75,11 @@ namespace Notebook.DataAccess.DataContext
                         .HasKey(a => new { a.FollowerID, a.FollowingID });
             modelBuilder.Entity<Follow>()
                         .HasOne(a => a.Follower)
-                        .WithMany(a => a.Followers)
+                        .WithMany(a => a.Following)
                         .HasForeignKey(a => a.FollowerID);
             modelBuilder.Entity<Follow>()
                         .HasOne(a => a.Following)
-                        .WithMany(a => a.Following)
+                        .WithMany(a => a.Follower)
                         .HasForeignKey(a => a.FollowingID);
 
             modelBuilder.Entity<UserGroup>()
@@ -87,11 +87,13 @@ namespace Notebook.DataAccess.DataContext
             modelBuilder.Entity<UserGroup>()
                         .HasOne(a => a.User)
                         .WithMany(a => a.Groups)
-                        .HasForeignKey(a => a.UserID);
+                        .HasForeignKey(a => a.UserID)
+                        .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<UserGroup>()
                         .HasOne(a => a.Group)
                         .WithMany(a => a.Users)
-                        .HasForeignKey(a => a.GroupID);
+                        .HasForeignKey(a => a.GroupID)
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserNote>()
                         .HasKey(a => new { a.UserID, a.NoteID });
@@ -104,38 +106,30 @@ namespace Notebook.DataAccess.DataContext
                         .WithMany(a => a.Users)
                         .HasForeignKey(a => a.NoteID);
 
-            //modelBuilder.Entity<GroupFolder>()
-            //            .HasKey(a => new { a.GroupID, a.FolderID });
-            //modelBuilder.Entity<GroupFolder>()
-            //            .HasOne(a => a.Group)
-            //            .WithMany(a => a.Folders)
-            //            .HasForeignKey(a => a.GroupID);
-            //modelBuilder.Entity<GroupFolder>()
-            //            .HasOne(a => a.Folder)
-            //            .WithMany(a => a.Groups)
-            //            .HasForeignKey(a => a.FolderID);
+            modelBuilder.Entity<User>()
+                       .HasMany(c => c.Groups)
+                       .WithOne(e => e.User)
+                       .OnDelete(DeleteBehavior.Cascade);
 
-            //modelBuilder.Entity<GroupNote>()
-            //            .HasKey(a => new { a.GroupID, a.NoteID });
-            //modelBuilder.Entity<GroupNote>()
-            //            .HasOne(a => a.Group)
-            //            .WithMany(a => a.Notes)
-            //            .HasForeignKey(a => a.GroupID);
-            //modelBuilder.Entity<GroupNote>()
-            //            .HasOne(a => a.Note)
-            //            .WithMany(a => a.Groups)
-            //            .HasForeignKey(a => a.NoteID);
+            modelBuilder.Entity<User>()
+                        .HasMany(c => c.Notes)
+                        .WithOne(e => e.User)
+                        .OnDelete(DeleteBehavior.Cascade);
 
-            //modelBuilder.Entity<FolderNote>()
-            //            .HasKey(a => new { a.FolderID, a.NoteID });
-            //modelBuilder.Entity<FolderNote>()
-            //            .HasOne(a => a.Folder)
-            //            .WithMany(a => a.Notes)
-            //            .HasForeignKey(a => a.FolderID);
-            //modelBuilder.Entity<FolderNote>()
-            //            .HasOne(a => a.Note)
-            //            .WithMany(a => a.Folders)
-            //            .HasForeignKey(a => a.NoteID);
+            modelBuilder.Entity<Group>()
+                        .HasMany(c => c.Notes)
+                        .WithOne(e => e.Group)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Folder>()
+                        .HasMany(c => c.Notes)
+                        .WithOne(e => e.Folder)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Group>()
+                        .HasMany(c => c.Folders)
+                        .WithOne(e => e.Group)
+                        .OnDelete(DeleteBehavior.Cascade);
 
             #endregion
         }

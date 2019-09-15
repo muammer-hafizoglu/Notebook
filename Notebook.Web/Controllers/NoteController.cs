@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Notebook.Business.Managers.Abstract;
+using Notebook.Business.Models;
 using Notebook.Entities.Entities;
 using Notebook.Entities.Enums;
 using Notebook.Web.Filters;
@@ -43,25 +44,9 @@ namespace Notebook.Web.Controllers
         {
             var _user = HttpContext.Session.GetSession<User>("User");
 
-            NoteDetailModel detail = null;
-
-            var _note = _noteManager.getMany(a => a.ID == ID).Include(a => a.Users).FirstOrDefault();
-            if (_note != null)
-            {
-                detail = new NoteDetailModel();
-                detail.ID = _note.ID;
-                detail.Title = _note.Title;
-                detail.Explanation = _note.Explanation;
-                detail.Content = _note.Content;
-                detail.CreateDate = _note.CreateDate;
-                detail.UpdateDate = _note.UpdateDate;
-                detail.Visible = _note.Visible;
-                detail.OwnerID = _note.UserID;
-                detail.ReadCount = _note.ReadCount;
-                detail.UserCount = _userNoteManager.getMany(a => a.NoteID == _note.ID).Count();
-
-                _noteManager.UpdateNoteReadCount(_note);
-            }
+            NoteInfoModel detail = _noteManager.GetNoteInfo(ID, _user?.ID);
+            detail.Group = (detail.Group != null) ? _groupManager.GetGroupInfo(detail.Group.ID, _user?.ID) :
+                (detail.Folder != null) ? _groupManager.GetGroupInfo(detail.Folder.GroupID, _user?.ID) : null;
 
             return View(detail);
         }
@@ -105,11 +90,11 @@ namespace Notebook.Web.Controllers
 
             TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
-            return Redirect(string.Format("/note/{0}/{1}",note.ID,note.Title.ClearHtmlTagAndCharacter()));
+            return Redirect(string.Format("/{0}/note-detail/{1}",note.ID,note.Title.ClearHtmlTagAndCharacter()));
         }
 
         [TypeFilter(typeof(AccountFilterAttribute))]
-        [HttpPost]
+        [HttpGet]
         [Route("~/{ID?}/delete-note")]
         public JsonResult Delete(string ID = "")
         {

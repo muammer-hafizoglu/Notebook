@@ -16,12 +16,18 @@ namespace Notebook.Web.Components
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var user = HttpContext.Session.GetSession<User>("User");
-            //if (user != null)
-            //{
-            //    user = await _userManager.getMany(a => a.ID == user.ID).Include(a => a.Role).FirstOrDefaultAsync();
 
-            //    user.Role = user.Role ?? new Role(); 
-            //}
+            if (user == null)
+            {
+                var _user = await _userManager.CookieAsync(HttpContext.Request.Cookies.GetCookies("Notebook"));
+
+                if (_user != null)
+                {
+                    HttpContext.Session.SetSession("User", _user);
+
+                    user = _user;
+                }
+            }
 
             return View(user);
         }

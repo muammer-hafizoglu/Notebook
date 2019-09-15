@@ -5,9 +5,12 @@
         Owner,
         Manager,
         Member,
+        Follow,
         Favorite,
+        ReadLater,
         Wait,
         User,
-        Visitor
+        Visitor,
+        Blocked
     }
 }

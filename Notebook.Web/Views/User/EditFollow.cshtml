@@ -1,0 +1,37 @@
+﻿@model Follow
+
+@inject IViewLocalizer Localizer
+
+<div id="modal" class="n-modal" role="dialog">
+    <div class="n-modal-dialog">
+        <form action="/editFollow" method="post">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(a => a.ID)
+
+            <div class="n-modal-content">
+                <div class="n-modal-header">
+                    <button type="button" class="close" onclick="closeModal()">&times;</button>
+                    <label class="n-modal-title">@Localizer["Edit"]</label>
+                </div>
+                <div class="n-modal-body">
+                    <div class="form-group">
+                        <label>@Localizer["Follow Type"]</label>
+                        <select class="select form-control" name="Status" id="status">
+                            <option value="Follow">@Localizer["Follow"]</option>
+                            <option value="Wait">@Localizer["Waiting"]</option>
+                            <option value="Blocked">@Localizer["Blocked"]</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="n-modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>
+                    <input type="submit" class="btn btn-success  btn-sm" value="@Localizer["Add"]" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $("#status").val('@Model.Status.ToString()');
+</script>

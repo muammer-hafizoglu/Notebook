@@ -20,5 +20,7 @@ namespace Notebook.Business.Models
         public int ReadCount { get; set; }
 
         public User User { get; set; }
+        public GroupInfoModel Group { get; set; }
+        public Folder Folder { get; set; }
     }
 }

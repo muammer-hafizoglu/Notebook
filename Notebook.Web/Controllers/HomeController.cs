@@ -24,10 +24,6 @@ namespace Notebook.Web.Controllers
         
         public IActionResult Index()
         {
-            var user = _userManager.Cookie(HttpContext.Request.Cookies.GetCookies("Notebook"));
-            if (user != null)
-                HttpContext.Session.SetSession("User", user);
-
             return View();
         }
 
@@ -46,6 +42,7 @@ namespace Notebook.Web.Controllers
                 // TODO: Sistem hatalarını kaydet
 
                 HttpContext.Session.Remove("Exception");
+
                 TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = exception.Message });
             }
 

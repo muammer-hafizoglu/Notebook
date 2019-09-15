@@ -2,6 +2,7 @@
 using Notebook.Entities.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Notebook.Business.Managers.Abstract
 {
@@ -10,6 +11,8 @@ namespace Notebook.Business.Managers.Abstract
         void LastActiveDateUpdate(User user);
         User Login(User user);
         User Cookie(string key);
-        UserInfoModel GetUserInfo(string ID);
+        Task<User> CookieAsync(string key);
+        UserInfoModel GetUserInfo(string ID, string UserID);
+        
     }
 }

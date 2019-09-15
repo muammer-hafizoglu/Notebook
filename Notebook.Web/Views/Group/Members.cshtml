@@ -1,0 +1,105 @@
+﻿@model GroupDetailModel
+
+@inject IViewLocalizer Localizer
+
+@{
+    var user = Context.Session.GetSession<User>("User");
+}
+
+
+@if (Model != null)
+{
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+        <li><a href="/@Model.Group.User.Username/groups">@Model.Group.User.Name</a></li>
+        <li class="active">@Model.Group.Name</li>
+    </ol>
+    <div class="row">
+        @{ await Html.RenderPartialAsync("~/Views/Group/GroupInfo.cshtml", Model.Group);}
+        
+        <div class="col-md-9">
+            <div class="nav-tabs-custom">
+                @{ await Html.RenderPartialAsync("~/Views/Group/Navigation.cshtml", Model.Navigation);}
+
+                @if (Model.Group.Visible == Visible.Private && Model.Group.Status != Status.Owner)
+                {
+                    <div class="alert alert-warning" style="margin-top:10px">@Localizer["This group is private"]</div>
+                }
+                else if (Model.Group.Status == Status.Blocked)
+                {
+                    <div class="alert alert-danger" style="margin-top:10px">@Localizer["Blocked"]</div>
+                }
+                else
+                {
+                    <div class="tab-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">@Localizer["User List"]</h3>
+                                </div>
+
+                                @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (Model.Data != null)
+                            {
+                                foreach (var item in (Model.Data.Datalist as List<UserGroup>).Where(a => a.Status != Status.Owner))
+                                {
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="model-card">
+                                            <div class="row">
+                                                <div class="col-xs-12 text-center">
+                                                    @if (item.Status != Status.Owner)
+                                                    {
+                                                        if (Model.Group.Status == Status.Owner || Model.Group.Status == Status.Manager)
+                                                        {
+                                                            <div class="text-right" style="position:absolute; top:-10px; left:5px">
+                                                                <button class="btn btn-primary btn-xs" data-type="modal" data-action="@item.ID/edit-member" title="@Localizer["Edit"]">
+                                                                    <i class="fa fa-cog"></i>
+                                                                </button>
+                                                                @if (Model.Group.Status == Status.Owner)
+                                                                {
+                                                                    <button class="btn btn-danger btn-xs" title="@Localizer["Remove"]"
+                                                                            data-type="redirect"
+                                                                            data-confirm="@Localizer["Are you sure you want to delete"] ?"
+                                                                            data-url="/@item.GroupID/group-detail/members"
+                                                                            data-action="@item.ID/delete-member">
+                                                                        <i class="fa fa-trash-o"></i>
+                                                                    </button>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    }
+                                                    <img src="@(item.User.Avatar ?? "/notebook/images/avatar.png")" class="profile-user-img img-responsive img-circle" style="height:80px; width:80px;" />
+                                                    <a href="/@item.User.Username"><b>@item.User.Name</b></a><br />
+                                                    <small>@item.User.Username</small><hr />
+                                                    <label class="label label-@((item.Status == Status.Owner || item.Status == Status.Manager) ? "info" : item.Status == Status.Member ? "default" : item.Status == Status.Wait ? "warning" : "danger")">
+                                                        @Localizer[item.Status.ToString()]
+                                                    </label>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="box-footer">
+                            @Localizer["Total"]: @(Model.Data.TotalData-1)
+                            @Html.Raw(Model.Data.Pagination)
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">@Localizer["Group not found"]</div>
+}
+
+
+
