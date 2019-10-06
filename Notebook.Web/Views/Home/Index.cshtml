@@ -1,4 +1,72 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model IndexPageModel
+
+@inject IViewLocalizer Localizer
+
+<div class="box">
+    <div class="box-primary">
+        <div class="box-body">
+            @if (Model != null)
+            {
+                var user = Context.Session.GetSession<User>("User");
+
+                if (user != null)
+                {
+                    <div class="box-header" style="font-size:16px; margin-bottom:20px; border-bottom:2px solid #ddd; font-weight:bold">
+                        @Localizer["Timeline"]
+                    </div>
+
+                    if ((Model.Data.Datalist as List<Event>).Count > 0)
+                    {
+                        foreach (var item in (Model.Data.Datalist as List<Event>))
+                        {
+                            string icon = item.Type == Product.Group ? "th-large" : item.Type == Product.Folder ? "folder-open-o" : "newspaper-o";
+
+                            <div class="post">
+                                <div class="user-block">
+                                    <img class="img-circle img-bordered-sm" src="@item.User.Avatar" alt="user image">
+                                    <span class="username">
+                                        <a href="/@item.User.Username">@item.User.Name <span style="color:#777">@("@" + item.User.Username)</span></a>
+                                    </span>
+                                    <span class="description">@item.CreateDate.ToString("F")</span>
+                                </div>
+                                <ul class="timeline timeline-inverse" style="margin-left:30px; margin-bottom:20px">
+                                    <li>
+                                        <i class="fa fa-@icon bg-blue"></i>
+
+                                        <div class="timeline-item" style="background:@(item.View ? "":"#fff0db" )">
+                                            <div class="timeline-body">
+                                                <p>
+                                                    <i class="fa fa-bell-o"></i> @Localizer[item.Explation]
+                                                </p>
+
+                                                @if (item.Operation == Operation.Add)
+                                                {
+                                                    <a href="/@item.Url" class="model-card-title">
+                                                        <i class="fa fa-@icon"></i> @item.ProductName
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <label style="padding-left:5px"><i class="fa fa-meh-o"></i> @Localizer["No activity"]</label>
+                    }
+                }
+                else
+                {
+                    <p>
+                        @Html.Raw(Model.Explanation)
+                    </p>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+
 

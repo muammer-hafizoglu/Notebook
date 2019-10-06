@@ -17,12 +17,10 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="/adminlte/dist/css/AdminLTE.min.css">
     <link rel="stylesheet" href="/adminlte/dist/css/skins/_all-skins.min.css">
-    <!-- Jquery Datatable -->
-    <link href="/adminlte/components/DataTables-1.10.18/css/datatables.min.css" rel="stylesheet" />
     <!-- Jquery Confirm -->
     <link href="/adminlte/components/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
 
-    <link href="/notebook/cssJs/css/navigation-menu.css" rel="stylesheet" />
+    @*<link href="/notebook/cssJs/css/navigation-menu.css" rel="stylesheet" />*@
     <!-- Notebook style -->
 
     <link href="/notebook/cssJs/css/notebook.css" rel="stylesheet" />
@@ -47,25 +45,14 @@
     <div class="wrapper">
         @await Component.InvokeAsync("Header")
 
-        
-        <!-- Full Width Column -->
         <div class="content-wrapper">
             <div class="container" style="padding:15px">
                 @RenderBody()
             </div>
-            <!-- /.container -->
         </div>
-        <!-- /.content-wrapper -->
-        <footer class="main-footer">
-            <div class="container">
-                <div class="pull-right hidden-xs">
-                    <b>Version</b> 2.4.0
-                </div>
-                <strong>Copyright &copy; 2014-2016 <a href="https://adminlte.io">Almsaeed Studio</a>.</strong> All rights
-                reserved.
-            </div>
-            <!-- /.container -->
-        </footer>
+
+        @await Component.InvokeAsync("Footer")
+
         <div id="modalContent"></div>
     </div>
     
@@ -82,47 +69,13 @@
     <script src="/adminlte/components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
     <!-- AdminLTE App -->
     <script src="/adminlte/dist/js/adminlte.min.js"></script>
-    <!-- Jquery Datatable -->
-    <script src="/adminlte/components/DataTables-1.10.18/js/datatables.min.js"></script>
     <!-- Jquery Confirm -->
     <script src="/adminlte/components/jquery-confirm/jquery-confirm.min.js"></script>
 
-    <script src="/notebook/cssJs/js/navigation-menu.js"></script>
+    @*<script src="/notebook/cssJs/js/navigation-menu.js"></script>*@
     <!-- Notebook Js -->
     <script src="/notebook/cssJs/js/notebook.js"></script>
     <script src="/notebook/cssJs/js/ajaxFunctions.js"></script>
-
-    <script>
-        @*$.extend(true, $.fn.dataTable.defaults, {
-            "language": {
-                "lengthMenu":"@Localizer["Show"]: _MENU_",
-                "decimal": "",
-                "emptyTable": "@Localizer["No data available in table"]",
-                "info": "@Localizer["Total"]: _TOTAL_ | @Localizer["Showing"]: _START_ - _END_",
-                "infoEmpty": "@Localizer["Total"]: 0",
-                "infoFiltered": "",
-                "infoPostFix": "",
-                "thousands": ",",
-                "loadingRecords": "@Localizer["Loading"]...",
-                "processing": "@Localizer["Processing"]...",
-                "search":"",
-                "searchPlaceholder": "@Localizer["Search"]",
-                "searchDelay":500,
-                "zeroRecords": "@Localizer["No matching records found"]",
-                "paginate": {
-                    "first": "@Localizer["First"]",
-                    "last": "@Localizer["Last"]",
-                    "next": "@Localizer["Next"]",
-                    "previous": "@Localizer["Previous"]"
-                },
-                "aria": {
-                    "sortAscending": ": activate to sort column ascending",
-                    "sortDescending": ": activate to sort column descending"
-                }
-            }
-        });*@
-
-    </script>
 
     <scripts render="true"></scripts>
 

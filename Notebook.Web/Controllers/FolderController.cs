@@ -10,7 +10,6 @@ using Notebook.Business.Managers.Abstract;
 using Notebook.Entities.Entities;
 using Notebook.Entities.Enums;
 using Notebook.Web.Models;
-using Notebook.Web.Models.Datatable;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,12 +23,15 @@ namespace Notebook.Web.Controllers
         private IFolderManager _folderManager;
         private IGroupManager _groupManager;
         private INoteManager _noteManager;
-        public FolderController(IStringLocalizer<FolderController> localizer,IFolderManager folderManager, IGroupManager groupManager, INoteManager noteManager)
+        private IEventManager _eventManager;
+        public FolderController(IStringLocalizer<FolderController> localizer,IFolderManager folderManager, IGroupManager groupManager, 
+            INoteManager noteManager, IEventManager eventManager)
         {
             _localizer = localizer;
             _folderManager = folderManager;
             _groupManager = groupManager;
             _noteManager = noteManager;
+            _eventManager = eventManager;
         }
 
         #region List
@@ -87,7 +89,7 @@ namespace Notebook.Web.Controllers
             if (_group != null)
                 return PartialView("Form", new Folder { Group = _group });
             else
-                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Group not found"] });
+                TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "error", message = _localizer["Group not found"] });
 
             return Redirect(TempData["BeforeUrl"].ToString());
         }
@@ -95,13 +97,23 @@ namespace Notebook.Web.Controllers
         [HttpPost]
         [Route("~/addFolder")]
         [ValidateAntiForgeryToken]
-        public IActionResult Add(Folder _folder)
+        public IActionResult Add(Folder _folder, string View = "")
         {
             var _user = HttpContext.Session.GetSession<User>("User");
          
             _folderManager.Add(_folder, _user.ID);
-         
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
+            _eventManager.Add(new Event
+            {
+                User = _user,
+                View = View == "on" ? true:false,
+                Url = $"{_folder.ID}/folder-detail",
+                ProductID = _folder.ID,
+                ProductName = _folder.Name,
+                Type = Product.Folder,
+                Explation = "New folder added"
+            });
+
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Redirect(TempData["BeforeUrl"].ToString());
         }
@@ -116,7 +128,7 @@ namespace Notebook.Web.Controllers
             if (_folder != null)
                 return PartialView("Form", _folder);
             else
-                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Folder not found"] });
+                TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "error", message = _localizer["Folder not found"] });
 
             return Redirect(TempData["BeforeUrl"].ToString());
         }
@@ -130,7 +142,7 @@ namespace Notebook.Web.Controllers
 
             _folderManager.Update(_folder, _user.ID);
 
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Redirect(TempData["BeforeUrl"].ToString());
         }
@@ -143,7 +155,7 @@ namespace Notebook.Web.Controllers
 
             _folderManager.Delete(ID, _user.ID);
 
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Json("");
         }

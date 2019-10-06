@@ -23,7 +23,7 @@ namespace Notebook.Business.Tools.Logging
 
             if (log != null)
             {
-                string _log = HelperMethods.JsonConvertString(log);
+                string _log = HelperMethods.ObjectConvertJson(log);
 
                 string root = string.Format("{0}{1}", _hostingEnvironment.ContentRootPath, _configuration.GetValue<string>("Logging:Path"));
 

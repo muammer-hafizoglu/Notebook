@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading.Tasks;
+using Notebook.Business.Tools.Mail;
+using Notebook.Business.Models;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,12 +19,14 @@ namespace Notebook.Web.Controllers
     [TypeFilter(typeof(ExceptionFilterAttribute))]
     public class AccountController : Controller
     {
-        private readonly IStringLocalizer<AccountController> _localizer;
-        private readonly IUserManager _userManager;
-        public AccountController(IStringLocalizer<AccountController> localizer, IUserManager userManager)
+        private IUserManager _userManager;
+        private ISettingsManager _settingsManager;
+        private IMailExtension _mailExtension;
+        public AccountController(IUserManager userManager, ISettingsManager settingsManager, IMailExtension mailExtension)
         {
-            _localizer = localizer;
             _userManager = userManager;
+            _settingsManager = settingsManager;
+            _mailExtension = mailExtension;
         }
 
         [Route("~/login")]
@@ -61,21 +65,57 @@ namespace Notebook.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register(User model, string PasswordConfirm)
+        public async Task<IActionResult> Register(User model, string PasswordConfirm)
         {
             if (!string.IsNullOrEmpty(model.Password) && model.Password == PasswordConfirm)
             {
-                // TODO: Email onayı gerekliliğini kontrol et ve avatar ayarı yapılacak
-                model.Approve = true;
-
+                var settings = _settingsManager.Table().FirstOrDefault();
+                
                 _userManager.Add(model);
 
-                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Registration successful"] });
+                var result = false;
+
+                if (settings.MembershipEmailControl)
+                {
+                    model.Approve = false;
+                    result = await _mailExtension.SendMail(new MailInfoModel
+                    {
+                        MailTo = model.Email,
+                        Subject = "Mynotebook | Account activation",
+                        Message = $"<a href='{settings.WebAddress}/account-activation?Username={model.Username}&Code={model.Email.SHA256Encrypt()}'>Activate</a>"
+                    });
+                }
+                else
+                    model.Approve = true;
+
+                TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = 
+                    result ? "click on the link sent to your e-mail address to complete the membership process" : "Registration successful" });
+
                 return View("Login");
             }
 
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Passwords do not match"] });
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "error", message = "Passwords do not match" });
             return View();
+        }
+
+        [Route("~/account-activation")]
+        public IActionResult Activation(string Username = "",string Code = "")
+        {
+            var user = _userManager.getOne(a => a.Username == Username);
+            if (user != null)
+            {
+                if (user.Email.SHA256Encrypt() == Code)
+                {
+                    user.Approve = true;
+                    _userManager.Update(user);
+
+                    TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = "Activation successful" });
+                    return Redirect("/login");
+                }
+            }
+
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "error", message = "Error: User not found" });
+            return Redirect("/register");
         }
 
         #region Social Media Login-Register
@@ -103,7 +143,7 @@ namespace Notebook.Web.Controllers
                 }
             }
 
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "warning", message = _localizer["Not user found"] });
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "warning", message = "Not user found" });
             return RedirectToAction("Login");
         }
 
@@ -130,7 +170,7 @@ namespace Notebook.Web.Controllers
                 return SocialMediaLoginPost();
             }
 
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Error"] });
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "error", message = "Error" });
             return RedirectToAction("Login");
         }
 

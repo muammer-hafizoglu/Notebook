@@ -1,0 +1,89 @@
+﻿@model  string
+
+@inject IViewLocalizer Localizer
+
+<link href="/adminlte/components/animated-calendar/simple-calendar.css" rel="stylesheet" />
+
+<ol class="breadcrumb">
+    <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+    <li class="active">@Localizer["Calendar"]</li>
+</ol>
+
+<div class="box" style="border-radius:10px">
+    <div class="box-header text-center" style="margin:10px auto; padding:20px 0; border-bottom:3px solid #eee">
+        <label class="box-title" style="font-size:16px">
+            <i class="fa fa-calendar-check-o"></i> @Localizer["Event Calendar"]
+        </label>
+    </div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-md-6 calendar-template">
+                <div id="calendar" style="width: 100%;"></div>
+            </div>
+            <div class="col-md-6">
+                <div id="activities" style="width: 100%;">
+                    <div class="row">
+                        <div class="col-md-12" style="padding-bottom:10px;">
+                            <span style="font-size:14px;">
+                                <i class="fa fa-calendar"></i> @Localizer["My events in this month"]
+                            </span>
+                            <button class="btn btn-xs btn-default pull-right" data-type="modal" data-action="add-event">
+                                <i class="fa fa-calendar-plus-o"></i>&nbsp;@Localizer["Add Event"]
+                            </button>
+                        </div>
+                        <div class="col-md-12 eventlist">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+<script src="/adminlte/components/animated-calendar/jquery.simple-calendar.js"></script>
+<script>
+    var months = ['@Localizer["January"]', '@Localizer["February"]', '@Localizer["March"]', '@Localizer["April"]', '@Localizer["May"]', '@Localizer["June"]', '@Localizer["July"]', '@Localizer["August"]', '@Localizer["September"]', '@Localizer["October"]', '@Localizer["November"]', '@Localizer["December"]'];
+    var days = ['@Localizer["Sunday"]', '@Localizer["Monday"]', '@Localizer["Tuesday"]', '@Localizer["Wednesday"]', '@Localizer["Thursday"]', '@Localizer["Friday"]', '@Localizer["Saturday"]'];
+    var events = @Html.Raw(Model);
+
+    createCalendar();
+
+    function createCalendar(date) {
+        $("#calendar").simpleCalendar({
+            months: months,
+            days: days,
+            events: events
+        });
+
+        getEvents(date);
+    }
+
+    function getEvents(date) {
+        $.get('/get-events', { date: date }, function(response) {
+             $(".eventlist").html(response);
+        });
+    }
+
+    function getMonthEvents(date) {
+        getEvents(date);
+        eventDays(date);
+    }
+
+    function eventDays(date) {
+        $.get('/eventDays', { date: date }, function (response) {
+            for (var i = 0; i < response.length; i++) {
+                $("a.day[id='" + response[i] + "']").addClass("event");
+            }
+        });
+    }
+
+    function deleteEvent(ID){
+        $.get('/remove-event', { ID: ID }, function () {
+             location.reload();
+        });
+    }
+</script>
+}

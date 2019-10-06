@@ -2,13 +2,10 @@
 
 @inject IViewLocalizer Localizer
 
-@{
-    var activeUser = Context.Session.GetSession<User>("User");
-}
-
-
-@if (Model.User != null)
+@if (Model != null)
 {
+    var activeUser = Context.Session.GetSession<User>("User");
+
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
         <li><a href="/@Model.User.Username">@Model.User.Name</a></li>
@@ -16,78 +13,82 @@
     </ol>
     <div class="row">
         @{ await Html.RenderPartialAsync("~/Views/User/UserInfo.cshtml", Model.User);}
-        <!-- /.col -->
-        <div class="col-md-9">
-            <div class="nav-tabs-custom">
-                @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
 
-                @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
-                {
-                    <div class="tab-content">
-                        <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
-                        <p>@Localizer["Follow to see this user's posts"]</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="tab-content">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="box-header with-border">
-                                    <h3 class="box-title">@Localizer["Follower List"]</h3>
-                                </div>
+        @if (Model.User.Status != Status.Blocked)
+        {
+            <div class="col-md-9">
+                <div class="nav-tabs-custom">
+                    @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
 
-                                @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
-                            </div>
+                    @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
+                    {
+                        <div class="tab-content">
+                            <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
+                            <p>@Localizer["Follow to see this user's posts"]</p>
                         </div>
-                        <div class="row">
-                            @if (Model.Data != null)
-                            {
-                                foreach (var item in Model.Data.Datalist as List<Follow>)
+                    }
+                    else
+                    {
+                        <div class="tab-content">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">@Localizer["Follower List"]</h3>
+                                    </div>
+
+                                    @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
+                                </div>
+                            </div>
+                            <div class="row">
+                                @if (Model.Data != null)
                                 {
-                                    <div class="col-sm-4">
-                                        <div class="model-card">
-                                            <div class="row">
-                                                <div class="col-xs-3 text-center">
-                                                    <a href="/@item.Follower.Username" class="model-card-title">
-                                                        <img class="user-image" height="50" src="@(item.Follower.Avatar ?? "/notebook/images/avatar.png")" alt="User profile picture">
-                                                    </a>
-                                                </div>
-                                                <div class="col-xs-9">
-                                                    @if (Model.User.Status == Status.Owner)
-                                                    {
-                                                        <label class="label label-@(item.Status == Status.Wait ? "warning": item.Status == Status.Follow ? "success" : "danger" )">
-                                                            @(item.Status == Status.Wait ? Localizer["Waiting"] : item.Status == Status.Follow ? Localizer["Follow"] : Localizer["Blocked"])
-                                                        </label>
-                                                        <div class="pull-right" style="font-size:15px; font-weight:bold;">
-                                                            <i class="fa fa-pencil" style="color:#628ec4; margin-right:5px; cursor:pointer"
-                                                               data-type="modal"
-                                                               data-action="@item.ID/edit-follow"></i>
-                                                            <i class="fa fa-remove" style="color:red; cursor:pointer"
-                                                               data-type="reload"
-                                                               data-confirm="@Localizer["Are you sure you want to delete"] ?"
-                                                               data-action="@item.ID/delete-follow"></i>
-                                                        </div><br />
-                                                    }
-                                                    <div>
-                                                        <small>@("@" + item.Follower.Username)</small><br />
-                                                        <a href="/@item.Follower.Username">@item.Follower.Name</a>
+                                    foreach (var item in Model.Data.Datalist as List<Follow>)
+                                    {
+                                        <div class="col-sm-4">
+                                            <div class="model-card">
+                                                <div class="row">
+                                                    <div class="col-xs-3 text-center">
+                                                        <a href="/@item.Follower.Username" class="model-card-title">
+                                                            <img class="user-image" height="50" src="@(item.Follower.Avatar ?? "/notebook/images/avatar.png")" alt="User profile picture">
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-9">
+                                                        @if (Model.User.Status == Status.Owner)
+                                                        {
+                                                            <label class="label label-@(item.Status == Status.Wait ? "warning": item.Status == Status.Follow ? "success" : "danger" )">
+                                                                @Localizer[item.Status.ToString()]
+                                                            </label>
+                                                            <div class="pull-right" style="font-size:15px; font-weight:bold;">
+                                                                <i class="fa fa-pencil" style="color:#628ec4; margin-right:5px; cursor:pointer"
+                                                                   data-type="modal"
+                                                                   data-action="@item.ID/edit-follow"></i>
+                                                                <i class="fa fa-remove" style="color:red; cursor:pointer"
+                                                                   data-type="reload"
+                                                                   data-confirm="@Localizer["Are you sure you want to delete"] ?"
+                                                                   data-action="@item.ID/delete-follow"></i>
+                                                            </div><br />
+                                                        }
+                                                        <div>
+                                                            <small>@("@" + item.Follower.Username)</small><br />
+                                                            <a href="/@item.Follower.Username">@item.Follower.Name</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    }
                                 }
-                            }
+                            </div>
+                            <div class="box-footer">
+                                @Localizer["Total"]: @Model.Data.TotalData
+                                @Html.Raw(Model.Data.Pagination)
+                            </div>
                         </div>
-                        <div class="box-footer">
-                            @Localizer["Total"]: @Model.Data.TotalData
-                            @Html.Raw(Model.Data.Pagination)
-                        </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-        </div>
+        }
+
     </div>
 }
 else

@@ -138,16 +138,19 @@
   <data name="Only group members" xml:space="preserve">
     <value>Sadece grup üyeleri</value>
   </data>
-  <data name="Only I'll see because the group is private" xml:space="preserve">
-    <value>Grup özel olduğu için sadece ben göreceğim</value>
-  </data>
   <data name="Open to everyone" xml:space="preserve">
     <value>Herkese açık</value>
+  </data>
+  <data name="Show in timeline" xml:space="preserve">
+    <value>Zaman tünelinde göster</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Güncelle</value>
   </data>
   <data name="Visibility" xml:space="preserve">
     <value>Görünürlük</value>
+  </data>
+  <data name="Warning: If the group is private, only the group members can see the folder" xml:space="preserve">
+    <value>Uyarı: Eğer grup özel ise, bu klasörü sadece grup üyeleri görebilecek</value>
   </data>
 </root>

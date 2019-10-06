@@ -12,7 +12,7 @@ public class DataListOperations
         ObjectListModel result = new ObjectListModel();
         result.Url = url;
 
-        if (!string.IsNullOrEmpty(parameters.Search))
+        if (!string.IsNullOrEmpty(parameters?.Search))
         {
             url += url.Contains("?") ? "&" : "?";
 
@@ -38,7 +38,7 @@ public class DataListOperations
         return model;
     }
 
-    public static string Pagination(string Url, int ActivePage, int TotalPage, int Interval = 4)
+    private static string Pagination(string Url, int ActivePage, int TotalPage, int Interval = 4)
     {
         if (TotalPage < 2) return "";
 

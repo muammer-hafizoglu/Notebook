@@ -3,6 +3,7 @@ using Notebook.DataAccess.DataAccess.Abstract;
 using Notebook.Entities.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Notebook.Business.Managers.Concrete
@@ -13,6 +14,11 @@ namespace Notebook.Business.Managers.Concrete
         public SettingsManager(ISettingsDal _servisDal) : base(_servisDal)
         {
             servisDal = _servisDal;
+        }
+
+        public Settings GetSettings()
+        {
+            return base.getAll().FirstOrDefault();
         }
 
         public override void Update(Settings model)
@@ -46,6 +52,7 @@ namespace Notebook.Business.Managers.Concrete
                 _settings.Address = model.Address;
                 _settings.IsMailActive = model.IsMailActive;
                 _settings.Linkedin = model.Linkedin;
+                _settings.AcceptedFileTypes = model.AcceptedFileTypes;
             }
 
             base.Update(_settings);

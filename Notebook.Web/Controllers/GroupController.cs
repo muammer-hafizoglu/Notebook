@@ -11,7 +11,6 @@ using Notebook.Entities.Entities;
 using Notebook.Entities.Enums;
 using Notebook.Web.Filters;
 using Notebook.Web.Models;
-using Notebook.Web.Models.Datatable;
 
 namespace Notebook.Web.Controllers
 {
@@ -24,8 +23,9 @@ namespace Notebook.Web.Controllers
         private IUserGroupManager _userGroupManager;
         private IFolderManager _folderManager;
         private INoteManager _noteManager;
+        private IEventManager _eventManager;
         public GroupController(IStringLocalizer<GroupController> localizer,IGroupManager groupManager,IUserManager userManager, IUserGroupManager userGroupManager, 
-            IFolderManager folderManager, INoteManager noteManager)
+            IFolderManager folderManager, INoteManager noteManager, IEventManager eventManager)
         {
             _localizer = localizer;
             _groupManager = groupManager;
@@ -33,6 +33,7 @@ namespace Notebook.Web.Controllers
             _userGroupManager = userGroupManager;
             _folderManager = folderManager;
             _noteManager = noteManager;
+            _eventManager = eventManager;
         }
 
         #region List
@@ -164,16 +165,25 @@ namespace Notebook.Web.Controllers
         [HttpPost]
         [Route("~/addGroup")]
         [ValidateAntiForgeryToken]
-        public IActionResult Add(Group _group)
+        public IActionResult Add(Group _group, string View = "")
         {
             var _user = HttpContext.Session.GetSession<User>("User");
 
             _groupManager.Add(_group);
+            _eventManager.Add(new Event
+            {
+                User = _user,
+                View = View == "on" ? true:false,
+                Url = $"{_group.ID}/group-detail",
+                ProductID = _group.ID,
+                ProductName = _group.Name,
+                Type = Product.Group,
+                Explation = "New group added"
+            });
 
-            // User - Group
             _userGroupManager.Add(new UserGroup { Group = _group, User = _user, CreateDate = DateTime.Now, Status = Status.Owner });
 
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Redirect(TempData["BeforeUrl"].ToString());
         }
@@ -187,11 +197,11 @@ namespace Notebook.Web.Controllers
             {
                 _groupManager.Update(_group);
 
-                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
+                TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
             }
             else
             {
-                TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "error", message = _localizer["Group not found"] });
+                TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "error", message = _localizer["Group not found"] });
             }
 
             return Redirect(TempData["BeforeUrl"].ToString());
@@ -206,7 +216,7 @@ namespace Notebook.Web.Controllers
 
             _groupManager.Delete(ID, _user.ID);
 
-            TempData["message"] = HelperMethods.JsonConvertString(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
+            TempData["message"] = HelperMethods.ObjectConvertJson(new TempDataModel { type = "success", message = _localizer["Transaction successful"] });
 
             return Json("");
         }
@@ -235,7 +245,7 @@ namespace Notebook.Web.Controllers
             var _user = HttpContext.Session.GetSession<User>("User");
 
             _userGroupManager.Exit(ID, _user.ID);
-
+            
             return Json("");
         }
 

@@ -1,0 +1,54 @@
+﻿@model List<FileModel>
+
+@{
+    Layout = null;
+}
+
+@inject IViewLocalizer Localizer
+
+<link rel="stylesheet" href="/adminlte/components/bootstrap/dist/css/bootstrap.min.css">
+<style>
+    .item-box{
+        border:2px solid #eee;
+        border-radius:3px;
+        padding:10px 15px;
+        width:135px;
+        background:#ddd;
+        margin:5px;
+        float:left;
+    }
+
+    .image-box{
+        width: 100px;
+        height:100px;
+        border-radius:5px;
+        overflow:hidden
+    }
+</style>
+<div class="col-md-12" style="margin-top:15px">
+    @if (Model != null && Model.Count > 0)
+    {
+        foreach (var image in Model)
+        {
+            <div class="item-box text-center">
+                <div class="image-box text-center">
+                    <img src="@image.Path" alt="@image.Name" class="img-rounded" height="100" />
+                </div>
+                <br />
+                <button class="btn btn-primary btn-xs" onclick="selectImage('@image.Path')"><i class="glyphicon glyphicon-ok"></i> @Localizer["Select"]</button>
+            </div>
+        }
+    }
+</div>
+
+<script src="/adminlte/components/jquery/dist/jquery.min.js"></script>
+<script type='text/javascript'>
+    function selectImage(_url) {
+        window.opener.$(".cke_dialog_ui_input_text > input.cke_dialog_ui_input_text[aria-required=true]").val(_url);
+        window.close();
+    }
+</script>
+
+
+
+

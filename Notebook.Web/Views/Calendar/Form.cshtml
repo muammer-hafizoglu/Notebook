@@ -1,0 +1,85 @@
+﻿@model Calendar
+
+@inject IViewLocalizer Localizer
+
+<link href="/adminlte/components/jquery-datetimepicker/jquery.datetimepicker.min.css" rel="stylesheet" />
+
+<div id="modal" class="n-modal" role="dialog">
+    <div class="n-modal-dialog">
+        <form action="@(Model.ID != null ? "/editCalendarEvent" : "/addCalendarEvent")" method="post">
+
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(a => a.ID)
+
+            <div class="n-modal-content">
+                <div class="n-modal-header">
+                    <button type="button" class="close" onclick="closeModal()">&times;</button>
+                    <label class="n-modal-title">@(Model.ID != null ? Localizer["Edit Event"] : Localizer["Add Event"])</label>
+                </div>
+                <div class="n-modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                                    <input type="text" class="form-control" name="Title" required value="@Model.Title" placeholder="@Localizer["Title"]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user-o"></i></span>
+                                    <input type="text" class="form-control" name="Content" value="@Model.Content" placeholder="@Localizer["Content"]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                                    <input type="text" class="form-control" name="Location" value="@Model.Location" placeholder="@Localizer["Location"]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="padding-right:10px">
+                            <div class="form-group">
+                                <div class='input-group date' id='datetimepicker6'>
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar-o"></i>
+                                    </span>
+                                    <input type='text' class="form-control" name="Start" required value="@(Model.ID != null ? Model.Start : DateTime.Now)"/>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-md-6">
+                            <div class="form-group">
+                                <div class='input-group date' id='datetimepicker6'>
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar-o"></i>
+                                    </span>
+                                    <input type='text' class="form-control" name="Finish" value="@(Model.ID != null ? Model.Finish.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss") : "")" />
+                                </div>
+                            </div>
+                        </div>*@
+                    </div>
+                </div>
+                <div class="n-modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>
+                    <input type="submit" class="btn btn-success  btn-sm" value="@(Model.ID != null ? Localizer["Update"] : Localizer["Add"])" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/adminlte/components/jquery-datetimepicker/jquery.datetimepicker.full.min.js"></script>
+<script>
+    $.datetimepicker.setLocale('tr');
+
+    $('[name=Start], [name=Finish]').datetimepicker({
+        format:'d.m.Y H:i',
+        dayOfWeekStart: 1,
+        minDate:"@DateTime.Now"
+    });
+</script>

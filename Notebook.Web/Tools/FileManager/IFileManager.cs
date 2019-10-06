@@ -11,6 +11,7 @@ namespace Notebook.Web.Tools.FileManager
     {
         string Add(FileModel fileModel);
         void Delete(string Path);
+        List<FileModel> GetFiles(string Path);
         string GetWebRootPath();
         string GetContentRootPath();
     }

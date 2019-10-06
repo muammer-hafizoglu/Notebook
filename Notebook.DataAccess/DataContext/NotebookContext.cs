@@ -23,6 +23,9 @@ namespace Notebook.DataAccess.DataContext
         public DbSet<Role> Role { get; set; }
         public DbSet<Permission> Permission { get; set; }
         public DbSet<Follow> Follow { get; set; }
+        public DbSet<Event> Event { get; set; }
+        public DbSet<Calendar> Calendar { get; set; }
+        public DbSet<Notification> Notification { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,7 +50,10 @@ namespace Notebook.DataAccess.DataContext
                 Password = "D3CE20FCCBE7D116ECD0",
                 ID = "23m454h5",
                 Avatar = "/notebook/images/avatar.png",
-                LastActiveDate = DateTime.Now
+                LastActiveDate = DateTime.Now,
+                CanUploadFile = true,
+                TotalFileSize = "999999999999999",
+                SingleFileSize = "9999999999999"
             };
 
             modelBuilder.Entity<User>().HasData(user);
@@ -76,11 +82,13 @@ namespace Notebook.DataAccess.DataContext
             modelBuilder.Entity<Follow>()
                         .HasOne(a => a.Follower)
                         .WithMany(a => a.Following)
-                        .HasForeignKey(a => a.FollowerID);
+                        .HasForeignKey(a => a.FollowerID)
+                        .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Follow>()
                         .HasOne(a => a.Following)
                         .WithMany(a => a.Follower)
-                        .HasForeignKey(a => a.FollowingID);
+                        .HasForeignKey(a => a.FollowingID)
+                        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserGroup>()
                         .HasKey(a => new { a.UserID, a.GroupID });
@@ -115,6 +123,16 @@ namespace Notebook.DataAccess.DataContext
                         .HasMany(c => c.Notes)
                         .WithOne(e => e.User)
                         .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+                       .HasMany(c => c.Calendars)
+                       .WithOne(e => e.User)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+                       .HasMany(c => c.Events)
+                       .WithOne(e => e.User)
+                       .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Group>()
                         .HasMany(c => c.Notes)

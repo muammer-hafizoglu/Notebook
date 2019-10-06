@@ -147,4 +147,7 @@
   <data name="Sign Up with Gmail" xml:space="preserve">
     <value>Gmail ile üye ol</value>
   </data>
+  <data name="Username" xml:space="preserve">
+    <value>Kullanıcı adı</value>
+  </data>
 </root>

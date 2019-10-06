@@ -2,15 +2,18 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Notebook.Business.Managers.Abstract;
 using Notebook.Business.Managers.Concrete;
 using Notebook.Business.Tools.Logging;
+using Notebook.Business.Tools.Mail;
 using Notebook.Core.Aspects.SimpleProxy.Caching;
 using Notebook.Core.Aspects.SimpleProxy.Logging;
 using Notebook.Core.Aspects.SimpleProxy.Validation;
@@ -25,6 +28,7 @@ using SimpleProxy.Extensions;
 using SimpleProxy.Strategies;
 using System;
 using System.Globalization;
+using System.IO;
 //using AutoMapper.Extensions.Microsoft.DependencyInjection;
 
 namespace Notebook.Web
@@ -61,6 +65,7 @@ namespace Notebook.Web
             services.AddScoped<AccountFilterAttribute>();
             services.AddScoped<ExceptionFilterAttribute>();
             services.AddScoped<IFileManager,FileManager>();
+            services.AddScoped<IMailExtension, MailExtension>();
             #endregion
 
             #region Managers
@@ -89,8 +94,14 @@ namespace Notebook.Web
             services.AddScoped<IFollowDal, EfFollowDal>();
             services.AddScoped<IFollowManager, FollowManager>();
 
+            services.AddScoped<IEventDal, EfEventDal>();
+            services.AddScoped<IEventManager, EventManager>();
+
             services.AddScoped<ISettingsDal, EfSettingsDal>();
             services.AddScoped<ISettingsManager, SettingsManager>();
+
+            services.AddScoped<ICalendarDal, EfCalendarDal>();
+            services.AddScoped<ICalendarManager, CalendarManager>();
             #endregion
 
             #region Session
@@ -189,6 +200,12 @@ namespace Notebook.Web
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @".well-known")),
+            //    RequestPath = new PathString("/.well-known"),
+            //    ServeUnknownFileTypes = true // serve extensionless file
+            //});
             app.UseSession();
 
             app.UseMvc(routes =>

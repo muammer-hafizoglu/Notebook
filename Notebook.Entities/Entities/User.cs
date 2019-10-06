@@ -14,6 +14,8 @@ namespace Notebook.Entities.Entities
             Notes = new HashSet<UserNote>();
             Follower = new HashSet<Follow>();
             Following = new HashSet<Follow>();
+            Events = new HashSet<Event>();
+            Calendars = new HashSet<Calendar>();
         }
 
         [Key,DatabaseGenerated(DatabaseGeneratedOption.None), MaxLength(8)]
@@ -28,6 +30,9 @@ namespace Notebook.Entities.Entities
         public DateTime CreateDate { get; set; }
         public DateTime LastActiveDate { get; set; }
         public string Avatar { get; set; }
+        public string TotalFileSize { get; set; }
+        public string SingleFileSize { get; set; }
+        public bool CanUploadFile { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual UserSettings Settings { get; set; }
@@ -35,5 +40,7 @@ namespace Notebook.Entities.Entities
         public virtual ICollection<Follow> Following { get; set; }
         public virtual ICollection<UserNote> Notes { get; set; }
         public virtual ICollection<UserGroup> Groups { get; set; }
+        public virtual ICollection<Event> Events { get; set; }
+        public virtual ICollection<Calendar> Calendars { get; set; }
     }
 }

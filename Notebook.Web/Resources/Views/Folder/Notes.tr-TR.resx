@@ -129,6 +129,9 @@
   <data name="Note List" xml:space="preserve">
     <value>Not Listesi</value>
   </data>
+  <data name="Only group members can see" xml:space="preserve">
+    <value>Sadece grup üyeleri görebilir</value>
+  </data>
   <data name="Read more" xml:space="preserve">
     <value>Daha fazlası</value>
   </data>
@@ -137,8 +140,5 @@
   </data>
   <data name="Total" xml:space="preserve">
     <value>Toplam</value>
-  </data>
-  <data name="Visible only to group members" xml:space="preserve">
-    <value>Sadece grup üyeleri görebilir</value>
   </data>
 </root>

@@ -129,6 +129,9 @@
   <data name="Note List" xml:space="preserve">
     <value>Not Listesi</value>
   </data>
+  <data name="Private Note" xml:space="preserve">
+    <value>Özel Not</value>
+  </data>
   <data name="Read more" xml:space="preserve">
     <value>Daha fazla oku</value>
   </data>

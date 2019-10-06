@@ -2,43 +2,101 @@
 
 @inject IViewLocalizer Localizer
 
-@{
-    var activeUser = Context.Session.GetSession<User>("User");
-}
-
-@if (Model.User != null)
+@if (Model != null)
 {
+    var activeUser = Context.Session.GetSession<User>("User");
+
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
         <li class="active">@Model.User.Name</li>
     </ol>
     <div class="row">
         @{ await Html.RenderPartialAsync("~/Views/User/UserInfo.cshtml", Model.User);}
-        <!-- /.col -->
-        <div class="col-md-9">
-            <div class="nav-tabs-custom">
-                @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
 
-                @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
-                {
-                    <div class="tab-content">
-                        <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
-                        <p>@Localizer["Follow to see this user's posts"]</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="tab-content">
-                        Timeline .....
-                    </div>
-                }
-                
+        @if (Model.User.Status != Status.Blocked)
+        {
+            <div class="col-md-9">
+                <div class="nav-tabs-custom">
+                    @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
+
+                    @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
+                    {
+                        <div class="tab-content">
+                            <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
+                            <p>@Localizer["Follow to see this user's posts"]</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="tab-content">
+
+                            @if ((Model.Data.Datalist as List<Event>).Count > 0)
+                            {
+                                foreach (var item in (Model.Data.Datalist as List<Event>))
+                                {
+                                    string icon = item.Type == Product.Group ? "th-large" : item.Type == Product.Folder ? "folder-open-o" : "newspaper-o";
+                                    <ul class="timeline timeline-inverse">
+                                        <li>
+                                            <i class="fa fa-@icon bg-blue"></i>
+
+                                            <div class="timeline-item" style="background:@(item.View ? "":"#fff0db" )">
+                                                <h3 class="timeline-header" style="padding:6px">
+                                                    <span class="time"><i class="fa fa-clock-o"></i> @item.CreateDate.ToString("F")</span>
+                                                </h3>
+
+                                                <div class="timeline-body">
+                                                    <p>
+                                                        <i class="fa fa-bell-o"></i> @Localizer[item.Explation]
+
+                                                        @if (activeUser?.ID == item.User.ID)
+                                                        {
+                                                            <i class="fa fa-trash pull-right" title="@Localizer["Delete"]" style="color:red; cursor:pointer"
+                                                               data-type="reload"
+                                                               data-action="@item.ID/delete-event"></i>
+
+                                                            if (!item.View)
+                                                            {
+                                                                <i class="fa fa-eye pull-right" title="@Localizer["Show"]" style="color:blue; cursor:pointer"
+                                                                   data-type="reload"
+                                                                   data-action="@item.ID/show-event"></i>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="fa fa-eye-slash  pull-right" title="@Localizer["Hide"]" style="color:orange; cursor:pointer"
+                                                                   data-type="reload"
+                                                                   data-action="@item.ID/hide-event"></i>
+                                                            }
+
+                                                        }
+                                                    </p>
+
+                                                    @if (item.Operation == Operation.Add)
+                                                    {
+                                                        <a href="/@item.Url" class="model-card-title">
+                                                            <i class="fa fa-@icon"></i> @item.ProductName
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                }
+                            }
+                            else
+                            {
+                               <label style="padding-left:5px"><i class="fa fa-meh-o"></i> @Localizer["No activity"]</label>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
-        </div>
+        }
+
     </div>
 }
 else
 {
     <div class="alert alert-warning">@Localizer["User not found"]</div>
 }
+
 

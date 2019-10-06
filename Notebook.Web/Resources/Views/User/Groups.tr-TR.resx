@@ -147,8 +147,11 @@
   <data name="Private" xml:space="preserve">
     <value>Kapalı</value>
   </data>
+  <data name="Private Group" xml:space="preserve">
+    <value>Özel Grup</value>
+  </data>
   <data name="Public" xml:space="preserve">
-    <value>Herkese Açık</value>
+    <value>Açık</value>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Ara</value>

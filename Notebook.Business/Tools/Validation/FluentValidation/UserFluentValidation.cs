@@ -13,7 +13,6 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
             RuleFor(p => p.Name).NotEmpty();
             RuleFor(p => p.Email).NotEmpty().EmailAddress();
             RuleFor(p => p.Password).NotEmpty();
-            //RuleFor(p => p.Username).Must(UsernameTagControl).WithMessage("Custom character unavailable");
         }
 
         public void Validator(object entity)
@@ -44,16 +43,6 @@ namespace Notebook.Business.Tools.Validation.FluentValidation
 
                 throw new System.Exception(exceptionMessage);
             }
-        }
-
-        private bool UsernameTagControl(string username)
-        {
-            if (username.IsThereTurkishCharacter() || username.IsThereHtmlTag("_"))
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }

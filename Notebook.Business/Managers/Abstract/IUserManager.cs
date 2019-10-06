@@ -13,6 +13,5 @@ namespace Notebook.Business.Managers.Abstract
         User Cookie(string key);
         Task<User> CookieAsync(string key);
         UserInfoModel GetUserInfo(string ID, string UserID);
-        
     }
 }

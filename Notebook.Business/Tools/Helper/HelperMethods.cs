@@ -6,7 +6,7 @@ public class HelperMethods
 {
     #region JsonConvert
 
-    public static string JsonConvertString(object model)
+    public static string ObjectConvertJson(object model)
     {
         return JsonConvert.SerializeObject(model);
     }

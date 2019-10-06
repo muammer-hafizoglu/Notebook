@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using Notebook.Web.Models;
 
 namespace Notebook.Web.Tools.FileManager
@@ -26,8 +27,9 @@ namespace Notebook.Web.Tools.FileManager
 
                 string fileExtension = _file.FileName.Substring(_file.FileName.LastIndexOf("."));
 
-                string fileName = (!string.IsNullOrEmpty(fileModel.Name) ? fileModel.Name : (_file.FileName.Substring(0, _file.FileName.LastIndexOf(".")) + "_" + DateTime.Now)) + fileExtension;
-
+                string fileName = ((!string.IsNullOrEmpty(fileModel.Name) ? fileModel.Name : 
+                    (_file.FileName.Substring(0, _file.FileName.LastIndexOf(".")) + "_" + DateTime.Now.ToString("dd-MM-yyyy_hh-mm"))) + fileExtension).ClearHtmlTagAndCharacter();
+                
                 try
                 {
                     string root = fileModel.IsWebRoot ? GetWebRootPath() + fileModel.Path + "/" : GetContentRootPath() + fileModel.Path + "/";
@@ -58,16 +60,49 @@ namespace Notebook.Web.Tools.FileManager
 
         public void Delete(string Path)
         {
+            Path = GetWebRootPath() + Path;
+
             if (!string.IsNullOrEmpty(Path))
             {
                 File.Delete(Path);
             }
         }
 
+        public List<FileModel> GetFiles(string Path)
+        {
+            List<FileModel> model = null;
+
+            string[] Files = Directory.GetFiles(Path);
+
+            if (Files.Length > 0)
+            {
+                model = new List<FileModel>();
+
+                foreach (var _url in Files)
+                {
+                    string url = _url.Substring(_url.IndexOf("wwwroot") + 7);
+
+                    IFileInfo info = _environment.WebRootFileProvider.GetFileInfo(url);
+
+                    model.Add(new FileModel
+                    {
+                        Name = info.Name.Substring(0, info.Name.LastIndexOf(".")),
+                        IsWebRoot = true,
+                        Path = url.Replace("\\", "/"),
+                        Length = (info.Length / 1024f) / 1024f,
+                        Extension = info.PhysicalPath.Substring(info.PhysicalPath.LastIndexOf(".")),
+                        LastModified = info.LastModified.UtcDateTime
+                    });
+                }
+            }
+
+            return model;
+        }
         public string GetContentRootPath()
         {
             return _environment.ContentRootPath;
         }
+
 
         public string GetWebRootPath()
         {

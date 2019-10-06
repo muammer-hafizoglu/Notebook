@@ -117,10 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Calendar" xml:space="preserve">
+    <value>Takvim</value>
+  </data>
+  <data name="Documents" xml:space="preserve">
+    <value>Dökümanlar</value>
+  </data>
+  <data name="Extra" xml:space="preserve">
+    <value>Ekstra</value>
+  </data>
   <data name="Login" xml:space="preserve">
     <value>Giriş Yap</value>
   </data>
+  <data name="Membership" xml:space="preserve">
+    <value>Kullanıcılar</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profilim</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Üye Ol</value>
+  </data>
+  <data name="Role Management" xml:space="preserve">
+    <value>Rol Yönetimi</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="Sign Out" xml:space="preserve">
+    <value>Çıkış Yap</value>
+  </data>
+  <data name="Tasks" xml:space="preserve">
+    <value>Görevler</value>
   </data>
 </root>

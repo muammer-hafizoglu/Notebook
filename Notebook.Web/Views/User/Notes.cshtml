@@ -1,15 +1,11 @@
 ﻿@model ProfileModel
 
-@using Microsoft.AspNetCore.Html
-
 @inject IViewLocalizer Localizer
 
-@{
-    var activeUser = Context.Session.GetSession<User>("User");
-}
-
-@if (Model.User != null)
+@if (Model != null)
 {
+    var activeUser = Context.Session.GetSession<User>("User");
+
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
         <li><a href="/@Model.User.Username">@Model.User.Name</a></li>
@@ -17,7 +13,9 @@
     </ol>
     <div class="row">
         @{ await Html.RenderPartialAsync("~/Views/User/UserInfo.cshtml", Model.User);}
-        <!-- /.col -->
+
+        @if (Model.User.Status != Status.Blocked)
+        {
         <div class="col-md-9">
             <div class="nav-tabs-custom">
                 @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
@@ -47,39 +45,46 @@
                                 @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" style="margin-top:-10px">
                             @if (Model.Data != null)
                             {
                                 foreach (var item in Model.Data.Datalist as List<UserNote>)
                                 {
                                     var owner = item.Note.Users.FirstOrDefault(a => a.Status == Status.Owner).User;
+                                    var secret = false;
+
+                                    if (item.Note.Group?.Visible == Visible.Private || item.Note.Folder?.Visible == Visible.Private || item.Note.Visible == Visible.Private)
+                                    {
+                                        if (!(Model.User.Status == Status.Owner || Model.User.Status == Status.Manager || Model.User.Status == Status.Member))
+                                        {
+                                            secret = true;
+                                        }
+                                    }
 
                                     <div class="col-md-12">
-                                        <div class="model-card" style="background:@(item.Note.Visible == Visible.Private ? "#fff0db" : "inherit")">
+                                        <div class="model-card" style="padding:10px;background:@(secret ? "#fff0db" : "inherit")">
                                             <div class="model-card-header">
                                                 <small>
-                                                    <i class="fa fa-calendar"></i> @item.Note.CreateDate.ToString("F")
+                                                    <i class="fa fa-clock-o"></i> @item.Note.CreateDate.ToString("F")
                                                 </small>
                                             </div>
                                             <div class="model-card-body">
-                                                <img src="/notebook/images/n.png" class="img-circle model-card-img">
-                                                <a href="/@item.Note.ID/note-detail" class="model-card-title" style="font-size:15px;">
-                                                    @item.Note.Title
-                                                </a><br />
-                                                <small>
-                                                    @Html.Raw(item.Note.Explanation)
-                                                </small>
-                                            </div>
-                                            <div class="model-card-footer">
-                                                <div class="pull-left">
-                                                    <a href="/@owner.Username" style="color:#ff6a00"><i class="fa fa-user"></i> @owner.Name</a>
-                                                </div>
-                                                <div class="pull-right">
-                                                    <a href="/@item.Note.ID/note-detail" style="color:cornflowerblue">@Localizer["Read more"] ...</a>
+                                                @if (secret)
+                                                {
+                                                    <i class="fa fa-lock"></i><span>&nbsp;&nbsp;@Localizer["Private Note"]</span>
+                                                }
+                                                else
+                                                {
+                                                    <img src="/notebook/images/n.png" class="img-circle" style="height:30px; margin-right:5px">
+                                                    <a href="/@item.Note.ID/note-detail" class="model-card-title">@item.Note.Title</a>
+                                                }
+                                                <br />
+                                                <div style="margin-top:10px">
+                                                    <a href="/@owner.Username" style="color:#777"><i class="fa fa-user"></i> @owner.Name</a>
                                                 </div>
                                             </div>
+                                            
                                         </div>
-
                                     </div>
                                 }
                             }
@@ -92,6 +97,8 @@
                 }
             </div>
         </div>
+        }
+            
     </div>
 }
 else

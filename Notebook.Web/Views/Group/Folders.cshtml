@@ -21,9 +21,11 @@
             <div class="nav-tabs-custom">
                 @{ await Html.RenderPartialAsync("~/Views/Group/Navigation.cshtml", Model.Navigation);}
 
-                @if (Model.Group.Visible == Visible.Private && Model.Group.Status != Status.Owner)
+                @if (Model.Group.Visible == Visible.Private && !(Model.Group.Status == Status.Owner || Model.Group.Status == Status.Manager || Model.Group.Status == Status.Member))
                 {
-                    <div class="alert alert-warning" style="margin-top:10px">@Localizer["This group is private"]</div>
+                    <div class="alert">
+                        <i class="fa fa-lock"></i>  @Localizer["Only group members can see"]
+                    </div>
                 }
                 else if (Model.Group.Status == Status.Blocked)
                 {
@@ -53,14 +55,15 @@
                                 foreach (var item in Model.Data.Datalist as List<Folder>)
                                 {
                                     <div class="col-md-4 col-sm-6">
-                                        <div class="model-card" style="background:@(item.Visible == Visible.Private ? "#fff0db" : "inherit")">
+                                        <div class="model-card" style="padding:10px">
                                             <div class="row">
                                                 <div class="col-xs-3 text-center">
                                                     <i class="fa fa-folder-open-o" style="font-size:50px"></i><br />
                                                 </div>
                                                 <div class="col-xs-9">
                                                     <a href="/@item.ID/folder-detail" class="model-card-title">
-                                                        @(item.Name.Length > 18 ? item.Name.Substring(0, 18) + "..." : item.Name)
+                                                        @Html.Raw(item.Visible == Visible.Private ? "<i class='fa fa-lock'></i>" : "")
+                                                        @(item.Name.Length > 16 ? item.Name.Substring(0, 16) + "..." : item.Name)
                                                     </a><br />
                                                     <small style="color:#808080"><i class="fa fa-newspaper-o"></i> @Localizer["Notes"]: @item.Notes.Count</small>
                                                 </div>

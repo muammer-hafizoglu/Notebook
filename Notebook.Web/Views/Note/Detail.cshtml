@@ -6,12 +6,19 @@
     var _user = Context.Session.GetSession<User>("User");
 }
 
+<style>
+    ul,ol{
+        padding-left:20px
+    }
+
+</style>
+
 @if (Model != null)
 {
     var control = true;
     var member = (Model.Group != null) ? (Model.Group.Status == Status.Owner || Model.Group.Status == Status.Manager || Model.Group.Status == Status.Member) ? true : false : false;
     <ol class="breadcrumb">
-        <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
         <li><a href="/@Model.User.Username">@Model.User.Name</a></li>
         @if (Model.Folder != null)
         {
@@ -45,7 +52,7 @@
                 {
                     control = false;
                 }
-                if(Model.Group != null && Model.Group.Visible == Visible.Private && Model.Group.Status != Status.Owner)
+                if(Model.Group != null && Model.Group.Visible == Visible.Private && !member)
                 {
                     control = false;
                 }
@@ -57,7 +64,7 @@
                     <div class="box-body box-profile">
                         <p style="margin:0">
                             <div class="pull-left">
-                                <small><i class="fa fa-calendar"></i>&nbsp; @Model.CreateDate.ToString("F")</small>
+                                <small style="color:#888"><i class="fa fa-calendar"></i>&nbsp; @Model.CreateDate.ToString("F")</small>
                             </div>
                             <div class="pull-right">
                                 @if (Model.Status == Status.Owner)
@@ -78,10 +85,10 @@
                                     if (Model.Status == Status.Visitor)
                                     {
                                         <button class="btn btn-default btn-xs" title="@Localizer["Favorite"]">
-                                            <i class="fa fa-heart-o"></i>
+                                            <i class="fa fa-heart-o"></i> @Localizer["Favorite"]
                                         </button>
                                         <button class="btn btn-default btn-xs" title="@Localizer["Read Later"]">
-                                            <i class="fa fa-hourglass-o"></i>
+                                            <i class="fa fa-hourglass-o"></i> @Localizer["Read Later"]
                                         </button>
                                     }
                                     else
@@ -97,16 +104,11 @@
 
                             </div>
                         </p><br />
-
                         <h3 class="box-title" style="font-size:17px;">@Model.Title</h3>
-
-                        <p>
-                            <div class="pull-left">
-                                <a href="/@Model.User.Username" style="font-weight:bold; color:#ff6a00"><i class="fa fa-user"></i>&nbsp;@Model.User.Name</a>&nbsp;&nbsp;
-                                <small><i class="fa fa-eye"></i>&nbsp;@Model.ReadCount</small>
-                            </div>
-                        </p><br />
-
+                        <div>
+                            <a href="/@Model.User.Username" style="font-weight:bold; color:#58cdff"><i class="fa fa-user"></i>&nbsp;@Model.User.Name</a>&nbsp;&nbsp;
+                            @*<small><i class="fa fa-eye"></i>&nbsp;@Model.ReadCount</small>*@
+                        </div><hr />
                         <p>@Html.Raw(Model.Content)</p>
                     </div>
                 </div>

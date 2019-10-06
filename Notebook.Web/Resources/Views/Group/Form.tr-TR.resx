@@ -123,8 +123,8 @@
   <data name="Add Group" xml:space="preserve">
     <value>Grup Ekle</value>
   </data>
-  <data name="Admin approval required" xml:space="preserve">
-    <value>Admin Onayı Gerektirir</value>
+  <data name="Admin approval required for membership" xml:space="preserve">
+    <value>Üyelik için admin onayı gereklidir</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Kapat</value>
@@ -141,14 +141,20 @@
   <data name="Name" xml:space="preserve">
     <value>İsim</value>
   </data>
-  <data name="Nobody can see the group contents" xml:space="preserve">
-    <value>Kimse grup içeriğini göremez</value>
-  </data>
   <data name="Only me" xml:space="preserve">
     <value>Sadece Ben</value>
   </data>
+  <data name="Only you and group members can see the group information" xml:space="preserve">
+    <value>Grup bilgisini yalnızca grup üyeleri ve siz görebilirsiniz</value>
+  </data>
+  <data name="Only you can see the group information" xml:space="preserve">
+    <value>Grup bilgisini yalnızca siz görebilirsiniz</value>
+  </data>
   <data name="Open to everyone" xml:space="preserve">
     <value>Herkese Açık</value>
+  </data>
+  <data name="Show in timeline" xml:space="preserve">
+    <value>Zaman tünelinde göster</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Güncelle</value>

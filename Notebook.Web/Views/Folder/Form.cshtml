@@ -21,30 +21,30 @@
                     <div class="form-group">
                         <input type="text" class="form-control" name="Explanation" value="@Model.Explanation" placeholder="@Localizer["Explanation"]" />
                     </div>
-                    @if (Model.Group.Visible == Visible.Public)
-                    {
-                        <div class="form-group">
-                            <label>@Localizer["Visibility"]</label>
-                            <div class="checkbox">
-                                <label style="padding:0">
-                                    @Html.RadioButtonFor(a => a.Visible, Visible.Private) @Localizer["Only group members"]
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label style="padding:0">
-                                    @Html.RadioButtonFor(a => a.Visible, Visible.Public) @Localizer["Open to everyone"]
-                                </label>
-                            </div>
+                    <div class="form-group">
+                        <label>@Localizer["Visibility"]</label>
+                        <div class="checkbox">
+                            <label style="padding:0">
+                                @Html.RadioButtonFor(a => a.Visible, Visible.Private) @Localizer["Only group members"]
+                            </label>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="text-left">
-                            *@Localizer["Only I'll see because the group is private"]
+                        <div class="checkbox">
+                            <label style="padding:0">
+                                @Html.RadioButtonFor(a => a.Visible, Visible.Public) @Localizer["Open to everyone"]
+                            </label>
                         </div>
-                    }
+                    </div>
+                    <label style="color:orange; font-size:12px;">@Localizer["Warning: If the group is private, only the group members can see the folder"]</label>
                 </div>
                 <div class="n-modal-footer">
+                    @if (Model.ID == null)
+                    {
+                        <div class="checkbox pull-left">
+                            <label>
+                                <input type="checkbox" name="View" /> @Localizer["Show in timeline"]
+                            </label>
+                        </div>
+                    }
                     <button type="button" class="btn btn-default btn-sm" onclick="closeModal('modal')">@Localizer["Close"]</button>
                     <input type="submit" class="btn btn-success  btn-sm" value="@(Model.ID != null ? Localizer["Update"] : Localizer["Add"])" />
                 </div>

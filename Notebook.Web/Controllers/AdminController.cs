@@ -10,7 +10,6 @@ using Notebook.Business.Managers.Abstract;
 using Notebook.Entities.Entities;
 using Notebook.Web.Filters;
 using Notebook.Web.Models;
-using Notebook.Web.Models.Datatable;
 using Notebook.Web.Tools.FileManager;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -176,11 +175,11 @@ namespace Notebook.Web.Controllers
 
         #endregion
 
-        #region Edit User
+        #region Edit-Delete User
 
         [TypeFilter(typeof(AccountFilterAttribute), Arguments = new[] { "EDIT_USERS" })]
         [HttpGet]
-        [Route("~/edit-user/{ID}")]
+        [Route("~/{ID}/edit-user")]
         public IActionResult UserForm(string ID = "")
         {
             var _user = _userManager.getOne(a => a.ID == ID);
@@ -201,6 +200,20 @@ namespace Notebook.Web.Controllers
             _userManager.Update(model);
 
             return Redirect("/notebook-membership");
+        }
+
+        [TypeFilter(typeof(AccountFilterAttribute), Arguments = new[] { "DELETE_USERS" })]
+        [HttpGet]
+        [Route("~/{ID}/delete-user")]
+        public JsonResult Delete(string ID = "")
+        {
+            var _user = _userManager.getOne(a => a.ID == ID);
+            if (_user != null)
+                _userManager.Delete(_user);
+            else
+                throw new Exception("User not found");
+
+            return Json("");
         }
         #endregion
 

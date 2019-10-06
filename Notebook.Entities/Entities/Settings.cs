@@ -43,6 +43,7 @@ namespace Notebook.Entities.Entities
         public bool MembershipEmailControl { get; set; }
 
         // Limitations
+        public string AcceptedFileTypes { get; set; }
         public string TotalFileSize { get; set; }
         public string SingleFileSize { get; set; }
     }

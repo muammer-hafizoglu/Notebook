@@ -1,0 +1,155 @@
+﻿@model ProfileEditModel
+
+@inject IViewLocalizer Localizer
+
+@if (Model != null)
+{
+    var user = Model.User;
+
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
+        <li><a href="/@Model.User.Username">@Model.User.Name</a></li>
+        <li class="active">@Localizer["Settings"]</li>
+    </ol>
+    <div class="row">
+        @{ await Html.RenderPartialAsync("~/Views/User/UserInfo.cshtml", Model.UserInfo);}
+
+        <div class="col-md-9">
+            <form action="/editProfile" method="post" enctype="multipart/form-data" onsubmit="return checkForm(this)">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ID" value="@user.ID" />
+
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#general" data-toggle="tab"><i class="fa fa-cogs"></i> @Localizer["General Settings"]</a></li>
+                        <li><a href="#password" data-toggle="tab"><i class="fa fa-lock"></i> @Localizer["Change Password"]</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="general">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Name"]</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-user-o"></i></span>
+                                            <input type="text" class="form-control" name="Name" required value="@user.Name" placeholder="@Localizer["Name"]">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Username"]</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-user-o"></i></span>
+                                            <input type="text" class="form-control" name="Username" required value="@user.Username" placeholder="@Localizer["Username"]">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Email"]</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+                                            <input type="email" class="form-control" name="Email" required value="@user.Email" placeholder="@Localizer["Email"]">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Info"]</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
+                                            <input type="text" class="form-control" name="Info" value="@user.Info" placeholder="@Localizer["Info"]">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Avatar"]</label>
+                                        <input type="file" name="Avatar">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Profile State"]</label>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="Lock" checked="@user.Lock" /> @Localizer["Lock"]
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="password">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Password"]</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                            <input type="password" class="form-control" name="Password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["New Password"]</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                            <input type="password" class="form-control" name="NewPassword">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@Localizer["Confirm New Password"]</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                            <input type="password" class="form-control" name="ConfirmPassword">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fa fa-check"></i>&nbsp;@Localizer["Save"]
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+
+    </div>
+
+    @section scripts{ 
+        <script type="text/javascript">
+            function checkForm(form) {
+                if (form.NewPassword.value != "") {
+                    if (form.NewPassword.value.length < 6 || form.NewPassword.value != form.ConfirmPassword.value) {
+                        alert('@Localizer["Error: Passwords do not match or password length is not enough. Min 6 characters"]!');
+                        form.Password.focus();
+                        return false;
+                    }
+
+                    if (form.Password.value == "" || form.Password.value.length < 6) {
+                        alert('@Localizer["Error: Enter current password"]!');
+                        form.Password.focus();
+                        return false;
+                    }
+                }
+                else {
+                    return true;
+                }
+            }
+        </script>
+    }
+}
+else
+{
+    <div class="alert alert-warning">@Localizer["User not found"]</div>
+}
+

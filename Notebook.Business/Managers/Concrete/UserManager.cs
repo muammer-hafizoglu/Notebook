@@ -22,9 +22,11 @@ namespace Notebook.Business.Managers.Concrete
     public class UserManager : Manager<User>, IUserManager
     {
         private IUserDal servisDal;
-        public UserManager(IUserDal _servisDal) : base(_servisDal)
+        private ISettingsManager settingsManager;
+        public UserManager(IUserDal _servisDal, ISettingsManager _settingsManager) : base(_servisDal)
         {
             servisDal = _servisDal;
+            settingsManager = _settingsManager;
         }
 
         public UserInfoModel GetUserInfo(string ID, string UserID = "")
@@ -67,6 +69,11 @@ namespace Notebook.Business.Managers.Concrete
         [Validate(typeof(User),typeof(UserFluentValidation))]
         public override void Add(User model)
         {
+            //var validation = new UserFluentValidation();
+            //validation.Validate(model);
+
+            var settings = settingsManager.GetSettings();
+
             EmailControl(model);
 
             if (!string.IsNullOrEmpty(model.Username))
@@ -74,9 +81,13 @@ namespace Notebook.Business.Managers.Concrete
             else
                 model.Username = CreatUsername();
 
+            model.Avatar = "/notebook/images/avatar.png";
             model.Password = model.Password.SHA256Encrypt();
             model.CreateDate = DateTime.Now;
             model.LastActiveDate = DateTime.Now;
+            model.CanUploadFile = false;
+            model.TotalFileSize = settings?.TotalFileSize;
+            model.SingleFileSize = settings?.SingleFileSize;
 
             base.Add(model);
         }
@@ -85,13 +96,9 @@ namespace Notebook.Business.Managers.Concrete
         public override void Update(User model)
         {
             EmailControl(model);
+            UsernameControl(model);
 
-            if (!string.IsNullOrEmpty(model.Username))
-                UsernameControl(model);
-            else
-                model.Username = CreatUsername();
-
-            var _user = servisDal.getMany(a => a.ID == model.ID).Include(a => a.Role).FirstOrDefault();
+            var _user = servisDal.getMany(a => a.ID == model.ID).FirstOrDefault();
             if (_user != null)
             {
                 _user.Email = model.Email;
@@ -100,6 +107,9 @@ namespace Notebook.Business.Managers.Concrete
                 _user.Info = model.Info;
                 _user.Password = model.Password;
                 _user.Lock = model.Lock;
+                _user.CanUploadFile = model.CanUploadFile;
+                _user.SingleFileSize = model.SingleFileSize;
+                _user.TotalFileSize = model.TotalFileSize;
             }
 
             base.Update(_user);

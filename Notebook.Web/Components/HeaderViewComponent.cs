@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Notebook.Business.Managers.Abstract;
 using Notebook.Entities.Entities;
+using Notebook.Web.Models;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Notebook.Web.Components
@@ -9,27 +11,31 @@ namespace Notebook.Web.Components
     public class HeaderViewComponent : ViewComponent
     {
         private IUserManager _userManager;
-        public HeaderViewComponent(IUserManager userManager)
+        private ISettingsManager _settingsManager;
+        public HeaderViewComponent(IUserManager userManager, ISettingsManager settingsManager)
         {
             _userManager = userManager;
+            _settingsManager = settingsManager;
         }
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var user = HttpContext.Session.GetSession<User>("User");
+            var model = new HeaderModel();
 
-            if (user == null)
+            model.User = HttpContext.Session.GetSession<User>("User");
+
+            if (model.User == null)
             {
-                var _user = await _userManager.CookieAsync(HttpContext.Request.Cookies.GetCookies("Notebook"));
+                model.User = _userManager.Cookie(HttpContext.Request.Cookies.GetCookies("Notebook"));
 
-                if (_user != null)
+                if (model.User != null)
                 {
-                    HttpContext.Session.SetSession("User", _user);
-
-                    user = _user;
+                    HttpContext.Session.SetSession("User", model.User);
                 }
             }
 
-            return View(user);
+            model.Settings = await _settingsManager.Table().FirstOrDefaultAsync();
+
+            return View(model);
         }
     }
 }

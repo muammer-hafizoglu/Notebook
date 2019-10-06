@@ -23,7 +23,15 @@
                     <div class="form-group">
                         <label>@Localizer["Visibility"]</label>
                         <div id="private-alert" class="alert alert-info alert-small">
-                           <i class="fa fa-info-circle"></i> @Localizer["Nobody can see the group contents"]
+                            <i class="fa fa-info-circle"></i>
+                            @if (Model.ID == null)
+                            {
+                                @Localizer["Only you can see the group information"]
+                            }
+                            else
+                            {
+                                @Localizer["Only you and group members can see the group information"]
+                            }
                         </div>
                         <div class="checkbox">
                             <label style="padding:0">
@@ -36,16 +44,24 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-group membershipControl">
+                    <div class="form-group membershipControl" style="margin-bottom:0">
                         <label>@Localizer["Membership"]</label>
-                        <div class="checkbox">
+                        <div class="checkbox" style="margin-bottom:0">
                             <label>
-                                @Html.CheckBoxFor(a=>a.IsRequiredApproval) @Localizer["Admin approval required"]
+                                @Html.CheckBoxFor(a => a.IsRequiredApproval) @Localizer["Admin approval required for membership"]
                             </label>
                         </div>
                     </div>
                 </div>
                 <div class="n-modal-footer">
+                    @if (Model.ID == null)
+                    {
+                        <div class="checkbox pull-left">
+                            <label>
+                                <input type="checkbox" name="View" /> @Localizer["Show in timeline"]
+                            </label>
+                        </div>
+                    }
                     <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>
                     <input type="submit" class="btn btn-success  btn-sm" value="@(Model.ID != null ? Localizer["Update"] : Localizer["Add"])" />
                 </div>

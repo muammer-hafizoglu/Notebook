@@ -120,6 +120,9 @@
   <data name="Add" xml:space="preserve">
     <value>Ekle</value>
   </data>
+  <data name="Add File" xml:space="preserve">
+    <value>Dosya Ekle</value>
+  </data>
   <data name="Add Note" xml:space="preserve">
     <value>Not Ekle</value>
   </data>
@@ -135,13 +138,22 @@
   <data name="Open to everyone" xml:space="preserve">
     <value>Herkese açık</value>
   </data>
+  <data name="Show in timeline" xml:space="preserve">
+    <value>Zaman tünelinde göster</value>
+  </data>
   <data name="Tags" xml:space="preserve">
     <value>Etiketler</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Başlık</value>
   </data>
-  <data name="Visiblity" xml:space="preserve">
+  <data name="Update" xml:space="preserve">
+    <value>Güncelle</value>
+  </data>
+  <data name="Visibility" xml:space="preserve">
     <value>Görünürlük</value>
+  </data>
+  <data name="Warning: If the group or folder is private, only the group members can see the note" xml:space="preserve">
+    <value>Uyarı: Eğer grup veya klasör özel ise notu sadece grup üyeleri görebilir</value>
   </data>
 </root>

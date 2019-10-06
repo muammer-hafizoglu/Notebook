@@ -50,7 +50,7 @@
                     </button>
                 </div>
             }
-            else if (Model.Visible != Visible.Private)
+            else
             {
                 if (Model.Status == Status.Member || Model.Status == Status.Manager)
                 {
@@ -63,48 +63,50 @@
                         </button>
                     </div>
                 }
-                else if (Model.Status == Status.Wait)
+                else if (Model.Visible == Visible.Private)
                 {
                     <div class="text-center">
-                        <button class="btn btn-warning btn-sm"
-                                data-type="redirect"
-                                data-url="/@Model.ID/group-detail"
-                                data-action="@Model.ID/exit-group">
-                            <i class="fa fa-close"></i> @Localizer["Request Cancel"]
-                        </button>
-                    </div>
-                }
-                else if (Model.Status == Status.User)
-                {
-                    <div class="text-center">
-                        <button class="btn btn-info btn-sm"
-                                data-type="redirect"
-                                data-url="/@Model.ID/group-detail"
-                                data-action="@Model.ID/join-group">
-                            <i class="fa fa-reply-all"></i> @Localizer["Request to join class"]
-                        </button>
-                    </div>
-                }
-                else if (Model.Status == Status.Blocked)
-                {
-                    <div class="text-center">
-                        <label style="color:red">@Localizer["Blocked"]</label>
+                        <label style="color:orange">@Localizer["This group is closed to membership"]</label>
                     </div>
                 }
                 else
                 {
-                    <div class="text-center">
-                        <a href="/login?ReturnUrl=/@Model.ID/group-detail" style="color:blue"><b>@Localizer["Sign in for to join class"]</b></a>
-                    </div>
+                    if (Model.Status == Status.Wait)
+                    {
+                        <div class="text-center">
+                            <button class="btn btn-warning btn-sm"
+                                    data-type="redirect"
+                                    data-url="/@Model.ID/group-detail"
+                                    data-action="@Model.ID/exit-group">
+                                <i class="fa fa-close"></i> @Localizer["Request Cancel"]
+                            </button>
+                        </div>
+                    }
+                    else if (Model.Status == Status.User)
+                    {
+                        <div class="text-center">
+                            <button class="btn btn-info btn-sm"
+                                    data-type="redirect"
+                                    data-url="/@Model.ID/group-detail"
+                                    data-action="@Model.ID/join-group">
+                                <i class="fa fa-reply-all"></i> @Localizer["Join to class"]
+                            </button>
+                        </div>
+                    }
+                    else if (Model.Status == Status.Blocked)
+                    {
+                        <div class="text-center">
+                            <label style="color:red">@Localizer["Blocked"]</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center">
+                            <a href="/login?ReturnUrl=/@Model.ID/group-detail" style="color:blue"><b>@Localizer["Sign in for to join class"]</b></a>
+                        </div>
+                    }
                 }
             }
-            else
-            {
-                <div class="text-center">
-                    <label style="color:orange">@Localizer["This group is closed to membership"]</label>
-                </div>
-            }
         </div>
-        <!-- /.box-body -->
     </div>
 </div>

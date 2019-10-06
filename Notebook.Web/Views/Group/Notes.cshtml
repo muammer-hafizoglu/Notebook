@@ -21,9 +21,11 @@
             <div class="nav-tabs-custom">
                 @{ await Html.RenderPartialAsync("~/Views/Group/Navigation.cshtml", Model.Navigation);}
 
-                @if (Model.Group.Visible == Visible.Private && Model.Group.Status != Status.Owner)
+                @if (Model.Group.Visible == Visible.Private && !(Model.Group.Status == Status.Owner || Model.Group.Status == Status.Manager || Model.Group.Status == Status.Member))
                 {
-                    <div class="alert alert-warning" style="margin-top:10px">@Localizer["This group is private"]</div>
+                    <div class="alert">
+                        <i class="fa fa-lock"></i>  @Localizer["Only group members can see"]
+                    </div>
                 }
                 else if (Model.Group.Status == Status.Blocked)
                 {
@@ -55,29 +57,21 @@
                                     var owner = item.Users.FirstOrDefault(a => a.Status == Status.Owner).User;
 
                                     <div class="col-md-12">
-                                        <div class="model-card" style="background:@(item.Visible == Visible.Private ? "#fff0db" : "inherit")">
+                                        <div class="model-card" style="padding:10px;">
                                             <div class="model-card-header">
                                                 <small>
-                                                    <i class="fa fa-calendar"></i> @item.CreateDate.ToString("F")
+                                                    <i class="fa fa-clock-o"></i> @item.CreateDate.ToString("F")
                                                 </small>
                                             </div>
                                             <div class="model-card-body">
-                                                <img src="/notebook/images/n.png" class="img-circle model-card-img">
-                                                <a href="/@item.ID/note-detail" class="model-card-title" style="font-size:15px;">
-                                                    @item.Title
-                                                </a><br />
-                                                <small>
-                                                    @Html.Raw((!string.IsNullOrEmpty(item.Explanation) && item.Explanation.Length > 500) ? item.Explanation.Substring(0, 500) : item.Explanation)
-                                                </small>
-                                            </div>
-                                            <div class="model-card-footer">
-                                                <div class="pull-left">
-                                                    <a href="/@owner.Username" style="color:#ff6a00"><i class="fa fa-user"></i> @owner.Name</a>
-                                                </div>
-                                                <div class="pull-right">
-                                                    <a href="/@item.ID/note-detail" style="color:cornflowerblue">@Localizer["Read more"] ...</a>
+                                                <img src="/notebook/images/n.png" class="img-circle" style="height:30px; margin-right:5px">
+                                                <a href="/@item.ID/note-detail" class="model-card-title">@item.Title</a>
+                                                <br />
+                                                <div style="margin-top:10px">
+                                                    <a href="/@owner.Username" style="color:#777"><i class="fa fa-user"></i> @owner.Name</a>
                                                 </div>
                                             </div>
+                                            
                                         </div>
 
                                     </div>

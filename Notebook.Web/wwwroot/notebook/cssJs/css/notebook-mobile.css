@@ -26,6 +26,10 @@
         margin-top: auto;
         width: 150px;
     }
+
+    table{
+        width:350px !important;
+    }
 }
 
 @media (min-width: 768px) {

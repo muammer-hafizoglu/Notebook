@@ -1,0 +1,32 @@
+﻿@model List<Calendar>
+
+@inject IViewLocalizer Localizer
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        <div class="c-event">
+            <b class="c-event-date">
+                <i class="fa fa-calendar-o"></i>&nbsp;&nbsp;@item.Start.ToString("dd MMMM yyyy HH:mm") @(item.Finish.Year >= 2019 ? " & " + item.Finish.ToString("dd MMMM yyyy HH:mm") : "")
+                @if (!string.IsNullOrEmpty(item.Location))
+                {
+                    <b class="label label-primary" style="font-size:85%">
+                        <i class="fa fa-map-marker"></i> @item.Location
+                    </b>
+                }
+            </b>
+            <div class="pull-right">
+                <button class="btn btn-xx btn-warning" onclick="deleteEvent('@item.ID')">
+                    <i class="fa fa-times" title="@Localizer["Delete"]"></i>
+                </button>
+            </div><br />
+            <label class="c-event-title">
+                @item.Title
+            </label><br />
+            <label class="c-event-content">
+                @item.Content
+            </label>
+        </div>
+    }
+}

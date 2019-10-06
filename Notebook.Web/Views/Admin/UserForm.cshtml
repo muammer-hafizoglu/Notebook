@@ -6,6 +6,8 @@
     <div class="n-modal-dialog">
         <form action="@(Model.ID != null ? "/editUser" : "/addUser")" method="post">
             @Html.AntiForgeryToken()
+            @Html.HiddenFor(a => a.ID)
+            @Html.HiddenFor(a => a.Password)
 
             <div class="n-modal-content">
                 <div class="n-modal-header">
@@ -13,34 +15,82 @@
                     <label class="n-modal-title">@(Model.ID != null ? Localizer["Edit User"] : Localizer["Add User"])</label>
                 </div>
                 <div class="n-modal-body">
-                    <div class="form-group">
-                        @Html.HiddenFor(a => a.ID)
-                        @Html.HiddenFor(a => a.Password)
-                        <input type="text" class="form-control" name="Name" required value="@Model.Name" placeholder="@Localizer["Name"]" />
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" name="Username" value="@Model.Username" placeholder="@Localizer["Username"]" />
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" name="Email" value="@Model.Email" placeholder="@Localizer["Email"]" />
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" name="NewPassword" placeholder="@Localizer["New password"]" />
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <label>
-                                @Html.CheckBoxFor(a => a.Lock) @Localizer["Lock"]
-                            </label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>@Localizer["Name"]</label>
+                                <input type="text" class="form-control" name="Name" required value="@Model.Name" placeholder="@Localizer["Name"]" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group membershipControl">
-                        <div class="checkbox">
-                            <label>
-                                @Html.CheckBoxFor(a => a.Approve) @Localizer["Active"]
-                            </label>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>@Localizer["Username"]</label>
+                                <input type="text" class="form-control" name="Username" value="@Model.Username" placeholder="@Localizer["Username"]" />
+                            </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>@Localizer["Email"]</label>
+                                <input type="text" class="form-control" name="Email" value="@Model.Email" placeholder="@Localizer["Email"]" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>@Localizer["New Password"]</label>
+                                <input type="text" class="form-control" name="NewPassword" placeholder="@Localizer["New password"]" />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>@Localizer["File Upload Settings"]</label>
+                                <div class="row">
+                                    <div class="col-xs-4" style="padding-right:0">
+                                        <input type="number" class="form-control" name="TotalFileSize" value="@Model.TotalFileSize" placeholder="@Localizer["Total size"]" />
+                                    </div>
+                                    <div class="col-xs-4" style="padding-right:0">
+                                        <input type="number" class="form-control" name="SingleFileSize" value="@Model.SingleFileSize" placeholder="@Localizer["Single size"]" />
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <div class="checkbox">
+                                            <label>
+                                                @Html.CheckBoxFor(a => a.CanUploadFile) @Localizer["Active"]
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>@Localizer["Profile"]</label>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBoxFor(a => a.Lock) @Localizer["Lock"]
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>@Localizer["State"]</label>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBoxFor(a => a.Approve) @Localizer["Active"]
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                        </div>
+
                     </div>
+
+
+
+
+
+
                 </div>
                 <div class="n-modal-footer">
                     <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>

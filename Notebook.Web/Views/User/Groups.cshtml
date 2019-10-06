@@ -2,13 +2,10 @@
 
 @inject IViewLocalizer Localizer
 
-@{
-    var activeUser = Context.Session.GetSession<User>("User");
-}
-
-
-@if (Model.User != null)
+@if (Model != null)
 {
+    var activeUser = Context.Session.GetSession<User>("User");
+
     <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-home"></i> @Localizer["Home"]</a></li>
         <li><a href="/@Model.User.Username">@Model.User.Name</a></li>
@@ -16,85 +13,88 @@
     </ol>
     <div class="row">
         @{ await Html.RenderPartialAsync("~/Views/User/UserInfo.cshtml", Model.User);}
-        <!-- /.col -->
-        <div class="col-md-9">
-            <div class="nav-tabs-custom">
-                @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
 
-                @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
-                {
-                    <div class="tab-content">
-                        <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
-                        <p>@Localizer["Follow to see this user's posts"]</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="tab-content">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="box-header with-border">
-                                    <h3 class="box-title">@Localizer["Group List"]</h3>
-                                    @if (Model.User.Status == Status.Owner)
-                                    {
-                                        <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-group">
-                                            <i class="fa fa-clone"></i>&nbsp;@Localizer["Add Group"]
-                                        </button>
-                                    }
-                                </div>
+        @if (Model.User.Status != Status.Blocked)
+        {
+            <div class="col-md-9">
+                <div class="nav-tabs-custom">
+                    @{ await Html.RenderPartialAsync("~/Views/User/Navigation.cshtml", Model.Navigation);}
 
-                                @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
-                            </div>
+                    @if (Model.User.Lock && !(Model.User.Status == Status.Owner || Model.User.Status == Status.Follow))
+                    {
+                        <div class="tab-content">
+                            <h3 style="font-size:16px; font-weight:bold">@Localizer["This user's account is locked"]</h3>
+                            <p>@Localizer["Follow to see this user's posts"]</p>
                         </div>
-                        <div class="row">
-                            @if (Model.Data != null)
-                            {
-                                foreach (var item in Model.Data.Datalist as List<UserGroup>)
-                                {
-                                    <div class="col-md-4 col-sm-6">
-                                        <div class="model-card">
-                                            <div class="row">
-                                                <div class="col-xs-4 text-center" style="padding:0px 10px 0 10px">
+                    }
+                    else
+                    {
+                        <div class="tab-content">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">@Localizer["Group List"]</h3>
+                                        @if (Model.User.Status == Status.Owner)
+                                        {
+                                            <button class="btn btn-xs btn-success pull-right" data-type="modal" data-action="add-group">
+                                                <i class="fa fa-th-large" style="color:white"></i>&nbsp;@Localizer["Add Group"]
+                                            </button>
+                                        }
+                                    </div>
 
-                                                    <a href="/@item.Group.ID/group-detail" class="model-card-title">
-                                                        <i class="fa fa-clone" style="font-size:60px; color:#3C8DBC;"></i>
-                                                    </a>
-                                                </div>
-                                                <div class="col-xs-8" style="padding-left:0">
-                                                    <a href="/@item.Group.ID/group-detail" class="model-card-title">
-                                                        @Html.Raw(item.Group.Visible == Visible.Private ? "<i class='fa fa-lock'></i>" : "")
-                                                        @(item.Group.Name.Length > 17 ? item.Group.Name.Substring(0, 17) + "..." : item.Group.Name)
-                                                    </a>
-                                                    <hr style="margin:5px 0" />
-                                                    <div class="row">
-                                                        <div class="col-xs-4 text-center">
-                                                            <small style="color:#808080">@Localizer["Members"]</small><br />
-                                                            <b>@item.Group.Users.Where(a => a.Status == Status.Member || a.Status == Status.Manager).Count()</b>
+                                    @{ await Html.RenderPartialAsync("~/Views/Shared/Plugins/Filter.cshtml", Model.Data);}
+                                </div>
+                            </div>
+                            <div class="row">
+                                @if (Model.Data != null)
+                                {
+                                    foreach (var item in Model.Data.Datalist as List<UserGroup>)
+                                    {
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="model-card">
+                                                        <div class="col-md-3 text-center" style="padding:0">
+                                                            @*<img src="/notebook/images/g.png" class="img-circle" style="height:50px" />*@
+                                                            <i class="fa fa-th-large" style="font-size:50px; margin-top:-2px"></i>
                                                         </div>
-                                                        <div class="col-xs-4 text-center">
-                                                            <small style="color:#808080">@Localizer["Folders"]</small><br />
-                                                            <b>@item.Group.Folders.Count</b>
-                                                        </div>
-                                                        <div class="col-xs-4 text-center">
-                                                            <small style="color:#808080">@Localizer["Notes"]</small><br />
-                                                            <b>@item.Group.Notes.Count</b>
+                                                        <div class="col-md-9" style="padding:0 10px">
+                                                            @if (item.Group.Visible == Visible.Private &&
+                                                         !item.Group.Users.Any(a => a.UserID == activeUser?.ID && (a.Status == Status.Owner || a.Status == Status.Manager || a.Status == Status.Member)))
+                                                            {
+                                                                <br /><i class="fa fa-lock"></i> @Localizer["Private Group"]
+                                                            }
+                                                            else
+                                                            {
+                                                                <label class="label label-@(item.Group.Visible == Visible.Private ? "danger" : "success")">@Localizer[item.Group.Visible.ToString()]</label>
+                                                                <small class="pull-right" style="margin-top:1px; color:#999">
+                                                                    <i class="fa fa-clock-o"></i> @item.Group.CreateDate.ToString("dd MMMM yyyy")
+                                                                </small>
+                                                                <hr style="margin:5px 0 0px; border-top:0" />
+                                                                <a href="/@item.Group.ID/group-detail" class="model-card-title">
+                                                                    @(item.Group.Name.Length > 17 ? item.Group.Name.Substring(0, 17) + "..." : item.Group.Name)
+                                                                </a>
+                                                                <br />
+                                                                <a href="/@item.User.Username" style=" color:#777;">@item.User.Name</a>
+                                                            }
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    }
                                 }
-                            }
+                            </div>
+                            <div class="box-footer">
+                                @Localizer["Total"]: @Model.Data.TotalData
+                                @Html.Raw(Model.Data.Pagination)
+                            </div>
                         </div>
-                        <div class="box-footer">
-                            @Localizer["Total"]: @Model.Data.TotalData
-                            @Html.Raw(Model.Data.Pagination)
-                        </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-        </div>
+        }
+
     </div>
 }
 else

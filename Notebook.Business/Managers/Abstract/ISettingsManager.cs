@@ -6,6 +6,6 @@ namespace Notebook.Business.Managers.Abstract
 {
     public interface ISettingsManager : IManager<Settings>
     {
-
+        Settings GetSettings();
     }
 }

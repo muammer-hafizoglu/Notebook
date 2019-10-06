@@ -1,0 +1,110 @@
+﻿@model List<FileModel>
+
+@inject IViewLocalizer Localizer
+
+<link href="/notebook/cssJs/css/document.css" rel="stylesheet" />
+
+@{
+    var user = Context.Session.GetSession<User>("User");
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="file-manager">
+                        <h5>@Localizer["Folders"]</h5>
+                        <ul class="folder-list" style="padding: 0">
+                            <li><a href=""><i class="fa fa-folder"></i> @Localizer["Files"]</a></li>
+                            <li><a href=""><i class="fa fa-folder"></i> @Localizer["Pictures"]</a></li>
+                            <li><a href=""><i class="fa fa-folder"></i> @Localizer["Films"]</a></li>
+                            <li><a href=""><i class="fa fa-folder"></i> @Localizer["Books"]</a></li>
+                        </ul>
+                        <br />
+                        <h5>@Localizer["Upload File"]</h5>
+                        <form action="/add-document" method="post" enctype="multipart/form-data">
+                            <input id="fileUpload" type="file" name="file" accept=".doc,.docx,.png,.jpeg,.jpg,.pdf" />
+                            <button type="submit" class="btn btn-success btn-sm btn-block btn-file-upload hide" style="margin-top:10px">
+                                <i class="fa fa-file-pdf-o"></i> @Localizer["Upload"]
+                            </button>
+                        </form>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 animated fadeInRight">
+            <div class="row">
+                <div class="col-md-12" style="padding:0 10px; margin-bottom:15px">
+                    <div class="box-header" style="background:white">
+                        @{ 
+                            float lenght = Model.Sum(a => a.Length);
+                        }
+
+                        @Localizer["Document"]: @Model.Count() & @Localizer["Lenght"]: @lenght.ToString("0.00") (MB) / @user.TotalFileSize (MB)
+                    </div>
+                </div>
+                @if (Model != null && Model.Count > 0)
+                {
+                    string imageExtension = ".jpg,.png,.jpeg";
+
+                    foreach (var item in Model.OrderByDescending(a => a.LastModified))
+                    {
+                        <div class="col-md-3" style="padding:0 10px; margin-bottom:15px">
+                            <div class="file">
+                                <span class="corner"></span>
+
+                                @if (imageExtension.Contains(item.Extension))
+                                {
+                                    <a href="@item.Path" target="_blank">
+                                        <div class="image">
+                                            <img alt="image" class="img-responsive" src="@item.Path">
+                                        </div>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="@item.Path" target="_blank">
+                                        <div class="icon">
+                                            <i class="fa fa-file"></i>
+                                        </div>
+                                    </a>
+                                }
+
+                                <div class="file-name">
+                                    @((item.Name.Length > 18 ? item.Name.Substring(0, 15) + "... " : item.Name) + item.Extension)
+                                    <br>
+                                    <small>@item.LastModified.ToString("dd MMMM yyyy")</small>
+                                    <small class="pull-right" style="margin-top:3px">@item.Length.ToString("0.00") (MB)</small>
+                                    <hr style="margin:5px 0" />
+                                    <button class="btn btn-default btn-xx" onclick="$alert('','@item.Path')">
+                                        <i class="fa fa-copy"></i> @Localizer["Show Url"]
+                                    </button>
+                                    <form action="/delete-document?Url=@item.Path" method="post">
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit" class="btn btn-danger btn-xx pull-right" style="margin-top:-18px" data-type="reload" data-action="">
+                                            <i class="fa fa-trash"></i> @Localizer["Delete"]
+                                        </button>
+                                    </form>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <input id="path" type="text" class="hide" value="" />
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{ 
+<script>
+    $("#fileUpload").on("change", function () {
+        $(".btn-file-upload").removeClass("hide");
+    })
+</script>
+}

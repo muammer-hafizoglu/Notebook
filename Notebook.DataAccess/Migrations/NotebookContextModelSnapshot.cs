@@ -17,6 +17,60 @@ namespace Notebook.DataAccess.Migrations
                 .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("Notebook.Entities.Entities.Calendar", b =>
+                {
+                    b.Property<string>("ID")
+                        .HasMaxLength(8);
+
+                    b.Property<string>("Content");
+
+                    b.Property<DateTime>("Finish");
+
+                    b.Property<string>("Location");
+
+                    b.Property<DateTime>("Start");
+
+                    b.Property<string>("Title");
+
+                    b.Property<string>("UserID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Calendar");
+                });
+
+            modelBuilder.Entity("Notebook.Entities.Entities.Event", b =>
+                {
+                    b.Property<string>("ID")
+                        .HasMaxLength(8);
+
+                    b.Property<DateTime>("CreateDate");
+
+                    b.Property<string>("Explation");
+
+                    b.Property<int>("Operation");
+
+                    b.Property<string>("ProductID");
+
+                    b.Property<string>("ProductName");
+
+                    b.Property<int>("Type");
+
+                    b.Property<string>("Url");
+
+                    b.Property<string>("UserID");
+
+                    b.Property<bool>("View");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Event");
+                });
+
             modelBuilder.Entity("Notebook.Entities.Entities.Folder", b =>
                 {
                     b.Property<string>("ID")
@@ -142,6 +196,30 @@ namespace Notebook.DataAccess.Migrations
                     b.ToTable("Note");
                 });
 
+            modelBuilder.Entity("Notebook.Entities.Entities.Notification", b =>
+                {
+                    b.Property<string>("ID")
+                        .HasMaxLength(8);
+
+                    b.Property<string>("Content");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<bool>("IsView");
+
+                    b.Property<string>("Title");
+
+                    b.Property<string>("Url");
+
+                    b.Property<string>("UserID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Notification");
+                });
+
             modelBuilder.Entity("Notebook.Entities.Entities.Permission", b =>
                 {
                     b.Property<string>("ID")
@@ -184,6 +262,8 @@ namespace Notebook.DataAccess.Migrations
                 {
                     b.Property<string>("ID")
                         .HasMaxLength(8);
+
+                    b.Property<string>("AcceptedFileTypes");
 
                     b.Property<string>("Address");
 
@@ -266,6 +346,8 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<string>("Avatar");
 
+                    b.Property<bool>("CanUploadFile");
+
                     b.Property<DateTime>("CreateDate");
 
                     b.Property<string>("Email");
@@ -282,6 +364,10 @@ namespace Notebook.DataAccess.Migrations
 
                     b.Property<string>("RoleID");
 
+                    b.Property<string>("SingleFileSize");
+
+                    b.Property<string>("TotalFileSize");
+
                     b.Property<string>("Username");
 
                     b.HasKey("ID");
@@ -296,12 +382,15 @@ namespace Notebook.DataAccess.Migrations
                             ID = "23m454h5",
                             Approve = true,
                             Avatar = "/notebook/images/avatar.png",
-                            CreateDate = new DateTime(2019, 9, 9, 18, 43, 38, 53, DateTimeKind.Local).AddTicks(1538),
+                            CanUploadFile = true,
+                            CreateDate = new DateTime(2019, 10, 5, 18, 32, 20, 20, DateTimeKind.Local).AddTicks(8742),
                             Email = "mhaf69@gmail.com",
-                            LastActiveDate = new DateTime(2019, 9, 9, 18, 43, 38, 55, DateTimeKind.Local).AddTicks(3871),
+                            LastActiveDate = new DateTime(2019, 10, 5, 18, 32, 20, 22, DateTimeKind.Local).AddTicks(5508),
                             Lock = false,
                             Name = "Muammer Hafızoğlu",
                             Password = "D3CE20FCCBE7D116ECD0",
+                            SingleFileSize = "9999999999999",
+                            TotalFileSize = "999999999999999",
                             Username = "muammer.hafizoglu"
                         });
                 });
@@ -369,6 +458,22 @@ namespace Notebook.DataAccess.Migrations
                     b.ToTable("UserSettings");
                 });
 
+            modelBuilder.Entity("Notebook.Entities.Entities.Calendar", b =>
+                {
+                    b.HasOne("Notebook.Entities.Entities.User", "User")
+                        .WithMany("Calendars")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Notebook.Entities.Entities.Event", b =>
+                {
+                    b.HasOne("Notebook.Entities.Entities.User", "User")
+                        .WithMany("Events")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Notebook.Entities.Entities.Folder", b =>
                 {
                     b.HasOne("Notebook.Entities.Entities.Group", "Group")
@@ -401,6 +506,13 @@ namespace Notebook.DataAccess.Migrations
                         .WithMany("Notes")
                         .HasForeignKey("GroupID")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Notebook.Entities.Entities.Notification", b =>
+                {
+                    b.HasOne("Notebook.Entities.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("Notebook.Entities.Entities.User", b =>

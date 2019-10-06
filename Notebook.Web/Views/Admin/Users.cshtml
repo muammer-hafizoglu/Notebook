@@ -79,10 +79,10 @@
                                                     </a>
                                                     <small class="block text-muted" style="font-size:80%">@item.CreateDate.ToShortDateString()</small><br />
                                                     
-                                                    <a class="btn btn-xs btn-primary m-t-xs" style="margin-top:5px" data-type="modal" data-method="get" data-action="edit-user/@item.ID">
+                                                    <a class="btn btn-xs btn-primary m-t-xs" style="margin-top:5px" data-type="modal" data-method="get" data-action="@item.ID/edit-user">
                                                         <i class="fa fa-edit"></i>
                                                     </a>
-                                                    <a class="btn btn-xs btn-danger m-t-xs" style="margin-top:5px" data-type="modal" data-action="delete-user/@item.ID">
+                                                    <a class="btn btn-xs btn-danger m-t-xs" style="margin-top:5px" data-type="reload" data-action="@item.ID/delete-user">
                                                         <i class="fa fa-trash"></i>
                                                     </a>
                                                 </div>

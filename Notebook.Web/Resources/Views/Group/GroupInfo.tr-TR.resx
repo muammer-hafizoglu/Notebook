@@ -135,6 +135,9 @@
   <data name="Folders" xml:space="preserve">
     <value>Klasörler</value>
   </data>
+  <data name="Join to class" xml:space="preserve">
+    <value>Sınıfa katıl</value>
+  </data>
   <data name="Members" xml:space="preserve">
     <value>Üyeler</value>
   </data>
@@ -149,9 +152,6 @@
   </data>
   <data name="Request Cancel" xml:space="preserve">
     <value>İsteği iptal et</value>
-  </data>
-  <data name="Request to join class" xml:space="preserve">
-    <value>Katılmak için istek gönder</value>
   </data>
   <data name="Sign in for to join class" xml:space="preserve">
     <value>Katılmak için oturum açınız</value>

@@ -2,7 +2,6 @@
 
 @inject IViewLocalizer Localizer
 
-<link href="/adminlte/components/summernote/summernote.css" rel="stylesheet" />
 <style>
     .modal-large {
         width: 100%;
@@ -19,11 +18,19 @@
     button.close {
         display: none;
     }
+
+    ul, ol {
+        padding-left: 20px
+    }
+
+    a[title="Sunucuya Gözat"] {
+        margin-top: 20px !important;
+    }
 </style>
 
 <div id="modal" class="n-modal" role="dialog">
     <div class="n-modal-dialog">
-        <form action="@(Model.ID != null ? "/editNote" : "/addNote")" method="post">
+        <form action="@(Model.ID != null ? "/editNote" : "/addNote")" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
 
             <div class="n-modal-content n-modal-lg">
@@ -43,7 +50,11 @@
                         <input type="text" class="form-control" name="Explanation" value="@Model.Explanation" placeholder="@Localizer["Explanation"]" />
                     </div>
                     <div class="form-group">
-                        <textarea name="Content" class="form-control summernote" required>@Model.Content</textarea>
+                        <textarea name="Content" class="form-control editor" required>@Model.Content</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>@Localizer["Add File"]</label>
+                        <input type="file" name="File" />
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" name="Tags" value="@Model.Tags" placeholder="@Localizer["Tags"]" />
@@ -61,8 +72,17 @@
                             </label>
                         </div>
                     </div>
+                    <label style="color:orange; font-size:12px;">@Localizer["Warning: If the group or folder is private, only the group members can see the note"]</label>
                 </div>
                 <div class="n-modal-footer">
+                    @if (Model.ID == null)
+                    {
+                        <div class="checkbox pull-left">
+                            <label>
+                                <input type="checkbox" name="View" /> @Localizer["Show in timeline"]
+                            </label>
+                        </div>
+                    }
                     <button type="button" class="btn btn-default btn-sm" onclick="closeModal()">@Localizer["Close"]</button>
                     <input type="submit" class="btn btn-success  btn-sm" value="@(Model.ID != null ? Localizer["Update"] : Localizer["Add"])" />
                 </div>
@@ -72,23 +92,25 @@
 </div>
 
 
-<script src="/adminlte/components/summernote/summernote.min.js"></script>
-<script>
-    $(".summernote").summernote({
-        height: 400,
-        placeholder: '@Localizer["Content"] ...',
-        toolbar: [
-            ['style', ['style']],
-            ['fontsize', ['fontsize']],
-            ['font', ['bold', 'italic', 'underline', 'clear']],
-            ['fontname', ['fontname']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['height', ['height']],
-            ['table', ['table']],
-            ['insert', ['link', 'picture', 'hr']],
-            ['view', ['fullscreen', 'codeview']],
-            ['help', ['help']]
-        ]
-    });
-</script>
+<script src="/adminlte/components/ckeditor/ckeditor.js"></script>
+
+@if (ViewBag.FileUpload)
+{
+    <script>
+        CKEDITOR.replace('Content', {
+            filebrowserBrowseUrl: '/get-file',
+            filebrowserImageBrowseUrl: '/get-file',
+            filebrowserUploadUrl: '/add-file',
+            filebrowserImageUploadUrl: '/add-file',
+            filebrowserWindowWidth: '800',
+            filebrowserWindowHeight: '500'
+        });
+    </script>
+}
+else
+{
+    <script>
+        CKEDITOR.replace('Content', {});
+    </script>
+}
+
